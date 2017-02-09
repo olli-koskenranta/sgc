@@ -63,8 +63,8 @@ public class GameControlScript : MonoBehaviour {
     public Turret PlasmaTurret;
     public bool[] WeaponUnlocked;
     public string[] WeaponNames = new string[] { "Blaster", "Pulse Laser", "Mass Driver", "Plasma" };
-    public int[] WeaponUpgradeCosts = new int[] { 1000, 5000, 10000, 20000 };
-    public int[] WeaponUpgradeRMCosts = new int[] { 1, 5, 10, 20 };
+    public int[] WeaponUpgradeCosts;
+    public int[] WeaponUpgradeRMCosts;
 
     //Preferences
     public bool AUDIO_SOUNDS = false;
@@ -114,6 +114,8 @@ public class GameControlScript : MonoBehaviour {
     void Start()
     {
         //Debug.Log("GameControl START()!");
+        WeaponUpgradeCosts = new int[] { 1000, 5000, 10000, 20000 };
+        WeaponUpgradeRMCosts = new int[] { 0, 5, 10, 20 };
         WeaponScrapCost = new int[numberOfWeapons] { 0, 20000, 100000, 1000000 };
         WeaponRMCost = new int[numberOfWeapons] { 0, 1, 5, 50 };
         Experience = new int[numberOfWeapons];
@@ -242,7 +244,12 @@ public class GameControlScript : MonoBehaviour {
         Debug.Log("Player data RESET!");
         LoadData();
         SaveData();
-        
+
+        for (int i = 0; i < Weapons.Length; i++)
+        {
+            Weapons[i].UpdateValues(i);
+        }
+
     }
 
     public void ClearArrays()
@@ -252,6 +259,22 @@ public class GameControlScript : MonoBehaviour {
         Array.Clear(Experience, 0, Experience.Length);
         Array.Clear(WeaponUpgradePointsTotal, 0, WeaponUpgradePointsTotal.Length);
         Array.Clear(WeaponUpgradePointsAvailable, 0, WeaponUpgradePointsAvailable.Length);
+    }
+
+    public int UpgradePointCost(int type)
+    {
+        if (type == 0)
+        {
+            int scrapCost = WeaponUpgradeCosts[SelectedWeapon] + WeaponUpgradeCosts[SelectedWeapon] * WeaponUpgradePointsTotal[SelectedWeapon];
+            return scrapCost;
+        }
+        else if (type == 1)
+        {
+            int RMCost = WeaponUpgradeRMCosts[SelectedWeapon] + WeaponUpgradeRMCosts[SelectedWeapon] * WeaponUpgradePointsTotal[SelectedWeapon];
+            return RMCost;
+        }
+        else
+            return 0;
     }
 
     private PlayerData GetPlayerData(bool ResetData = false)

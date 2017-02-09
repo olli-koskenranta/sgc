@@ -11,9 +11,6 @@ public class UIControlScript : MonoBehaviour {
         GameObject canvas;
         canvas = GameObject.Find("Canvas");
         LoadingText = canvas.transform.FindChild("LoadingText").gameObject;
-        //LoadingText = GameObject.Find("/Canvas/LoadingText");
-        //if (LoadingText == null)
-        //    Debug.Log("LoadingText null!");
         LoadingText.GetComponent<Text>().enabled = false;
     }
     public void PlayGameClicked()
@@ -31,13 +28,10 @@ public class UIControlScript : MonoBehaviour {
 
     public void ReturnToBaseClicked()
     {
-        //GameObject canvas;
-        //canvas = GameObject.Find("Canvas");
-        //LoadingText = canvas.transform.FindChild("LoadingText").gameObject;
+        GameObject canvas;
+        canvas = GameObject.Find("Canvas");
+        LoadingText = canvas.transform.FindChild("LoadingText").gameObject;
 
-        //LoadingText = GameObject.Find("/Canvas/LoadingText");
-        //if (LoadingText == null)
-        //    Debug.Log("LoadingText null!");
         LoadingText.GetComponent<Text>().enabled = true;
         GameControlScript.gameControl.SaveData();
         GameControlScript.gameControl.currentLevel = 1;
@@ -47,9 +41,6 @@ public class UIControlScript : MonoBehaviour {
 
     public void ArmoryPlayClicked()
     {
-        //GameObject canvas;
-        //canvas = GameObject.Find("Canvas");
-        //LoadingText = canvas.transform.FindChild("LoadingText").gameObject;
         LoadingText.GetComponent<Text>().enabled = true;
         GameControlScript.gameControl.SaveData();
         SceneManager.LoadScene("GameWorld1");
@@ -57,9 +48,6 @@ public class UIControlScript : MonoBehaviour {
 
     public void ArmoryExitClicked()
     {
-        //GameObject canvas;
-        //canvas = GameObject.Find("Canvas");
-        //LoadingText = canvas.transform.FindChild("LoadingText").gameObject;
         LoadingText.GetComponent<Text>().enabled = true;
         GameControlScript.gameControl.SaveData();
         SceneManager.LoadScene("MainMenu");
@@ -114,7 +102,7 @@ public class UIControlScript : MonoBehaviour {
         if (SceneManager.GetActiveScene().name == "GameWorld1")
         {
             GameObject canvas;
-            canvas = GameObject.Find("Canvas");// as GameObject;
+            canvas = GameObject.Find("Canvas");
             canvas.transform.FindChild("BossHPBG").gameObject.SetActive(value);
             canvas.transform.FindChild("BossHP").gameObject.SetActive(value);
             canvas.transform.FindChild("BossText").gameObject.SetActive(value);
@@ -123,10 +111,8 @@ public class UIControlScript : MonoBehaviour {
 
     public void BuyPointsClicked()
     {
-        int scrapCost = GameControlScript.gameControl.WeaponUpgradeCosts[GameControlScript.gameControl.SelectedWeapon]
-            + GameControlScript.gameControl.WeaponUpgradeCosts[GameControlScript.gameControl.SelectedWeapon] * GameControlScript.gameControl.WeaponUpgradePointsTotal[GameControlScript.gameControl.SelectedWeapon];
-        int RMCost = GameControlScript.gameControl.WeaponUpgradeRMCosts[GameControlScript.gameControl.SelectedWeapon]
-            + GameControlScript.gameControl.WeaponUpgradeRMCosts[GameControlScript.gameControl.SelectedWeapon] * GameControlScript.gameControl.WeaponUpgradePointsTotal[GameControlScript.gameControl.SelectedWeapon];
+        int scrapCost = GameControlScript.gameControl.UpgradePointCost(0);
+        int RMCost = GameControlScript.gameControl.UpgradePointCost(1);
 
         if (GameControlScript.gameControl.scrapCount >= scrapCost && GameControlScript.gameControl.researchMaterialCount >= RMCost)
         {

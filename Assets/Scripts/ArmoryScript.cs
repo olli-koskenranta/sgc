@@ -13,7 +13,7 @@ public class ArmoryScript : MonoBehaviour {
     public Button selectWeapon2;
     public Button zonePlus;
     public Button zoneMinus;
-    
+    public Button btnBuyPoints;
 
     public Slider[] upgradeSliders = new Slider[6];
 
@@ -64,7 +64,8 @@ public class ArmoryScript : MonoBehaviour {
         zonePlus.GetComponentInChildren<Text>().text = "Start Zone+";
         zoneMinus.GetComponentInChildren<Text>().text = "Start Zone-";
 
-        textUpgPoints.text = GameControlScript.gameControl.WeaponNames[GameControlScript.gameControl.SelectedWeapon] + " Upgrade Points: " + GameControlScript.gameControl.WeaponUpgradePointsTotal[GameControlScript.gameControl.SelectedWeapon].ToString();
+        textUpgPoints.text = GameControlScript.gameControl.WeaponNames[GameControlScript.gameControl.SelectedWeapon] + " Upgrade Points: " + UpgPointsAvailable().ToString();
+        btnBuyPoints.GetComponentInChildren<Text>().text = "Buy Points\n" + GameControlScript.gameControl.UpgradePointCost(0).ToString() + "S/" + GameControlScript.gameControl.UpgradePointCost(1).ToString() + "RM";
 
 
         //GameControlScript.gameControl.UpdatePlayerAttributes();
@@ -92,11 +93,26 @@ public class ArmoryScript : MonoBehaviour {
 
     public void PlusUpgradeClicked(int sliderNumber)
     {
-        upgradeSliders[sliderNumber].value += 1;
+
+        if (UpgPointsAvailable() > 0)
+        {
+            upgradeSliders[sliderNumber].value += 1;
+        }
     }
 
     public void MinusUpgradeClicked(int sliderNumber)
     {
         upgradeSliders[sliderNumber].value -= 1;
+    }
+
+    private int UpgPointsAvailable()
+    {
+        int usedPoints = 0;
+        foreach (Slider slider in upgradeSliders)
+        {
+            usedPoints += (int)slider.value;
+        }
+        int availablePoints = GameControlScript.gameControl.WeaponUpgradePointsTotal[GameControlScript.gameControl.SelectedWeapon] - usedPoints;
+        return availablePoints;
     }
 }
