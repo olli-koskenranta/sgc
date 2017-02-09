@@ -1,0 +1,32 @@
+Initialize engine version: 5.4.2f2 (b7e030c65c9b)
+GfxDevice: creating device client; threaded=1
+Direct3D:
+    Version:  Direct3D 11.0 [level 11.0]
+    Renderer: NVIDIA GeForce GTX 1070 (ID=0x1b81)
+    Vendor:   NVIDIA
+    VRAM:     3072 MB
+Begin MonoManager ReloadAssembly
+Platform assembly: D:\Unity\SGC\SGC_Data\Managed\UnityEngine.dll (this message is harmless)
+Loading D:\Unity\SGC\SGC_Data\Managed\UnityEngine.dll into Unity Child Domain
+Platform assembly: D:\Unity\SGC\SGC_Data\Managed\Assembly-CSharp.dll (this message is harmless)
+Loading D:\Unity\SGC\SGC_Data\Managed\Assembly-CSharp.dll into Unity Child Domain
+Platform assembly: D:\Unity\SGC\SGC_Data\Managed\UnityEngine.UI.dll (this message is harmless)
+Loading D:\Unity\SGC\SGC_Data\Managed\UnityEngine.UI.dll into Unity Child Domain
+Platform assembly: D:\Unity\SGC\SGC_Data\Managed\UnityEngine.Networking.dll (this message is harmless)
+Loading D:\Unity\SGC\SGC_Data\Managed\UnityEngine.Networking.dll into Unity Child Domain
+- Completed reload, in  0.052 seconds
+Platform assembly: D:\Unity\SGC\SGC_Data\Managed\System.Core.dll (this message is harmless)
+Platform assembly: D:\Unity\SGC\SGC_Data\Managed\System.dll (this message is harmless)
+desktop: 1920x1080 60Hz; virtual: 1920x2280 at 0,-1200
+<RI> Initializing input.
+<RI> Input initialized.
+<RI> Initialized touch support.
+UnloadTime: 0.918777 ms
+Unloading 5 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 4.249988 ms
+
+Unloading 6 unused Assets to reduce memory usage. Loaded Objects now: 255.
+Total: 0.176120 ms (FindLiveObjects: 0.025343 ms CreateObjectMapping: 0.009624 ms MarkObjects: 0.125754 ms  DeleteObjects: 0.010265 ms)
+
+Setting up 1 worker threads for Enlighten.
+  Thread -> id: 3f2c -> priority: 1 

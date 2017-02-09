@@ -1,0 +1,564 @@
+﻿using UnityEngine;
+using UnityEngine.SceneManagement;
+using ShipWeapons;
+using System.Collections;
+using System;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.IO;
+
+public class GameControlScript : MonoBehaviour {
+
+    public const int numberOfPowerUps = 3;
+    public const int numberOfWeapons = 4;
+
+    public static GameControlScript gameControl;
+    public int scrapCount = 0;
+    public int researchMaterialCount = 0;
+    public int currentLevel;
+    public int scrapRequiredForNextLevel;
+
+    public int[] Experience;
+    public int[] WeaponSkill;
+    public int ExpForSkillUp;
+    private string GameVersion = "0.5";
+
+    public int[] WeaponScrapCost;
+    public int[] WeaponRMCost;
+
+
+    //0 = attack speed
+    //1 = mass
+    //2 = damage
+    //3 = crit multiplier
+    //4 = skill cap
+    //5 = special chance
+    //6 = bounces
+    public int[,] WeaponUpgrades;
+    public int[] WeaponUpgradePointsTotal;
+    public int[] WeaponUpgradePointsAvailable;
+
+
+
+    //Player status
+    public bool PLAYER_ALIVE = true;
+
+    //Player attributes
+    public int shipArmor;
+
+    //Weapon types
+    //0 = Basic Cannon
+    //1 = Laser Cannon
+    //2 = Mass Driver
+    //3 = Plasma Cannon
+    public int SelectedWeapon = 0;
+
+    //Player upgrades
+    public int ArmorUpgrades;
+
+    //Player weapons
+    public Turret[] Weapons;
+    public Turret BlasterTurret;
+    public Turret PulseLaserTurret;
+    public Turret MassDriverTurret;
+    public Turret PlasmaTurret;
+    public bool[] WeaponUnlocked;
+    public string[] WeaponNames = new string[] { "Blaster", "Pulse Laser", "Mass Driver", "Plasma" };
+    public int[] WeaponUpgradeCosts = new int[] { 1000, 5000, 10000, 20000 };
+    public int[] WeaponUpgradeRMCosts = new int[] { 1, 5, 10, 20 };
+
+    //Preferences
+    public bool AUDIO_SOUNDS = false;
+    public bool AUDIO_MUSIC = false;
+
+    //Power Ups
+    //0 = Gravity Gun
+    //1 = Gravity Bomb
+    //2 = Scrap Bonus
+    //3 = Slow Meteors
+    //4 = Cluster Projectile
+    //5 = Repel Shield,
+    //6 = Attack speed
+    
+    public bool[] PowerUps;
+    public string[] PowerUpNames;
+    
+
+
+
+    void Awake()
+    {
+        
+
+        if (gameControl == null)
+        {
+            DontDestroyOnLoad(gameObject);
+            gameControl = this;
+
+            
+
+        }
+        else if (gameControl != this)
+        {
+            Destroy(gameObject);
+        }
+
+    }
+
+    void OnApplicationQuit()
+    {
+        SaveData();
+        Debug.Log("Application quit!");
+    }
+
+    
+    void Start()
+    {
+        //Debug.Log("GameControl START()!");
+        WeaponScrapCost = new int[numberOfWeapons] { 0, 20000, 100000, 1000000 };
+        WeaponRMCost = new int[numberOfWeapons] { 0, 1, 5, 50 };
+        Experience = new int[numberOfWeapons];
+        PowerUps = new bool[numberOfPowerUps];
+        PowerUpNames = new string[numberOfPowerUps] { "Kinetic Bomb", "Repel Shield", "Gravity Bomb" }; //, "Slow Meteors", "Cluster Projectile", "Repel Shield", "Attack Speed" };
+        WeaponSkill = new int[numberOfWeapons];
+        WeaponUnlocked = new bool[numberOfWeapons] { false, false, false, false };
+        ExpForSkillUp = 10;
+        currentLevel = 1;
+        scrapRequiredForNextLevel = 200;
+
+        AUDIO_SOUNDS = false;
+        AUDIO_MUSIC = false;
+
+        WeaponUpgrades = new int[numberOfWeapons, 7];
+        WeaponUpgradePointsTotal = new int[numberOfWeapons];
+        WeaponUpgradePointsAvailable = new int[numberOfWeapons];
+
+        ClearArrays();
+
+        Weapons = new Turret[numberOfWeapons];
+
+        //Create weapons
+        BlasterTurret = new Turret(10f, 2, 2, 1, 5, 2, 0, SpecialType.GravityDamage);
+        BlasterTurret.SetUpgradeValuesPerSkillPoint(2, 2, 0.2f);
+
+        PulseLaserTurret = new Turret(20f, 100, 0.0001f, 0.4f, 5, 3, 1, SpecialType.Piercing);
+        PulseLaserTurret.SetUpgradeValuesPerSkillPoint(3, 0, 0.2f);
+
+        MassDriverTurret = new Turret(30f, 50, 0.1f, 0.2f, 5f, 4, 2, SpecialType.Shrapnel);
+        MassDriverTurret.SetUpgradeValuesPerSkillPoint(4, 0.1f, 0.2f);
+
+        PlasmaTurret = new Turret(10f, 10, 3, 1, 5, 5, 3, SpecialType.Shrapnel);
+        PlasmaTurret.SetUpgradeValuesPerSkillPoint(10, 3, 0.2f);
+
+        Weapons[0] = BlasterTurret;
+        Weapons[1] = PulseLaserTurret;
+        Weapons[2] = MassDriverTurret;
+        Weapons[3] = PlasmaTurret;
+
+
+        ResetPowerUps();
+        LoadData();
+
+        for (int i = 0; i < Weapons.Length; i++)
+        {
+            Weapons[i].UpdateValues(i);
+        }
+
+    }
+
+    public void UpdatePlayerAttributes()
+    {
+        shipArmor = ArmorUpgrades;
+    }
+    
+
+    public void SaveData()
+    {
+        
+        BinaryFormatter bf = new BinaryFormatter();
+        FileStream file = File.Create(Application.persistentDataPath + "/SGC.dat");
+
+        PlayerData playerData = GetPlayerData();
+
+     
+
+        bf.Serialize(file, playerData);
+        file.Close();
+        Debug.Log("Player data saved!");
+        
+    }
+
+    public void LoadData()
+    {
+
+        if (File.Exists(Application.persistentDataPath + "/SGC.dat"))
+        {
+            BinaryFormatter bf = new BinaryFormatter();
+            FileStream file = File.Open(Application.persistentDataPath + "/SGC.dat", FileMode.Open);
+            PlayerData playerData = (PlayerData)bf.Deserialize(file);
+            file.Close();
+
+            SetPlayerData(playerData);
+
+            Debug.Log("Player data loaded!");
+            if (playerData.GameVersion == null)
+            {
+                Debug.Log("New game version found, resetting data!");
+                ResetData();
+                return;
+            }
+            else
+            {
+                if (!playerData.GameVersion.Equals(GameVersion))
+                {
+                    Debug.Log("New game version found, resetting data!");
+                    ResetData();
+                    return;
+                }
+            }
+
+        }
+        else
+        {
+            Debug.Log("Player data not found!");
+            ResetData();
+            return;
+        }
+    }
+
+    public void ResetData()
+    {
+        
+        BinaryFormatter bf = new BinaryFormatter();
+        FileStream file = File.Create(Application.persistentDataPath + "/SGC.dat");
+
+        //WeaponUpgrades = new int[4, 7];
+        ClearArrays();
+        WeaponUnlocked = new bool[numberOfWeapons] { false, false, false, false };
+
+        PlayerData playerData = GetPlayerData(true);
+
+        bf.Serialize(file, playerData);
+        file.Close();
+        Debug.Log("Player data RESET!");
+        LoadData();
+        SaveData();
+        
+    }
+
+    public void ClearArrays()
+    {
+        Array.Clear(WeaponUpgrades, 0, WeaponUpgrades.Length);
+        Array.Clear(WeaponSkill, 0, WeaponSkill.Length);
+        Array.Clear(Experience, 0, Experience.Length);
+        Array.Clear(WeaponUpgradePointsTotal, 0, WeaponUpgradePointsTotal.Length);
+        Array.Clear(WeaponUpgradePointsAvailable, 0, WeaponUpgradePointsAvailable.Length);
+    }
+
+    private PlayerData GetPlayerData(bool ResetData = false)
+    {
+        PlayerData data = new PlayerData();
+        if (ResetData)
+        {
+            data.scrapCount = 0;
+            data.shipArmor = 0;
+            data.selectedWeapon = 0;
+            data.ArmorUpgrades = 0;
+            data.researchMaterialCount = 0;
+        }
+        else
+        {
+            data.scrapCount = scrapCount;
+            data.shipArmor = shipArmor;
+            data.selectedWeapon = SelectedWeapon;
+            data.ArmorUpgrades = ArmorUpgrades;
+            data.researchMaterialCount = researchMaterialCount;
+        }
+        data.WeaponSkill = WeaponSkill;
+        data.Experience = Experience;
+        data.WeaponUnlocked = WeaponUnlocked;
+        data.WeaponUpgrades = WeaponUpgrades;
+        data.WeaponUpgradePointsTotal = WeaponUpgradePointsTotal;
+        data.WeaponUpgradePointsAvailable = WeaponUpgradePointsAvailable;
+        data.GameVersion = GameVersion;
+
+        return data;
+    }
+
+    private void SetPlayerData(PlayerData data)
+    {
+        scrapCount = data.scrapCount;
+        shipArmor = data.shipArmor;
+        SelectedWeapon = data.selectedWeapon;
+        ArmorUpgrades = data.ArmorUpgrades;
+        if (data.WeaponSkill != null)
+            WeaponSkill = data.WeaponSkill;
+        if (data.Experience != null)
+            Experience = data.Experience;
+        researchMaterialCount = data.researchMaterialCount;
+        if (data.WeaponUnlocked != null)
+            WeaponUnlocked = data.WeaponUnlocked;
+        if (data.WeaponUpgrades != null)
+            WeaponUpgrades = data.WeaponUpgrades;
+        if (data.WeaponUpgradePointsTotal != null)
+            WeaponUpgradePointsTotal = data.WeaponUpgradePointsTotal;
+        if (data.WeaponUpgradePointsAvailable != null)
+            WeaponUpgradePointsAvailable = data.WeaponUpgradePointsAvailable;
+    }
+
+    public void ResetPowerUps()
+    {
+        
+        for (int i = 0; i < PowerUps.Length; i++)
+            PowerUps[i] = false;
+    }
+
+    public int GetNumberOfPowerUps()
+    {
+        return numberOfPowerUps;
+    }
+
+    public int GetNumberOfWeapons()
+    {
+        return numberOfWeapons;
+    }
+
+    public void ExperienceGained(int amount)
+    {
+        Experience[SelectedWeapon] += amount * currentLevel * 100;
+        if (Experience[SelectedWeapon] >= ExpForSkillUp * WeaponSkill[SelectedWeapon]) //if true -> +Skill point
+        {
+            Experience[SelectedWeapon] -= ExpForSkillUp * WeaponSkill[SelectedWeapon];
+            if (WeaponSkill[SelectedWeapon] < 100 + GameObject.FindWithTag("PlayerTurret").GetComponent<TurretScript>().GetTurret().SkillCap)
+            {
+                WeaponSkill[SelectedWeapon] += 1;
+                GameObject.FindWithTag("PlayerTurret").GetComponent<TurretScript>().GetTurret().UpdateValues(SelectedWeapon);
+                if (SceneManager.GetActiveScene().name =="GameWorld1")
+                {
+                    GameObject.FindWithTag("PlayerTurret").GetComponent<TurretScript>().WeaponSkillGained();
+                }
+            }
+            else
+                WeaponSkill[SelectedWeapon] = 100 + GameObject.FindWithTag("PlayerTurret").GetComponent<TurretScript>().GetTurret().SkillCap;
+        }
+    }
+
+    public int ExperienceNeededForSkillUp()
+    {
+        int expNeeded = ExpForSkillUp * WeaponSkill[SelectedWeapon];
+        return expNeeded;
+    }
+}
+
+[Serializable]
+class PlayerData
+{
+    public int scrapCount;
+
+    public int researchMaterialCount;
+
+    public int shipArmor;
+
+    public int ArmorUpgrades;
+
+    public int[] WeaponSkill = new int[GameControlScript.gameControl.GetNumberOfWeapons()];
+
+    public int[] Experience = new int[GameControlScript.gameControl.GetNumberOfWeapons()];
+
+    public bool[] WeaponUnlocked = new bool[GameControlScript.gameControl.GetNumberOfWeapons()];
+
+    public int[,] WeaponUpgrades = new int[GameControlScript.gameControl.GetNumberOfWeapons(), 7];
+
+    public int[] WeaponUpgradePointsTotal = new int[GameControlScript.gameControl.GetNumberOfWeapons()];
+
+    public int[] WeaponUpgradePointsAvailable = new int[GameControlScript.gameControl.GetNumberOfWeapons()];
+
+    public int selectedWeapon;
+
+    public string GameVersion;
+}
+
+namespace Asteroids
+{
+    public enum AsteroidType { NONE, Scrap, Medium, Big, Huge, Anomaly1 }
+}
+
+namespace FloatingText
+{
+    public enum FTType { Normal, PopUp, Announcement, Danger, PowerUp }
+}
+
+namespace Scrap
+{
+    public enum ScrapType { Normal, ResearchMaterial }
+}
+
+namespace PUBombs
+{
+    public enum PUBombType { Gravity, Kinetic }
+}
+
+namespace ShipWeapons
+{
+    public enum SpecialType { NONE, GravityDamage, Piercing, Shrapnel }
+
+    public class Turret
+    {
+        //Base stats
+        float baseSpeed;
+        int baseDamage;
+        float baseMass;
+        float baseROF;
+        float baseCritChance;
+        int baseCritMultiplier;
+        float baseSpecialChance;
+        SpecialType specialType;
+        int WeaponType;
+        float fireTime;
+        int bounces;
+        int skillCap;
+
+        //Upgrades per skill point
+        int uDamage;
+        float uMass;
+        float uROF;
+        float uCritChance;
+        float uSpecialChance;
+
+        //Upgraded stats
+        int totalDamage;
+        float totalMass;
+        float totalROF;
+        float totalCritChance;
+        float totalSpecialChance;
+
+        public Turret(float speed, int damage, float mass, float rof, float crit_chance,
+            int crit_multiplier, int weapon_type, SpecialType special_type = SpecialType.NONE)
+        {
+            baseSpeed = speed;
+            baseDamage = damage;
+            baseMass = mass;
+            baseROF = rof;
+            baseCritChance = crit_chance;
+            baseCritMultiplier = crit_multiplier;
+            baseSpecialChance = 25;
+            WeaponType = weapon_type;
+            specialType = special_type;
+            bounces = 0;
+            skillCap = 100;
+            fireTime = Time.time;
+        }
+
+        public void SetUpgradeValuesPerSkillPoint(int damage, float mass, float crit)
+        {
+            uDamage = damage;
+            uMass = mass;
+            uCritChance = crit;
+        }
+
+        public void UpdateValues(int weaponNumber)
+        {
+            //Debug.Log("Updating weapon number " + weaponNumber.ToString());
+            int skillLevel = GameControlScript.gameControl.WeaponSkill[weaponNumber];
+            totalDamage = baseDamage + skillLevel * uDamage;
+            totalMass = baseMass + skillLevel * uMass;
+            totalCritChance = baseCritChance + skillLevel * uCritChance;
+            UpdateUpgrades();
+
+            
+        }
+
+        private void UpdateUpgrades()
+        {
+            //0 = attack speed
+            //1 = mass
+            //2 = damage
+            //3 = crit multiplier
+            //4 = unique ability
+            //5 = special chance
+            //6 = super weapon, ultra weapon
+            totalROF = baseROF - 0.15f * GameControlScript.gameControl.WeaponUpgrades[WeaponType, 0];
+            totalMass += totalMass * GameControlScript.gameControl.WeaponUpgrades[WeaponType, 1];
+            totalDamage += totalDamage * GameControlScript.gameControl.WeaponUpgrades[WeaponType, 2];
+            baseCritMultiplier = 1 + GameControlScript.gameControl.WeaponUpgrades[WeaponType, 3];
+            totalSpecialChance = baseSpecialChance * GameControlScript.gameControl.WeaponUpgrades[WeaponType, 5];
+
+            skillCap += 100 * GameControlScript.gameControl.WeaponUpgrades[WeaponType, 6];
+
+            switch (WeaponType) //0 = blaster, 1 = laser, 2 = mass driver, 3 = plasma
+            {
+                case 0:
+                    
+                    bounces = GameControlScript.gameControl.WeaponUpgrades[WeaponType, 4];
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        public int SkillCap
+        {
+            get { return skillCap; }
+            set { skillCap = value; }
+        }
+
+        public int Bounces
+        {
+            get { return bounces; }
+            set { bounces = value; }
+        }
+
+        public float Speed
+        {
+            get { return baseSpeed; }
+            set { baseSpeed = value; }
+        }
+
+        public int Damage
+        {
+            get { return totalDamage; }
+            //set { totalDamage = value; }
+        }
+
+        public float Mass
+        {
+            get { return totalMass; }
+            //set { totalMass = value; }
+        }
+
+        public float RateOfFire
+        {
+            get { return totalROF; }
+            //set { totalROF = value; }
+        }
+
+        public float CriticalChance
+        {
+            get { return totalCritChance; }
+            //set { totalCritChance = value; }
+        }
+
+        public int CriticalMultiplier
+        {
+            get { return baseCritMultiplier; }
+            //set { baseCritMultiplier = value; }
+        }
+
+        public float SpecialChance
+        {
+            get { return totalSpecialChance; }
+            //set { totalSpecialChance = value; }
+        }
+
+        public SpecialType SpecialType
+        {
+            get { return specialType; }
+            set { specialType = value; }
+        }
+
+        public float FireTime
+        {
+            get { return fireTime; }
+            set { fireTime = value; }
+        }
+    }
+}
