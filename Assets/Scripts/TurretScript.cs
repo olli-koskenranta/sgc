@@ -94,11 +94,11 @@ public class TurretScript : MonoBehaviour {
         bool crit = false;
         bool special = false;
         //Roll for crit
-        int roll = Random.Range(0, 101);
+        int roll = Random.Range(1, 101);
         if (roll <= turret.CriticalChance)
             crit = true;
         //Roll for special
-        roll = Random.Range(0, 101);
+        roll = Random.Range(1, 101);
         if (roll <= turret.SpecialChance)
             special = true;
 

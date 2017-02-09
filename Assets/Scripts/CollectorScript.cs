@@ -125,7 +125,7 @@ public class CollectorScript : MonoBehaviour
             GameControlScript.gameControl.scrapCount += amount;
         //sessionScrapCount += amount;
 
-        if (FindAnomaly(1) == null && FindAnomaly(2) == null && FindAnomaly(3)) //Do not allow level up if a "boss" is present
+        if (FindAnomaly(1) == null && FindAnomaly(2) == null && FindAnomaly(3) == null) //Do not allow level up if a "boss" is present
             scrapForNextLevel += amount;
 
         SetScrapCountText();

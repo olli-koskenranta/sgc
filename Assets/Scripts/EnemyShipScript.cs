@@ -236,8 +236,8 @@ public class EnemyShipScript : MonoBehaviour {
 
     private void Shoot()
     {
-        if (GameControlScript.gameControl.AUDIO_SOUNDS)
-            laserSound.Play();
+        //if (GameControlScript.gameControl.AUDIO_SOUNDS)
+        //    laserSound.Play();
         int firepos;
         if (!switchFire)
         {

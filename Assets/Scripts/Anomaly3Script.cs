@@ -71,6 +71,22 @@ public class Anomaly3Script : MonoBehaviour {
 
     }
 
+    void OnCollisionEnter2D(Collision2D col)
+    {
+        if (col.gameObject.GetComponent<PlayerProjectileScript>() != null)
+        {
+            isHit(col.gameObject.GetComponent<PlayerProjectileScript>().damage);
+        }
+    }
+
+    void OnTriggerEnter2D(Collider2D col)
+    {
+        if (col.gameObject.GetComponent<PlayerProjectileScript>() != null)
+        {
+            isHit(col.gameObject.GetComponent<PlayerProjectileScript>().damage);
+        }
+    }
+
     void isHit(int amount)
     {
         if (!ALIVE)

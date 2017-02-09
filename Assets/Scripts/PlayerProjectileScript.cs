@@ -140,10 +140,10 @@ public class PlayerProjectileScript : MonoBehaviour {
         HitEffect();
         DamageText();
 
-        if (col.GetComponent<NebulaScript>() != null)
+        /*if (col.GetComponent<NebulaScript>() != null)
         {
             Destroy(gameObject);
-        }
+        }*/
 
         if (PIERCE)
         {

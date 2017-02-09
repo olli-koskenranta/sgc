@@ -43,25 +43,17 @@ public class Anomaly2Script : MonoBehaviour {
 
     void OnCollisionEnter2D(Collision2D col)
     {
-        switch (col.gameObject.tag)
+        if (col.gameObject.GetComponent<PlayerProjectileScript>() != null)
         {
-            case "Bullet2":
-                isHit(col.gameObject.GetComponent<PlayerProjectileScript>().damage);
-                break;
-            default:
-                break;
+            isHit(col.gameObject.GetComponent<PlayerProjectileScript>().damage);
         }
     }
 
     void OnTriggerEnter2D(Collider2D col)
     {
-        switch (col.gameObject.tag)
+        if (col.gameObject.GetComponent<PlayerProjectileScript>() != null)
         {
-            case "Bullet2":
-                isHit(col.gameObject.GetComponent<PlayerProjectileScript>().damage);
-                break;
-            default:
-                break;
+            isHit(col.gameObject.GetComponent<PlayerProjectileScript>().damage);
         }
     }
 

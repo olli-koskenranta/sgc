@@ -20,7 +20,7 @@ public class GameControlScript : MonoBehaviour {
     public int[] Experience;
     public int[] WeaponSkill;
     public int ExpForSkillUp;
-    private string GameVersion = "0.5";
+    private string GameVersion = "0.6a";
 
     public int[] WeaponScrapCost;
     public int[] WeaponRMCost;
@@ -63,6 +63,7 @@ public class GameControlScript : MonoBehaviour {
     public Turret PlasmaTurret;
     public bool[] WeaponUnlocked;
     public string[] WeaponNames = new string[] { "Blaster", "Pulse Laser", "Mass Driver", "Plasma" };
+    public float[] AttackSpeedReductions = new float[] { 0.15f, 0.5f, 0.25f, 0 };
     public int[] WeaponUpgradeCosts;
     public int[] WeaponUpgradeRMCosts;
 
@@ -127,8 +128,8 @@ public class GameControlScript : MonoBehaviour {
         currentLevel = 1;
         scrapRequiredForNextLevel = 200;
 
-        AUDIO_SOUNDS = false;
-        AUDIO_MUSIC = false;
+        AUDIO_SOUNDS = true;
+        AUDIO_MUSIC = true;
 
         WeaponUpgrades = new int[numberOfWeapons, 7];
         WeaponUpgradePointsTotal = new int[numberOfWeapons];
@@ -347,11 +348,11 @@ public class GameControlScript : MonoBehaviour {
 
     public void ExperienceGained(int amount)
     {
-        Experience[SelectedWeapon] += amount * currentLevel * 100;
+        Experience[SelectedWeapon] += amount * currentLevel;// * 100;
         if (Experience[SelectedWeapon] >= ExpForSkillUp * WeaponSkill[SelectedWeapon]) //if true -> +Skill point
         {
             Experience[SelectedWeapon] -= ExpForSkillUp * WeaponSkill[SelectedWeapon];
-            if (WeaponSkill[SelectedWeapon] < 100 + GameObject.FindWithTag("PlayerTurret").GetComponent<TurretScript>().GetTurret().SkillCap)
+            if (WeaponSkill[SelectedWeapon] < GameObject.FindWithTag("PlayerTurret").GetComponent<TurretScript>().GetTurret().SkillCap)
             {
                 WeaponSkill[SelectedWeapon] += 1;
                 GameObject.FindWithTag("PlayerTurret").GetComponent<TurretScript>().GetTurret().UpdateValues(SelectedWeapon);
@@ -499,13 +500,15 @@ namespace ShipWeapons
             //4 = unique ability
             //5 = special chance
             //6 = super weapon, ultra weapon
-            totalROF = baseROF - 0.15f * GameControlScript.gameControl.WeaponUpgrades[WeaponType, 0];
+            totalROF = baseROF - GameControlScript.gameControl.AttackSpeedReductions[WeaponType] * GameControlScript.gameControl.WeaponUpgrades[WeaponType, 0];
             totalMass += totalMass * GameControlScript.gameControl.WeaponUpgrades[WeaponType, 1];
             totalDamage += totalDamage * GameControlScript.gameControl.WeaponUpgrades[WeaponType, 2];
-            baseCritMultiplier = 1 + GameControlScript.gameControl.WeaponUpgrades[WeaponType, 3];
+            baseCritMultiplier = 2 + GameControlScript.gameControl.WeaponUpgrades[WeaponType, 3];
             totalSpecialChance = baseSpecialChance * GameControlScript.gameControl.WeaponUpgrades[WeaponType, 5];
 
-            skillCap += 100 * GameControlScript.gameControl.WeaponUpgrades[WeaponType, 6];
+            skillCap = 100 + 100 * GameControlScript.gameControl.WeaponUpgrades[WeaponType, 6];
+            //Debug.Log("Skill cap: " + skillCap.ToString());
+   
 
             switch (WeaponType) //0 = blaster, 1 = laser, 2 = mass driver, 3 = plasma
             {
