@@ -352,7 +352,7 @@ public class GameControlScript : MonoBehaviour {
         if (Experience[SelectedWeapon] >= ExpForSkillUp * WeaponSkill[SelectedWeapon]) //if true -> +Skill point
         {
             Experience[SelectedWeapon] -= ExpForSkillUp * WeaponSkill[SelectedWeapon];
-            if (WeaponSkill[SelectedWeapon] < GameObject.FindWithTag("PlayerTurret").GetComponent<TurretScript>().GetTurret().SkillCap)
+            if (WeaponSkill[SelectedWeapon] < Weapons[SelectedWeapon].SkillCap)
             {
                 WeaponSkill[SelectedWeapon] += 1;
                 GameObject.FindWithTag("PlayerTurret").GetComponent<TurretScript>().GetTurret().UpdateValues(SelectedWeapon);
@@ -362,7 +362,7 @@ public class GameControlScript : MonoBehaviour {
                 }
             }
             else
-                WeaponSkill[SelectedWeapon] = 100 + GameObject.FindWithTag("PlayerTurret").GetComponent<TurretScript>().GetTurret().SkillCap;
+                WeaponSkill[SelectedWeapon] = Weapons[SelectedWeapon].SkillCap;
         }
     }
 
