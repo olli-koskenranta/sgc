@@ -5,7 +5,7 @@ public class NebulaScript : MonoBehaviour {
 
     private float movementSpeed = -0.005f;
     private int consumedObjects = 0;
-    public int hitPoints = 500;
+    public int hitPoints = 150;
     public int XP = 50;
     private Camera mainCamera;
     private GameObject asteroidFragment;
@@ -16,12 +16,13 @@ public class NebulaScript : MonoBehaviour {
 	void Start () {
         mainCamera = Camera.main;
         preferredScale = transform.localScale;
+        hitPoints *= GameControlScript.gameControl.currentLevel;
     }
 	
 	// Update is called once per frame
 	void Update () {
         //Destroy if "out of bounds"
-        if (gameObject.transform.position.x > 19 || gameObject.transform.position.x < -9 || gameObject.transform.position.y < -7 || gameObject.transform.position.y > 7)
+        if (gameObject.transform.position.x > 19 || gameObject.transform.position.x < -19 || gameObject.transform.position.y < -7 || gameObject.transform.position.y > 7)
             Destroy(gameObject);
 
         transform.position += new Vector3(movementSpeed, 0, 0);
@@ -54,6 +55,17 @@ public class NebulaScript : MonoBehaviour {
 
     void OnTriggerStay2D(Collider2D col)
     {
+
+        if (col.GetComponent<ShipHullScript>() != null)
+        {
+            //Debug.Log("Ship hull taking damage!");
+            dmgCounter++;
+            if (dmgCounter % 10 == 0)
+            {
+                col.GetComponent<ShipHullScript>().isHit(1);
+            }
+        }
+
         if (!IsOnScreen())
             return;
 
@@ -75,15 +87,7 @@ public class NebulaScript : MonoBehaviour {
             }
         }
 
-        if (col.GetComponent<ShipHullScript>() != null)
-        {
-            //Debug.Log("Ship hull taking damage!");
-            dmgCounter++;
-            if (dmgCounter % 10 == 0)
-            {
-                col.GetComponent<ShipHullScript>().isHit(1);
-            }
-        }
+        
 
 
     }
@@ -122,7 +126,7 @@ public class NebulaScript : MonoBehaviour {
         asteroidFragment = Resources.Load("ScrapPiece") as GameObject;
         for (int i = 0; i <= consumedObjects; i++)
         {
-            Vector3 rngpos = new Vector3(Random.Range(-0.5f, 0.5f), Random.Range(0.5f, 0.5f), 0f);
+            Vector3 rngpos = new Vector3(Random.Range(-1f, 1f), Random.Range(-1f, 1f), 0f);
             GameObject fragmentInstance = Instantiate(asteroidFragment, this.transform.position + rngpos, this.transform.rotation) as GameObject;
             fragmentInstance.GetComponent<ScrapPieceScript>().type = Scrap.ScrapType.Normal;
             if (Random.Range(1, 1001) >= 1000 - GameControlScript.gameControl.currentLevel / 10)

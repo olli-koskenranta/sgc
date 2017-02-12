@@ -17,7 +17,7 @@ public class PlayerProjectileScript : MonoBehaviour {
     private bool ROTATE = false;
     public int bounces = 0;
 
-    public int critMultiplier;
+    public float critMultiplier;
     public float mass;
     public int damage;
     public float gravityDmgAmount = 0.1f;
@@ -70,7 +70,8 @@ public class PlayerProjectileScript : MonoBehaviour {
 
         if (CRITICAL)
         {
-            damage *= critMultiplier;
+            float newDamage = (float)damage * critMultiplier;
+            damage = (int)newDamage;
         }
 
 

@@ -10,7 +10,7 @@ public class Anomaly2Script : MonoBehaviour {
     private float speed = 0.3f;
     private float mass;
     private GameObject shipHull;
-    private int XP = 1000;
+    private int XP = 2000;
     public bool ALIVE = false;
     public GameObject BossHPBar;
 
@@ -21,7 +21,7 @@ public class Anomaly2Script : MonoBehaviour {
 
     void Start ()
     {
-        hitPoints = 100000;
+        hitPoints = 10000;
         BossHPBar = GameObject.Find("Canvas/BossHP");
         GameObject.Find("Music").GetComponent<MusicScript>().PlayTrack(2);
         shipHull = GameObject.FindWithTag("ShipHull");

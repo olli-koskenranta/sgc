@@ -7,7 +7,7 @@ public class Anomaly3Script : MonoBehaviour {
     private Transform standingPosition;
     private float speed = 0.3f;
     private GameObject shipHull;
-    private int XP = 1000;
+    private int XP = 3000;
     public bool ALIVE = false;
     public GameObject BossHPBar;
     private GameObject fighter;

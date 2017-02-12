@@ -13,7 +13,7 @@ public class Anomaly1Script : MonoBehaviour {
     private GameObject[] bigMeteors;
     private GameObject[] hugeMeteors;
     private Turret playerTurret;
-    private int XP = 100;
+    private int XP = 1000;
     public GameObject BossHPBar;
 
 

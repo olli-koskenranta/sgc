@@ -26,21 +26,24 @@ public class ArmoryScript : MonoBehaviour {
     public void SetTextsAndUpdate()
     {
 
-        //int upgradeCostMass = GameControlScript.gameControl.UpgCost + GameControlScript.gameControl.UpgCost * GameControlScript.gameControl.MassUpgrades;
-        //int upgradeCostArmor = GameControlScript.gameControl.UpgCost + GameControlScript.gameControl.UpgCost * GameControlScript.gameControl.ArmorUpgrades;
-        //int upgradeCostDamage = GameControlScript.gameControl.UpgCost + GameControlScript.gameControl.UpgCost * GameControlScript.gameControl.DamageUpgrades;
-        //int upgradeCostROF = GameControlScript.gameControl.UpgCost + GameControlScript.gameControl.UpgCost * GameControlScript.gameControl.RateOfFireUpgrades;
-
         textInfo.text = "Scrap Count: " + GameControlScript.gameControl.scrapCount.ToString()
             + "\nResearch Material: " + GameControlScript.gameControl.researchMaterialCount.ToString()
             + "\n\nSelected Weapon: " + GameControlScript.gameControl.WeaponNames[GameControlScript.gameControl.SelectedWeapon]
             + "\nWeapon Skill: " + GameControlScript.gameControl.WeaponSkill[GameControlScript.gameControl.SelectedWeapon].ToString() + "/" + GameControlScript.gameControl.Weapons[GameControlScript.gameControl.SelectedWeapon].SkillCap.ToString()
-            + "\nWeapon Damage: " + GameControlScript.gameControl.Weapons[GameControlScript.gameControl.SelectedWeapon].Damage.ToString()
-            + "\nCritical Chance: " + GameControlScript.gameControl.Weapons[GameControlScript.gameControl.SelectedWeapon].CriticalChance.ToString()
-            + "\nCritical Multiplier: " + GameControlScript.gameControl.Weapons[GameControlScript.gameControl.SelectedWeapon].CriticalMultiplier.ToString()
+                + "(+" + (GameControlScript.gameControl.WeaponUpgrades[GameControlScript.gameControl.SelectedWeapon, 6] * 100).ToString() + ")"
+            + "\nCritical Chance: " + GameControlScript.gameControl.Weapons[GameControlScript.gameControl.SelectedWeapon].CriticalChance.ToString() + "%"
             + "\nRate of Fire: " + GameControlScript.gameControl.Weapons[GameControlScript.gameControl.SelectedWeapon].RateOfFire.ToString()
             + "\nProjectile Mass: " + GameControlScript.gameControl.Weapons[GameControlScript.gameControl.SelectedWeapon].Mass.ToString()
-            + "\nSpecial Chance: " + GameControlScript.gameControl.Weapons[GameControlScript.gameControl.SelectedWeapon].SpecialChance.ToString()
+                + "(+" + (GameControlScript.gameControl.WeaponUpgrades[GameControlScript.gameControl.SelectedWeapon, 1] * 100).ToString() + "%)"
+            + "\nWeapon Damage: " + GameControlScript.gameControl.Weapons[GameControlScript.gameControl.SelectedWeapon].Damage.ToString()
+                + "(+" + (GameControlScript.gameControl.WeaponUpgrades[GameControlScript.gameControl.SelectedWeapon, 2] * 25).ToString() + "%)"
+            + "\nCritical Multiplier: " + GameControlScript.gameControl.Weapons[GameControlScript.gameControl.SelectedWeapon].CriticalMultiplier.ToString()
+            + "\nSpecial Chance: " + GameControlScript.gameControl.Weapons[GameControlScript.gameControl.SelectedWeapon].SpecialChance.ToString() + "%"
+            
+            
+            
+            
+            
             + "\nStart Zone: " + GameControlScript.gameControl.currentLevel.ToString();
 
         selectWeapon0.GetComponentInChildren<Text>().text = GameControlScript.gameControl.WeaponNames[0];

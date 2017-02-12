@@ -36,10 +36,10 @@ public class EnemyShipScript : MonoBehaviour {
 
     private int enemyFighterMass = 30;
     private int enemyMissileCruiserMass = 500;
-    private int enemyFighterHitPoints = 50;
-    private int enemyMissileCruiserHitPoints = 150;
+    private int enemyFighterHitPoints = 250;
+    private int enemyMissileCruiserHitPoints = 500;
     private int enemyFighterDamage = 1;
-    private int enemyMissileCruiserDamage = 2;
+    private int enemyMissileCruiserDamage = 1;
 
     void Start () {
         rotateSpeed = 1f;

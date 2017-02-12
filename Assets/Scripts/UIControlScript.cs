@@ -22,7 +22,6 @@ public class UIControlScript : MonoBehaviour {
 
     public void ExitClicked()
     {
-        GameControlScript.gameControl.SaveData();
         Application.Quit();
     }
 

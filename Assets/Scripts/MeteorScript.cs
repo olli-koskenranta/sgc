@@ -9,7 +9,7 @@ public class MeteorScript : MonoBehaviour {
     private bool spawnProtection;
     private float spawnTime;
     float speed = 1f;
-    public int hitPoints = 9;
+    public int hitPoints;
     public int meteorFragments = 3;
     public GameObject scrapMeteor;
     public GameObject asteroidFragment;
@@ -115,7 +115,7 @@ public class MeteorScript : MonoBehaviour {
         {
             if (anomaly2.GetComponent<Anomaly2Script>().ALIVE)
             {
-                Vector2 forceVector = (shipHull.transform.position - transform.position).normalized; // * GameControlScript.gameControl.currentLevel;
+                Vector2 forceVector = (shipHull.transform.position - transform.position).normalized * 0.1f; // * GameControlScript.gameControl.currentLevel;
                 GetComponent<Rigidbody2D>().AddForce(forceVector, ForceMode2D.Impulse);
             }
             //GetComponent<Rigidbody2D>().velocity = (anomaly1.transform.position - transform.position).normalized;

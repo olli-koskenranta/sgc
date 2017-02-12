@@ -63,7 +63,7 @@ public class GameControlScript : MonoBehaviour {
     public Turret PlasmaTurret;
     public bool[] WeaponUnlocked;
     public string[] WeaponNames = new string[] { "Blaster", "Pulse Laser", "Mass Driver", "Plasma" };
-    public float[] AttackSpeedReductions = new float[] { 0.15f, 0.5f, 0.25f, 0 };
+    public float[] AttackSpeedReductions;
     public int[] WeaponUpgradeCosts;
     public int[] WeaponUpgradeRMCosts;
 
@@ -124,12 +124,13 @@ public class GameControlScript : MonoBehaviour {
         PowerUpNames = new string[numberOfPowerUps] { "Kinetic Bomb", "Repel Shield", "Gravity Bomb" }; //, "Slow Meteors", "Cluster Projectile", "Repel Shield", "Attack Speed" };
         WeaponSkill = new int[numberOfWeapons];
         WeaponUnlocked = new bool[numberOfWeapons] { false, false, false, false };
+        AttackSpeedReductions = new float[] { 0.15f, 0.5f, 0.25f, 0 };
         ExpForSkillUp = 10;
         currentLevel = 1;
         scrapRequiredForNextLevel = 200;
 
-        AUDIO_SOUNDS = true;
-        AUDIO_MUSIC = true;
+        AUDIO_SOUNDS = false;
+        AUDIO_MUSIC = false;
 
         WeaponUpgrades = new int[numberOfWeapons, 7];
         WeaponUpgradePointsTotal = new int[numberOfWeapons];
@@ -140,13 +141,13 @@ public class GameControlScript : MonoBehaviour {
         Weapons = new Turret[numberOfWeapons];
 
         //Create weapons
-        BlasterTurret = new Turret(10f, 2, 2, 1, 5, 2, 0, SpecialType.GravityDamage);
+        BlasterTurret = new Turret(10f, 2, 2, 1, 5, 2f, 0, SpecialType.GravityDamage);
         BlasterTurret.SetUpgradeValuesPerSkillPoint(2, 2, 0.2f);
 
-        PulseLaserTurret = new Turret(20f, 100, 0.0001f, 0.4f, 5, 3, 1, SpecialType.Piercing);
+        PulseLaserTurret = new Turret(20f, 100, 0.0001f, 0.4f, 5, 2f, 1, SpecialType.Piercing);
         PulseLaserTurret.SetUpgradeValuesPerSkillPoint(3, 0, 0.2f);
 
-        MassDriverTurret = new Turret(30f, 50, 0.1f, 0.2f, 5f, 4, 2, SpecialType.Shrapnel);
+        MassDriverTurret = new Turret(30f, 50, 0.1f, 0.2f, 5f, 2f, 2, SpecialType.Shrapnel);
         MassDriverTurret.SetUpgradeValuesPerSkillPoint(4, 0.1f, 0.2f);
 
         PlasmaTurret = new Turret(10f, 10, 3, 1, 5, 5, 3, SpecialType.Shrapnel);
@@ -433,7 +434,7 @@ namespace ShipWeapons
         float baseMass;
         float baseROF;
         float baseCritChance;
-        int baseCritMultiplier;
+        float baseCritMultiplier;
         float baseSpecialChance;
         SpecialType specialType;
         int WeaponType;
@@ -454,9 +455,10 @@ namespace ShipWeapons
         float totalROF;
         float totalCritChance;
         float totalSpecialChance;
+        float totalCritMultiplier;
 
         public Turret(float speed, int damage, float mass, float rof, float crit_chance,
-            int crit_multiplier, int weapon_type, SpecialType special_type = SpecialType.NONE)
+            float crit_multiplier, int weapon_type, SpecialType special_type = SpecialType.NONE)
         {
             baseSpeed = speed;
             baseDamage = damage;
@@ -502,8 +504,8 @@ namespace ShipWeapons
             //6 = super weapon, ultra weapon
             totalROF = baseROF - GameControlScript.gameControl.AttackSpeedReductions[WeaponType] * GameControlScript.gameControl.WeaponUpgrades[WeaponType, 0];
             totalMass += totalMass * GameControlScript.gameControl.WeaponUpgrades[WeaponType, 1];
-            totalDamage += totalDamage * GameControlScript.gameControl.WeaponUpgrades[WeaponType, 2];
-            baseCritMultiplier = 2 + GameControlScript.gameControl.WeaponUpgrades[WeaponType, 3];
+            totalDamage += (int)((float)totalDamage * (float)GameControlScript.gameControl.WeaponUpgrades[WeaponType, 2] * 0.25f);
+            totalCritMultiplier = baseCritMultiplier + GameControlScript.gameControl.WeaponUpgrades[WeaponType, 3] * 0.5f;
             totalSpecialChance = baseSpecialChance * GameControlScript.gameControl.WeaponUpgrades[WeaponType, 5];
 
             skillCap = 100 + 100 * GameControlScript.gameControl.WeaponUpgrades[WeaponType, 6];
@@ -563,9 +565,9 @@ namespace ShipWeapons
             //set { totalCritChance = value; }
         }
 
-        public int CriticalMultiplier
+        public float CriticalMultiplier
         {
-            get { return baseCritMultiplier; }
+            get { return totalCritMultiplier; }
             //set { baseCritMultiplier = value; }
         }
 
