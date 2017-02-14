@@ -45,7 +45,7 @@ public class SpawningScript : MonoBehaviour {
         bigAsteroidChance = 30;
         HugeAsteroidChance = 1;
         NebulaChance = 1;
-        EnemyFighterChance = 1;
+        EnemyFighterChance = 2;
         EnemyMissileCruiserChance = 1;
         
 
@@ -107,7 +107,7 @@ public class SpawningScript : MonoBehaviour {
 
 
         //Huge Asteroid
-        if (GameControlScript.gameControl.currentLevel >= 1)
+        if (GameControlScript.gameControl.currentLevel >= 5)
         {
             if (RollDice(100) <= HugeAsteroidChance)
             {
@@ -131,7 +131,7 @@ public class SpawningScript : MonoBehaviour {
         }
 
         //Nebula
-        if (GameControlScript.gameControl.currentLevel >= 11)
+        if (GameControlScript.gameControl.currentLevel >= 11 && GameControlScript.gameControl.currentLevel % 10 != 0)
         {
             if (RollDice(100) <= NebulaChance)
             {

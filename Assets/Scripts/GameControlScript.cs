@@ -123,7 +123,7 @@ public class GameControlScript : MonoBehaviour {
         PowerUps = new bool[numberOfPowerUps];
         PowerUpNames = new string[numberOfPowerUps] { "Kinetic Bomb", "Repel Shield", "Gravity Bomb" }; //, "Slow Meteors", "Cluster Projectile", "Repel Shield", "Attack Speed" };
         WeaponSkill = new int[numberOfWeapons];
-        WeaponUnlocked = new bool[numberOfWeapons] { false, false, false, false };
+        WeaponUnlocked = new bool[numberOfWeapons] { true, false, false, false };
         AttackSpeedReductions = new float[] { 0.15f, 0.5f, 0.25f, 0 };
         ExpForSkillUp = 10;
         currentLevel = 1;
@@ -237,7 +237,7 @@ public class GameControlScript : MonoBehaviour {
 
         //WeaponUpgrades = new int[4, 7];
         ClearArrays();
-        WeaponUnlocked = new bool[numberOfWeapons] { false, false, false, false };
+        WeaponUnlocked = new bool[numberOfWeapons] { true, false, false, false };
 
         PlayerData playerData = GetPlayerData(true);
 

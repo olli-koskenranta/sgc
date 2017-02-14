@@ -25,16 +25,16 @@ public class MeteorScript : MonoBehaviour {
     public int damage;
 
     private int medMeteorMass = 10;
-    private int bigMeteorMass = 50;
-    private int hugeMeteorMass = 500;
+    private int bigMeteorMass = 30;
+    private int hugeMeteorMass = 90;
 
-    private int medMeteorHitPoints = 3;
-    private int bigMeteorHitPoints = 9;
+    private int medMeteorHitPoints = 10;
+    private int bigMeteorHitPoints = 30;
     private int hugeMeteorHitPoints = 90;
 
-    private int medMeteorDamage = 1;
-    private int bigMeteorDamage = 3;
-    private int hugeMeteorDamage = 9;
+    private int medMeteorDamage = 2;
+    private int bigMeteorDamage = 6;
+    private int hugeMeteorDamage = 18;
 
     void Start()
     {
@@ -44,6 +44,7 @@ public class MeteorScript : MonoBehaviour {
         //if (GameControlScript.gameControl.PowerUps[0])
         //    speed *= 0.5f;
         GetComponent<Rigidbody2D>().velocity = transform.TransformDirection(Vector3.left * speed);
+        GetComponent<SpriteRenderer>().transform.Rotate(Vector3.forward);
 
         mainCamera = Camera.main;
         if (asteroidType != AsteroidType.Anomaly1)
@@ -99,7 +100,7 @@ public class MeteorScript : MonoBehaviour {
         if (gameObject.transform.position.x > 19 || gameObject.transform.position.x < -9 || gameObject.transform.position.y < -7 || gameObject.transform.position.y > 7)
             Destroy(gameObject);
 
-        GetComponent<SpriteRenderer>().transform.Rotate(Vector3.forward);
+        //GetComponent<SpriteRenderer>().transform.Rotate(Vector3.forward);
 
         if (anomaly1 != null)
         {
@@ -115,7 +116,7 @@ public class MeteorScript : MonoBehaviour {
         {
             if (anomaly2.GetComponent<Anomaly2Script>().ALIVE)
             {
-                Vector2 forceVector = (shipHull.transform.position - transform.position).normalized * 0.1f; // * GameControlScript.gameControl.currentLevel;
+                Vector2 forceVector = (shipHull.transform.position - transform.position).normalized * 0.5f; // * GameControlScript.gameControl.currentLevel;
                 GetComponent<Rigidbody2D>().AddForce(forceVector, ForceMode2D.Impulse);
             }
             //GetComponent<Rigidbody2D>().velocity = (anomaly1.transform.position - transform.position).normalized;
@@ -130,14 +131,15 @@ public class MeteorScript : MonoBehaviour {
 
     void OnCollisionEnter2D(Collision2D col)
     {
-        //if (!IsOnScreen())
-        //    return;
+        if (!IsOnScreen())
+            return;
 
         if (col.gameObject.GetComponent<PlayerProjectileScript>() != null)
         {
             if (col.gameObject.GetComponent<PlayerProjectileScript>().GravityDamage)
             {
                 HIT_BY_GRAVITY_DMG = true;
+                gameObject.GetComponent<SpriteRenderer>().color = Color.green;
                 gameObject.GetComponent<Rigidbody2D>().gravityScale += col.gameObject.GetComponent<PlayerProjectileScript>().gravityDmgAmount;
             }
 
@@ -164,16 +166,35 @@ public class MeteorScript : MonoBehaviour {
         }
     }
 
+    void OnCollisionStay2D(Collision2D col)
+    {
+        if (!IsOnScreen())
+            return;
+        if (col.gameObject.GetComponent<MeteorScript>() != null)
+        {
+            if (anomaly1 != null)
+            {
+                return;
+            }
+            else
+            {
+                if (!spawnProtection)
+                    isHit(col.gameObject.GetComponent<MeteorScript>().damage);
+            }
+        }
+    }
+
     void OnTriggerEnter2D(Collider2D col)
     {
-        //if (!IsOnScreen())
-        //    return;
+        if (!IsOnScreen())
+            return;
 
         if (col.gameObject.GetComponent<PlayerProjectileScript>() != null)
         {
             if (col.gameObject.GetComponent<PlayerProjectileScript>().GravityDamage)
             {
                 HIT_BY_GRAVITY_DMG = true;
+                gameObject.GetComponent<SpriteRenderer>().color = Color.green;
                 gameObject.GetComponent<Rigidbody2D>().gravityScale += col.gameObject.GetComponent<PlayerProjectileScript>().gravityDmgAmount;
             }
 
@@ -200,7 +221,7 @@ public class MeteorScript : MonoBehaviour {
         }
     }
 
-    void isHit(int Damage)
+    public void isHit(int Damage)
     {
 
         hitPoints -= Damage;
@@ -239,6 +260,11 @@ public class MeteorScript : MonoBehaviour {
                     fragment.GetComponent<MeteorScript>().hitPoints = 1;
                     fragment.GetComponent<MeteorScript>().HIT_BY_KINECTIC_DMG = true;
                 }
+                if (HIT_BY_GRAVITY_DMG)
+                {
+                    fragment.GetComponent<SpriteRenderer>().color = Color.green;
+                    fragment.GetComponent<MeteorScript>().HIT_BY_GRAVITY_DMG = true;
+                }
             }
         }
         
@@ -252,7 +278,7 @@ public class MeteorScript : MonoBehaviour {
         
     }
 
-    private bool IsOnScreen()
+    public bool IsOnScreen()
     {
         Vector3 screenPoint = mainCamera.WorldToViewportPoint(gameObject.transform.position);
         if (screenPoint.x > 0 && screenPoint.y > 0 && screenPoint.x < 1 && screenPoint.y < 1)

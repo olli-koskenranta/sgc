@@ -89,7 +89,7 @@ public class PlayerProjectileScript : MonoBehaviour {
         if (ROTATE)
             GetComponent<SpriteRenderer>().transform.Rotate(Vector3.forward * 2f);
 
-        if (hugeMeteor != null)
+        if (hugeMeteor != null && hugeMeteor.GetComponent<MeteorScript>().IsOnScreen())
         {
             Vector2 forceVector = (hugeMeteor.transform.position - transform.position).normalized * GameControlScript.gameControl.currentLevel;
             GetComponent<Rigidbody2D>().AddForce(new Vector2(0, forceVector.y), ForceMode2D.Impulse);
@@ -170,9 +170,12 @@ public class PlayerProjectileScript : MonoBehaviour {
 
     private void HitEffect()
     {
+        ParticleSystem.MainModule mm;
         GameObject hiteffect;
         hiteffect = Instantiate(hit_effect, transform.position, Quaternion.identity) as GameObject;
-        hiteffect.GetComponent<ParticleSystem>().startColor = gameObject.GetComponent<SpriteRenderer>().color;
+        mm = hiteffect.GetComponent<ParticleSystem>().main;
+        mm.startColor = gameObject.GetComponent<SpriteRenderer>().color;
+        //hiteffect.GetComponent<ParticleSystem>().main.startColor = gameObject.GetComponent<SpriteRenderer>().color;
     }
 
     private void DamageText()

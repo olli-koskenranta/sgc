@@ -5,16 +5,15 @@ using System.Collections;
 public class Anomaly1Script : MonoBehaviour {
 
     public int hitPoints;
-    private float speed = 0.3f;
     private float mass;
     private GameObject shipHull;
     public bool ALIVE = false;
     private GameObject[] medMeteors;
     private GameObject[] bigMeteors;
     private GameObject[] hugeMeteors;
-    private Turret playerTurret;
     private int XP = 1000;
     public GameObject BossHPBar;
+    public int damage = 100;
 
 
     void Awake()
@@ -48,7 +47,6 @@ public class Anomaly1Script : MonoBehaviour {
             meteor.GetComponent<SpriteRenderer>().color = Color.cyan;
         }
 
-        playerTurret = GameObject.FindWithTag("PlayerTurret").GetComponent<TurretScript>().GetTurret();
         UpdateBossHPBar();
 
 
@@ -68,6 +66,11 @@ public class Anomaly1Script : MonoBehaviour {
         if (col.gameObject.GetComponent<PlayerProjectileScript>() != null)
         {
             isHit(col.gameObject.GetComponent<PlayerProjectileScript>().damage);
+        }
+
+        if (col.gameObject.GetComponent<ShipHullScript>() != null)
+        {
+            col.gameObject.GetComponent<ShipHullScript>().isHit(damage);
         }
     }
 

@@ -7,7 +7,6 @@ public class Anomaly2Script : MonoBehaviour {
 
     public int hitPoints;
     private Transform standingPosition;
-    private float speed = 0.3f;
     private float mass;
     private GameObject shipHull;
     private int XP = 2000;
@@ -77,6 +76,6 @@ public class Anomaly2Script : MonoBehaviour {
 
     void UpdateBossHPBar()
     {
-        BossHPBar.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, hitPoints / 1000);
+        BossHPBar.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, hitPoints / 100);
     }
 }

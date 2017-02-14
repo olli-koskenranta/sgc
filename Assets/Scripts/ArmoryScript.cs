@@ -11,14 +11,25 @@ public class ArmoryScript : MonoBehaviour {
     public Button selectWeapon0;
     public Button selectWeapon1;
     public Button selectWeapon2;
+    public Button buttonShipUpgrades;
     public Button zonePlus;
     public Button zoneMinus;
     public Button btnBuyPoints;
+
+    public enum ArmoryView { Weapon, Ship };
+    public ArmoryView view;
+
+    private GameObject[] WeaponUpgradeUIElements;
+    private GameObject[] ShipUpgradeUIElements;
 
     public Slider[] upgradeSliders = new Slider[6];
 
 	void Start ()
     {
+        view = ArmoryView.Weapon;
+        WeaponUpgradeUIElements = FindGameObjectsWithLayer(12);
+        ShipUpgradeUIElements = FindGameObjectsWithLayer(13);
+        ShowShipUI(false);
         SetTextsAndUpdate();
         UpdateSliders();
 	}
@@ -117,5 +128,118 @@ public class ArmoryScript : MonoBehaviour {
         }
         int availablePoints = GameControlScript.gameControl.WeaponUpgradePointsTotal[GameControlScript.gameControl.SelectedWeapon] - usedPoints;
         return availablePoints;
+    }
+
+    public void SelectWeaponClicked(int weaponNumber)
+    {
+        if (view != ArmoryView.Weapon)
+        {
+            view = ArmoryScript.ArmoryView.Weapon;
+            ShowWeaponUI(true);
+            ShowShipUI(false);
+        }
+
+        if (GameControlScript.gameControl.WeaponUnlocked[weaponNumber])
+        {
+            GameControlScript.gameControl.SelectedWeapon = weaponNumber;
+            SetTextsAndUpdate();
+        }
+        else
+        {
+            if (GameControlScript.gameControl.scrapCount >= GameControlScript.gameControl.WeaponScrapCost[weaponNumber]
+                && GameControlScript.gameControl.researchMaterialCount >= GameControlScript.gameControl.WeaponRMCost[weaponNumber])
+            {
+                GameControlScript.gameControl.scrapCount -= GameControlScript.gameControl.WeaponScrapCost[weaponNumber];
+                GameControlScript.gameControl.researchMaterialCount -= GameControlScript.gameControl.WeaponRMCost[weaponNumber];
+                GameControlScript.gameControl.WeaponUnlocked[weaponNumber] = true;
+                SelectWeaponClicked(weaponNumber);
+            }
+        }
+    }
+
+    public void ShipUpgradesClicked()
+    {
+        if (view != ArmoryView.Ship)
+        {
+            view = ArmoryScript.ArmoryView.Ship;
+            ShowShipUI(true);
+            ShowWeaponUI(false);
+            SetTextsAndUpdate();
+        }
+
+        //Show ship upgrades UI
+    }
+
+    public GameObject[] FindGameObjectsWithLayer(int layer)
+    {
+        GameObject[] goArray = Object.FindObjectsOfType<GameObject>();
+        System.Collections.Generic.List<GameObject> goList = new System.Collections.Generic.List<GameObject>();
+        for (int i = 0; i < goArray.Length; i++)
+        {
+            if (goArray[i].layer == layer)
+            {
+                goList.Add(goArray[i]);
+            }
+        }
+
+        if (goList.Count == 0)
+        {
+            return null;
+        }
+
+        return goList.ToArray();
+    }
+
+    public void ShowWeaponUI(bool value)
+    {
+        if (WeaponUpgradeUIElements != null)
+        {
+            foreach (GameObject go in WeaponUpgradeUIElements)
+            {
+                go.SetActive(value);
+            }
+        }
+    }
+
+    public void ShowShipUI(bool value)
+    {
+        if (ShipUpgradeUIElements != null)
+        {
+            foreach (GameObject go in ShipUpgradeUIElements)
+            {
+                go.SetActive(value);
+            }
+        }
+    }
+
+    public void ZonePlusClicked()
+    {
+        GameControlScript.gameControl.currentLevel += 1;
+        SetTextsAndUpdate();
+    }
+
+    public void ZoneMinusClicked()
+    {
+        if (GameControlScript.gameControl.currentLevel > 2)
+            GameControlScript.gameControl.currentLevel -= 1;
+
+        SetTextsAndUpdate();
+    }
+
+    public void BuyPointsClicked()
+    {
+        int scrapCost = GameControlScript.gameControl.UpgradePointCost(0);
+        int RMCost = GameControlScript.gameControl.UpgradePointCost(1);
+
+        if (GameControlScript.gameControl.scrapCount >= scrapCost && GameControlScript.gameControl.researchMaterialCount >= RMCost)
+        {
+            GameControlScript.gameControl.scrapCount -= scrapCost;
+            GameControlScript.gameControl.researchMaterialCount -= RMCost;
+
+            GameControlScript.gameControl.WeaponUpgradePointsTotal[GameControlScript.gameControl.SelectedWeapon] += 1;
+            SetTextsAndUpdate();
+        }
+        else
+            Debug.Log("Not enough materials!");
     }
 }

@@ -6,6 +6,9 @@ using System.Collections;
 public class UIControlScript : MonoBehaviour {
 
     private GameObject LoadingText;
+
+    
+
     void Start()
     {
         GameObject canvas;
@@ -52,45 +55,6 @@ public class UIControlScript : MonoBehaviour {
         SceneManager.LoadScene("MainMenu");
     }
 
-    public void SelectWeaponClicked(int weaponNumber)
-    {
-        if (GameControlScript.gameControl.WeaponUnlocked[weaponNumber])
-        { 
-            GameControlScript.gameControl.SelectedWeapon = weaponNumber;
-            GameObject.Find("ArmoryScript").GetComponent<ArmoryScript>().SetTextsAndUpdate();
-        }
-        else
-        {
-            if (GameControlScript.gameControl.scrapCount >= GameControlScript.gameControl.WeaponScrapCost[weaponNumber]
-                && GameControlScript.gameControl.researchMaterialCount >= GameControlScript.gameControl.WeaponRMCost[weaponNumber])
-            {
-                GameControlScript.gameControl.scrapCount -= GameControlScript.gameControl.WeaponScrapCost[weaponNumber];
-                GameControlScript.gameControl.researchMaterialCount -= GameControlScript.gameControl.WeaponRMCost[weaponNumber];
-                GameControlScript.gameControl.WeaponUnlocked[weaponNumber] = true;
-                SelectWeaponClicked(weaponNumber);
-            }
-        }
-    }
-
-    public void ShipUpgradesClicked()
-    {
-        //Show ship upgrades UI
-    }
-
-    public void ZonePlusClicked()
-    {
-        GameControlScript.gameControl.currentLevel += 1;
-        GameObject.Find("ArmoryScript").GetComponent<ArmoryScript>().SetTextsAndUpdate();
-    }
-
-    public void ZoneMinusClicked()
-    {
-        if (GameControlScript.gameControl.currentLevel > 2)
-            GameControlScript.gameControl.currentLevel -= 1;
-
-        GameObject.Find("ArmoryScript").GetComponent<ArmoryScript>().SetTextsAndUpdate();
-    }
-
     public void ResetClicked()
     {
         GameControlScript.gameControl.ResetData();
@@ -108,20 +72,7 @@ public class UIControlScript : MonoBehaviour {
         }
     }
 
-    public void BuyPointsClicked()
-    {
-        int scrapCost = GameControlScript.gameControl.UpgradePointCost(0);
-        int RMCost = GameControlScript.gameControl.UpgradePointCost(1);
+    
 
-        if (GameControlScript.gameControl.scrapCount >= scrapCost && GameControlScript.gameControl.researchMaterialCount >= RMCost)
-        {
-            GameControlScript.gameControl.scrapCount -= scrapCost;
-            GameControlScript.gameControl.researchMaterialCount -= RMCost;
-
-            GameControlScript.gameControl.WeaponUpgradePointsTotal[GameControlScript.gameControl.SelectedWeapon] += 1;
-            GameObject.Find("ArmoryScript").GetComponent<ArmoryScript>().SetTextsAndUpdate();
-        }
-        else
-            Debug.Log("Not enough materials!");
-    }
+    
 }

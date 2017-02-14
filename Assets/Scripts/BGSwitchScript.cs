@@ -3,7 +3,7 @@ using System.Collections;
 
 public class BGSwitchScript : MonoBehaviour {
 
-    GameObject bg1, bg2;
+    /*GameObject bg1, bg2;
     Color newColor1, newColor2;
     MeshRenderer mr;
     Material nm;
@@ -34,5 +34,5 @@ public class BGSwitchScript : MonoBehaviour {
         //newColor2.a += 0.001f;
 
 
-    }
+    }*/
 }

@@ -40,8 +40,10 @@ public class PUBombScript : MonoBehaviour {
 
     public void HitEffect(Vector3 hitPosition)
     {
+        ParticleSystem.MainModule mm;
         GameObject hiteffect;
-        hiteffect = Instantiate(hit_effect, hitPosition, Quaternion.identity) as GameObject;
-        hiteffect.GetComponent<ParticleSystem>().startColor = gameObject.GetComponent<SpriteRenderer>().color;
+        hiteffect = Instantiate(hit_effect, transform.position, Quaternion.identity) as GameObject;
+        mm = hiteffect.GetComponent<ParticleSystem>().main;
+        mm.startColor = gameObject.GetComponent<SpriteRenderer>().color;
     }
 }

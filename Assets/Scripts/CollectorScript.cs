@@ -18,6 +18,8 @@ public class CollectorScript : MonoBehaviour
     private bool[] PowerUpActive;
     private float[] PowerUpStartTime;
 
+    public int grinderDamage = 1;
+
     void Start()
     {
         scrapForNextLevel = 0;
@@ -66,7 +68,7 @@ public class CollectorScript : MonoBehaviour
     {
         if (col.gameObject.GetComponent<MeteorScript>() != null)
         {
-            col.gameObject.GetComponent<MeteorScript>().Explode();
+            col.gameObject.GetComponent<MeteorScript>().isHit(grinderDamage);
         }
         else if (col.gameObject.GetComponent<ScrapPieceScript>() != null)
         {
@@ -76,6 +78,14 @@ public class CollectorScript : MonoBehaviour
             else if (col.gameObject.GetComponent<ScrapPieceScript>().type == Scrap.ScrapType.ResearchMaterial)
                 ScrapCollected(col.gameObject.GetComponent<ScrapPieceScript>().researchMaterialAmount, true);
             Destroy(col.gameObject);
+        }
+    }
+
+    void OnCollisionStay2D(Collision2D col)
+    {
+        if (col.gameObject.GetComponent<MeteorScript>() != null)
+        {
+            col.gameObject.GetComponent<MeteorScript>().isHit(grinderDamage);
         }
     }
 

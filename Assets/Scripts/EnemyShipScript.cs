@@ -33,16 +33,18 @@ public class EnemyShipScript : MonoBehaviour {
 
     private float destroyed_time;
     private float destroyed_interval = 0.3f;
+    public bool ALIVE;
 
     private int enemyFighterMass = 30;
     private int enemyMissileCruiserMass = 500;
     private int enemyFighterHitPoints = 250;
     private int enemyMissileCruiserHitPoints = 500;
-    private int enemyFighterDamage = 1;
-    private int enemyMissileCruiserDamage = 1;
+    private int enemyFighterDamage = 6;
+    private int enemyMissileCruiserDamage = 18;
 
     void Start () {
         rotateSpeed = 1f;
+        ALIVE = true;
 
         switch (sType)
         {
@@ -52,7 +54,7 @@ public class EnemyShipScript : MonoBehaviour {
                 fire_interval = 2f;
                 Bullet = Resources.Load("EnemyBullet1") as GameObject;
                 GetComponent<Rigidbody2D>().mass = enemyFighterMass * GameControlScript.gameControl.currentLevel;
-                damage = enemyFighterDamage * GameControlScript.gameControl.currentLevel;
+                damage = enemyFighterDamage; // * GameControlScript.gameControl.currentLevel;
                 hitPoints = enemyFighterHitPoints * GameControlScript.gameControl.currentLevel; // + 200 * GameControlScript.gameControl.currentLevel / 10;
                 break;
             case ShipType.MissileCruiser:
@@ -62,7 +64,7 @@ public class EnemyShipScript : MonoBehaviour {
                 fire_interval = 1f;
                 Bullet = Resources.Load("Missile") as GameObject;
                 GetComponent<Rigidbody2D>().mass = enemyMissileCruiserMass * GameControlScript.gameControl.currentLevel;
-                damage = enemyMissileCruiserDamage * GameControlScript.gameControl.currentLevel;
+                damage = enemyMissileCruiserDamage; // * GameControlScript.gameControl.currentLevel;
                 hitPoints = enemyMissileCruiserHitPoints * GameControlScript.gameControl.currentLevel; // + 200 * GameControlScript.gameControl.currentLevel / 10;
                 break;
             default:
@@ -141,24 +143,12 @@ public class EnemyShipScript : MonoBehaviour {
 
     void OnCollisionEnter2D(Collision2D col)
     {
-        //if (!IsOnScreen())
-        //    return;
+        if (!IsOnScreen())
+            return;
 
         if (col.gameObject.GetComponent<PlayerProjectileScript>() != null)
         {
             isHit(col.gameObject.GetComponent<PlayerProjectileScript>().damage);
-        }
-
-        switch (col.gameObject.tag)
-        {
-            case "Collector":
-                isHit(hitPoints);
-                Destroy(gameObject);
-                break;
-
-            default:
-                break;
-
         }
 
         if (col.gameObject.GetComponent<MeteorScript>() != null)
@@ -166,13 +156,35 @@ public class EnemyShipScript : MonoBehaviour {
             isHit(col.gameObject.GetComponent<MeteorScript>().damage);
         }
 
+        if (col.gameObject.GetComponent<CollectorScript>() != null)
+        {
+            if (!ALIVE)
+                Destroy(gameObject);
+            else
+                isHit(col.gameObject.GetComponent<CollectorScript>().grinderDamage);
+        }
+    }
 
+    void OnCollisionStay2D(Collision2D col)
+    {
+        if (col.gameObject.GetComponent<MeteorScript>() != null)
+        {
+            isHit(col.gameObject.GetComponent<MeteorScript>().damage);
+        }
+
+        if (col.gameObject.GetComponent<CollectorScript>() != null)
+        {
+            if (!ALIVE)
+                Destroy(gameObject);
+            else
+                isHit(col.gameObject.GetComponent<CollectorScript>().grinderDamage);
+        }
     }
 
     void OnTriggerEnter2D(Collider2D col)
     {
-        //if (!IsOnScreen())
-        //    return;
+        if (!IsOnScreen())
+            return;
 
         if (col.gameObject.GetComponent<PlayerProjectileScript>() != null)
         {
@@ -188,6 +200,7 @@ public class EnemyShipScript : MonoBehaviour {
         hitPoints -= Damage;
         if (hitPoints <= 0)
         {
+            ALIVE = false;
             Explode();
             destroyed_time = Time.time;
         }
@@ -220,9 +233,11 @@ public class EnemyShipScript : MonoBehaviour {
 
     private void HitEffect()
     {
+        ParticleSystem.MainModule mm;
         GameObject hiteffect;
         hiteffect = Instantiate(hit_effect, transform.position, Quaternion.identity) as GameObject;
-        hiteffect.GetComponent<ParticleSystem>().startColor = Color.red; //gameObject.GetComponent<SpriteRenderer>().color;
+        mm = hiteffect.GetComponent<ParticleSystem>().main;
+        mm.startColor = gameObject.GetComponent<SpriteRenderer>().color;
     }
 
     private bool IsOnScreen()

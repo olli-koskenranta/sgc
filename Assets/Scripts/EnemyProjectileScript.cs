@@ -69,8 +69,10 @@ public class EnemyProjectileScript : MonoBehaviour {
 
     private void HitEffect()
     {
+        ParticleSystem.MainModule mm;
         GameObject hiteffect;
         hiteffect = Instantiate(hit_effect, transform.position, Quaternion.identity) as GameObject;
-        hiteffect.GetComponent<ParticleSystem>().startColor = gameObject.GetComponent<SpriteRenderer>().color;
+        mm = hiteffect.GetComponent<ParticleSystem>().main;
+        mm.startColor = gameObject.GetComponent<SpriteRenderer>().color;
     }
 }

@@ -3,8 +3,9 @@ using System.Collections;
 
 public class ExplosionScript : MonoBehaviour {
 
-	void Start () {
-        Destroy(this.gameObject, GetComponent<ParticleSystem>().duration);
+	void Start ()
+    {
+        Destroy(this.gameObject, GetComponent<ParticleSystem>().main.duration);
 	}
 	
 }

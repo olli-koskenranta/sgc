@@ -75,6 +75,10 @@ public class PlayerShieldScript : MonoBehaviour {
         {
             isHit(col.gameObject.GetComponent<EnemyProjectileScript>().damage);
         }
+        else if (col.gameObject.GetComponent<Anomaly1Script>() != null)
+        {
+            isHit(col.gameObject.GetComponent<Anomaly1Script>().damage);
+        }
     }
 
     void SetTransparency()
