@@ -175,7 +175,9 @@ public class EnemyShipScript : MonoBehaviour {
         if (col.gameObject.GetComponent<CollectorScript>() != null)
         {
             if (!ALIVE)
+            {
                 Destroy(gameObject);
+            }
             else
                 isHit(col.gameObject.GetComponent<CollectorScript>().grinderDamage);
         }

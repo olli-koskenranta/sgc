@@ -19,12 +19,14 @@ public class CollectorScript : MonoBehaviour
     private float[] PowerUpStartTime;
 
     public int grinderDamage = 1;
+    private float levelStartTime;
+    private float levelUpInterval = 30f;
 
     void Start()
     {
         scrapForNextLevel = 0;
         //sessionScrapCount = 0;
-
+        levelStartTime = Time.time;
         PowerUpActive = new bool[GameControlScript.gameControl.GetNumberOfPowerUps()];
         PowerUpStartTime = new float[GameControlScript.gameControl.GetNumberOfPowerUps()];
         for (int i = 0; i < PowerUpActive.Length; i++)
@@ -37,6 +39,10 @@ public class CollectorScript : MonoBehaviour
 
     void Update()
     {
+        if (Time.time - levelStartTime >= levelUpInterval && !IsBossPresent())
+        {
+            LevelUp();
+        }
         //Handle Power Up Duration, ***DEPRECATED***
         /*for (int i = 0; i < PowerUpActive.Length; i++)
         {
@@ -69,6 +75,7 @@ public class CollectorScript : MonoBehaviour
         if (col.gameObject.GetComponent<MeteorScript>() != null)
         {
             col.gameObject.GetComponent<MeteorScript>().isHit(grinderDamage);
+            col.gameObject.GetComponent<Rigidbody2D>().gravityScale = 1f;
         }
         else if (col.gameObject.GetComponent<ScrapPieceScript>() != null)
         {
@@ -135,18 +142,34 @@ public class CollectorScript : MonoBehaviour
             GameControlScript.gameControl.scrapCount += amount;
         //sessionScrapCount += amount;
 
-        if (FindAnomaly(1) == null && FindAnomaly(2) == null && FindAnomaly(3) == null) //Do not allow level up if a "boss" is present
-            scrapForNextLevel += amount;
+        
+        //scrapForNextLevel += amount;
 
         SetScrapCountText();
 
-        if (scrapForNextLevel >= GameControlScript.gameControl.scrapRequiredForNextLevel * GameControlScript.gameControl.currentLevel)
+        /*if (scrapForNextLevel >= GameControlScript.gameControl.scrapRequiredForNextLevel * GameControlScript.gameControl.currentLevel)
         {
             scrapForNextLevel -= GameControlScript.gameControl.scrapRequiredForNextLevel * GameControlScript.gameControl.currentLevel;
             GameControlScript.gameControl.currentLevel += 1;
             SetScrapCountText();
             announcer.GetComponent<AnnouncerScript>().Announce("Zone " + GameControlScript.gameControl.currentLevel.ToString() + "!", FloatingText.FTType.Announcement);
-        }
+        }*/
+    }
+
+    public void LevelUp()
+    {
+        GameControlScript.gameControl.currentLevel += 1;
+        SetScrapCountText();
+        announcer.GetComponent<AnnouncerScript>().Announce("Zone " + GameControlScript.gameControl.currentLevel.ToString() + "!", FloatingText.FTType.Announcement);
+        levelStartTime = Time.time;
+    }
+
+    public bool IsBossPresent()
+    {
+        if (FindAnomaly(1) || FindAnomaly(2) || FindAnomaly(3))
+            return true;
+        else
+            return false;
     }
 
     public void GotPowerUp()

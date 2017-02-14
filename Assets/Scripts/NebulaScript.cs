@@ -30,14 +30,14 @@ public class NebulaScript : MonoBehaviour {
         //counter++;
         if (!ALIVE)
         {
-            transform.localScale -= new Vector3(0.01f, 0.01f, 0);
+            transform.localScale -= new Vector3(0.005f, 0.005f, 0);
             if (transform.localScale.x < 0.05)
                 Destroy(gameObject);
             return;
         }
         else if (transform.localScale.x < preferredScale.x)
         {
-            transform.localScale += new Vector3(0.01f, 0.01f, 0);
+            transform.localScale += new Vector3(0.005f, 0.005f, 0);
         }
 
 
@@ -111,9 +111,9 @@ public class NebulaScript : MonoBehaviour {
     {
         hitPoints += 2 * hp;
         Destroy(gameobj);
-        if (preferredScale.x < 1f)
+        if (preferredScale.x < 0.5f)
         {
-            preferredScale += new Vector3(0.1f, 0.1f, 0);
+            preferredScale += new Vector3(0.05f, 0.05f, 0);
         }
         consumedObjects++;
     }

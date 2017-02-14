@@ -15,11 +15,6 @@ public class FloatingTextScript : MonoBehaviour {
     public float durationBeforeFading = 4f;
     //Default font size is 30
 
-    void Awake()
-    {
-        GetComponent<MeshRenderer>().sortingLayerName = SortingLayerName;
-        GetComponent<MeshRenderer>().sortingOrder = SortingOrder;
-    }
 	void Start () {
         GetComponent<TextMesh>().text = text;
         newColor = GetComponent<TextMesh>().color;
@@ -45,6 +40,8 @@ public class FloatingTextScript : MonoBehaviour {
             default:
                 break;
         }
+        GetComponent<MeshRenderer>().sortingLayerName = SortingLayerName;
+        GetComponent<MeshRenderer>().sortingOrder = SortingOrder;
 
     }
 	

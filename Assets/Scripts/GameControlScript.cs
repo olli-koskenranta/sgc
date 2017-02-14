@@ -25,6 +25,8 @@ public class GameControlScript : MonoBehaviour {
     public int[] WeaponScrapCost;
     public int[] WeaponRMCost;
 
+    public DateTime DateDailyResearchTime;
+
 
     //0 = attack speed
     //1 = mass
@@ -128,6 +130,7 @@ public class GameControlScript : MonoBehaviour {
         ExpForSkillUp = 10;
         currentLevel = 1;
         scrapRequiredForNextLevel = 200;
+        DateDailyResearchTime = new DateTime(2001, 1, 1, 6, 0, 0);
 
         AUDIO_SOUNDS = false;
         AUDIO_MUSIC = false;
@@ -289,6 +292,7 @@ public class GameControlScript : MonoBehaviour {
             data.selectedWeapon = 0;
             data.ArmorUpgrades = 0;
             data.researchMaterialCount = 0;
+            data.DateDailyResearchTime = new DateTime(2001, 1, 1, 6, 0, 0);
         }
         else
         {
@@ -297,6 +301,7 @@ public class GameControlScript : MonoBehaviour {
             data.selectedWeapon = SelectedWeapon;
             data.ArmorUpgrades = ArmorUpgrades;
             data.researchMaterialCount = researchMaterialCount;
+            data.DateDailyResearchTime = DateDailyResearchTime;
         }
         data.WeaponSkill = WeaponSkill;
         data.Experience = Experience;
@@ -328,6 +333,9 @@ public class GameControlScript : MonoBehaviour {
             WeaponUpgradePointsTotal = data.WeaponUpgradePointsTotal;
         if (data.WeaponUpgradePointsAvailable != null)
             WeaponUpgradePointsAvailable = data.WeaponUpgradePointsAvailable;
+        if (data.DateDailyResearchTime != null)
+            DateDailyResearchTime = data.DateDailyResearchTime;
+        
     }
 
     public void ResetPowerUps()
@@ -396,6 +404,8 @@ class PlayerData
     public int[] WeaponUpgradePointsTotal = new int[GameControlScript.gameControl.GetNumberOfWeapons()];
 
     public int[] WeaponUpgradePointsAvailable = new int[GameControlScript.gameControl.GetNumberOfWeapons()];
+
+    public DateTime DateDailyResearchTime;
 
     public int selectedWeapon;
 

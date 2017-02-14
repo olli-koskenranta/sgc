@@ -15,6 +15,7 @@ public class ArmoryScript : MonoBehaviour {
     public Button zonePlus;
     public Button zoneMinus;
     public Button btnBuyPoints;
+    public Button btnDailyResearch;
 
     public enum ArmoryView { Weapon, Ship };
     public ArmoryView view;
@@ -59,11 +60,6 @@ public class ArmoryScript : MonoBehaviour {
                 + "(+" + (GameControlScript.gameControl.WeaponUpgrades[GameControlScript.gameControl.SelectedWeapon, 2] * 25).ToString() + "%)"
             + "\nCritical Multiplier: " + GameControlScript.gameControl.Weapons[GameControlScript.gameControl.SelectedWeapon].CriticalMultiplier.ToString()
             + "\nSpecial Chance: " + GameControlScript.gameControl.Weapons[GameControlScript.gameControl.SelectedWeapon].SpecialChance.ToString() + "%"
-            
-            
-            
-            
-            
             + "\nStart Zone: " + GameControlScript.gameControl.currentLevel.ToString();
 
         selectWeapon0.GetComponentInChildren<Text>().text = GameControlScript.gameControl.WeaponNames[0];
@@ -94,7 +90,18 @@ public class ArmoryScript : MonoBehaviour {
         }
         else
         {
-            btnBuyPoints.GetComponentInChildren<Text>().text = "Upgrade points\nMAXED";
+            btnBuyPoints.GetComponentInChildren<Text>().text = "Points Maxed";
+        }
+
+        if (IsDailyResearchAvailable())
+        {
+            btnDailyResearch.interactable = true;
+            btnDailyResearch.GetComponentInChildren<Text>().text = "Daily Research\n+5 RM\nWatch Ad";
+        }
+        else
+        {
+            btnDailyResearch.interactable = false;
+            btnDailyResearch.GetComponentInChildren<Text>().text = "Daily Research\nCompleted";
         }
 
 
@@ -249,6 +256,10 @@ public class ArmoryScript : MonoBehaviour {
 
         int scrapCost = GameControlScript.gameControl.UpgradePointCost(0);
         int RMCost = GameControlScript.gameControl.UpgradePointCost(1);
+        if (GameControlScript.gameControl.WeaponUpgradePointsTotal[GameControlScript.gameControl.SelectedWeapon] >= 10)
+        {
+            RMCost += 1;
+        }
 
         if (GameControlScript.gameControl.scrapCount >= scrapCost && GameControlScript.gameControl.researchMaterialCount >= RMCost)
         {
@@ -271,6 +282,8 @@ public class ArmoryScript : MonoBehaviour {
                 {
                     GameControlScript.gameControl.researchMaterialCount += 5;
                     DAILY_RESEARCH = false;
+                    GameControlScript.gameControl.DateDailyResearchTime = System.DateTime.Now;
+                    GameControlScript.gameControl.SaveData();
                 }
                 break;
             case "SKIPPED":
@@ -284,8 +297,20 @@ public class ArmoryScript : MonoBehaviour {
 
     public void DailyResearchClicked()
     {
-        DAILY_RESEARCH = true;
-        adManager.ShowAd();
+        if (IsDailyResearchAvailable())
+        {
+            DAILY_RESEARCH = true;
+            adManager.ShowAd();
+        }
+    }
+
+    private bool IsDailyResearchAvailable()
+    {
+        System.DateTime dateTime = System.DateTime.Now;
+        if (dateTime.Day != GameControlScript.gameControl.DateDailyResearchTime.Day)
+            return true;
+        else
+            return false;
     }
 
 

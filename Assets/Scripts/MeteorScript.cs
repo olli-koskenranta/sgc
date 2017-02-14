@@ -8,7 +8,7 @@ public class MeteorScript : MonoBehaviour {
 
     private bool spawnProtection;
     private float spawnTime;
-    float speed = 1f;
+    float speed = 1.5f;
     public int hitPoints;
     public int meteorFragments = 3;
     public GameObject scrapMeteor;
