@@ -24,7 +24,10 @@ public class ArmoryScript : MonoBehaviour {
 
     public Slider[] upgradeSliders = new Slider[6];
 
-	void Start ()
+    private AdManagerScript adManager;
+    private bool DAILY_RESEARCH = false;
+
+    void Start ()
     {
         view = ArmoryView.Weapon;
         WeaponUpgradeUIElements = FindGameObjectsWithLayer(12);
@@ -32,7 +35,13 @@ public class ArmoryScript : MonoBehaviour {
         ShowShipUI(false);
         SetTextsAndUpdate();
         UpdateSliders();
-	}
+
+        adManager = GameObject.Find("AdManager").GetComponent<AdManagerScript>();
+        if (adManager)
+        {
+            Debug.Log("Ad manager found!");
+        }
+    }
 
     public void SetTextsAndUpdate()
     {
@@ -79,7 +88,14 @@ public class ArmoryScript : MonoBehaviour {
         zoneMinus.GetComponentInChildren<Text>().text = "Start Zone-";
 
         textUpgPoints.text = GameControlScript.gameControl.WeaponNames[GameControlScript.gameControl.SelectedWeapon] + " Upgrade Points: " + UpgPointsAvailable().ToString();
-        btnBuyPoints.GetComponentInChildren<Text>().text = "Buy Points\n" + GameControlScript.gameControl.UpgradePointCost(0).ToString() + "S/" + GameControlScript.gameControl.UpgradePointCost(1).ToString() + "RM";
+        if (GameControlScript.gameControl.WeaponUpgradePointsTotal[GameControlScript.gameControl.SelectedWeapon] < 24)
+        {
+            btnBuyPoints.GetComponentInChildren<Text>().text = "Buy Points\n" + GameControlScript.gameControl.UpgradePointCost(0).ToString() + "S/" + GameControlScript.gameControl.UpgradePointCost(1).ToString() + "RM";
+        }
+        else
+        {
+            btnBuyPoints.GetComponentInChildren<Text>().text = "Upgrade points\nMAXED";
+        }
 
 
         //GameControlScript.gameControl.UpdatePlayerAttributes();
@@ -228,6 +244,9 @@ public class ArmoryScript : MonoBehaviour {
 
     public void BuyPointsClicked()
     {
+        if (GameControlScript.gameControl.WeaponUpgradePointsTotal[GameControlScript.gameControl.SelectedWeapon] == 24)
+            return;
+
         int scrapCost = GameControlScript.gameControl.UpgradePointCost(0);
         int RMCost = GameControlScript.gameControl.UpgradePointCost(1);
 
@@ -242,4 +261,32 @@ public class ArmoryScript : MonoBehaviour {
         else
             Debug.Log("Not enough materials!");
     }
+
+    public void AdFinished(string result)
+    {
+        switch (result)
+        {
+            case "FINISHED":
+                if (DAILY_RESEARCH)
+                {
+                    GameControlScript.gameControl.researchMaterialCount += 5;
+                    DAILY_RESEARCH = false;
+                }
+                break;
+            case "SKIPPED":
+                break;
+            case "FAILED":
+                break;
+            default:
+                break;
+        }
+    }
+
+    public void DailyResearchClicked()
+    {
+        DAILY_RESEARCH = true;
+        adManager.ShowAd();
+    }
+
+
 }

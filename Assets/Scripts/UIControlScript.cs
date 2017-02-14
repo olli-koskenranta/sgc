@@ -6,7 +6,7 @@ using System.Collections;
 public class UIControlScript : MonoBehaviour {
 
     private GameObject LoadingText;
-
+    
     
 
     void Start()
@@ -72,7 +72,5 @@ public class UIControlScript : MonoBehaviour {
         }
     }
 
-    
 
-    
 }
