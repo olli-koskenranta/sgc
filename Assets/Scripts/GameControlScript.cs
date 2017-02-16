@@ -20,7 +20,7 @@ public class GameControlScript : MonoBehaviour {
     public int[] Experience;
     public int[] WeaponSkill;
     public int ExpForSkillUp;
-    private string GameVersion = "0.6a";
+    private string GameVersion = "0.6c";
 
     public int[] WeaponScrapCost;
     public int[] WeaponRMCost;
