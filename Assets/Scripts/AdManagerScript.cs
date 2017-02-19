@@ -24,11 +24,11 @@ public class AdManagerScript : MonoBehaviour {
         }
     }
 
-    public void ShowAd(string type = "")
+    public IEnumerator ShowAd(string type = "")
     {
-    #if UNITY_EDITOR
-            StartCoroutine(WaitForAd());
-    #endif
+    //#if UNITY_EDITOR
+    //        StartCoroutine(WaitForAd());
+    //#endif
 
         if (string.Equals(type, ""))
         {
@@ -38,10 +38,12 @@ public class AdManagerScript : MonoBehaviour {
         ShowOptions options = new ShowOptions();
         options.resultCallback = AdCallbackHandler;
 
-        if (Advertisement.IsReady(type))
+        while (!Advertisement.isInitialized || !Advertisement.IsReady())
         {
-            Advertisement.Show(type, options);
+            yield return new WaitForSeconds(0.5f);
         }
+
+        Advertisement.Show(type, options);
         
     }
 

@@ -160,6 +160,18 @@ public class CollectorScript : MonoBehaviour
     {
         GameControlScript.gameControl.currentLevel += 1;
         SetScrapCountText();
+        for (int i = 0; i < GameControlScript.gameControl.startZones.Length; i++)
+        {
+            if (GameControlScript.gameControl.startZones[i] == GameControlScript.gameControl.currentLevel && !GameControlScript.gameControl.StartZoneUnlocked[i])
+            {
+                GameControlScript.gameControl.StartZoneUnlocked[i] = true;
+                announcer.GetComponent<AnnouncerScript>().Announce("Zone " + GameControlScript.gameControl.currentLevel.ToString() + "!"
+                    + "\nNew Start Zone Unlocked!", FloatingText.FTType.Announcement);
+                levelStartTime = Time.time;
+                GameControlScript.gameControl.SaveData();
+                return;
+            }
+        }
         announcer.GetComponent<AnnouncerScript>().Announce("Zone " + GameControlScript.gameControl.currentLevel.ToString() + "!", FloatingText.FTType.Announcement);
         levelStartTime = Time.time;
     }

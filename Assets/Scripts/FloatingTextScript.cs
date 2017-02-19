@@ -26,6 +26,7 @@ public class FloatingTextScript : MonoBehaviour {
                 break;
             case FTType.Announcement:
                 newColor.a = 0f;
+                GetComponent<TextMesh>().color = newColor;
                 transform.position += new Vector3(0f, -2f, 0);
                 break;
             case FTType.PowerUp:

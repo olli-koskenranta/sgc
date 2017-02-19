@@ -35,6 +35,7 @@ public class MeteorScript : MonoBehaviour {
     private int medMeteorDamage = 2;
     private int bigMeteorDamage = 6;
     private int hugeMeteorDamage = 18;
+    private int collisionCounter = 0;
 
     void Start()
     {
@@ -89,6 +90,9 @@ public class MeteorScript : MonoBehaviour {
             default:
                 break;
         }
+
+        if (HIT_BY_KINECTIC_DMG)
+            hitPoints = 1;
         
 
     }
@@ -178,8 +182,12 @@ public class MeteorScript : MonoBehaviour {
             }
             else
             {
-                if (!spawnProtection)
-                    isHit(col.gameObject.GetComponent<MeteorScript>().damage);
+                collisionCounter++;
+                if (collisionCounter % 10 == 0)
+                {
+                    if (!spawnProtection)
+                        isHit(col.gameObject.GetComponent<MeteorScript>().damage);
+                }
             }
         }
     }
@@ -257,7 +265,6 @@ public class MeteorScript : MonoBehaviour {
                 if (HIT_BY_KINECTIC_DMG)
                 {
                     fragment.GetComponent<SpriteRenderer>().color = Color.gray;
-                    fragment.GetComponent<MeteorScript>().hitPoints = 1;
                     fragment.GetComponent<MeteorScript>().HIT_BY_KINECTIC_DMG = true;
                 }
                 if (HIT_BY_GRAVITY_DMG)

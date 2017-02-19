@@ -12,21 +12,23 @@ public class ArmoryScript : MonoBehaviour {
     public Button selectWeapon1;
     public Button selectWeapon2;
     public Button buttonShipUpgrades;
-    public Button zonePlus;
-    public Button zoneMinus;
     public Button btnBuyPoints;
     public Button btnDailyResearch;
+    public Dropdown ddSelectZone;
 
     public enum ArmoryView { Weapon, Ship };
     public ArmoryView view;
 
     private GameObject[] WeaponUpgradeUIElements;
     private GameObject[] ShipUpgradeUIElements;
+    
 
     public Slider[] upgradeSliders = new Slider[6];
 
     private AdManagerScript adManager;
     private bool DAILY_RESEARCH = false;
+
+    private int[] StartingZones;
 
     void Start ()
     {
@@ -34,8 +36,11 @@ public class ArmoryScript : MonoBehaviour {
         WeaponUpgradeUIElements = FindGameObjectsWithLayer(12);
         ShipUpgradeUIElements = FindGameObjectsWithLayer(13);
         ShowShipUI(false);
-        SetTextsAndUpdate();
+        
         UpdateSliders();
+        UpdateStartingZones();
+        UpdateArmoryUI();
+        
 
         adManager = GameObject.Find("AdManager").GetComponent<AdManagerScript>();
         if (adManager)
@@ -44,7 +49,7 @@ public class ArmoryScript : MonoBehaviour {
         }
     }
 
-    public void SetTextsAndUpdate()
+    public void UpdateArmoryUI()
     {
 
         textInfo.text = "Scrap Count: " + GameControlScript.gameControl.scrapCount.ToString()
@@ -80,8 +85,6 @@ public class ArmoryScript : MonoBehaviour {
         else
             selectWeapon2.GetComponentInChildren<Text>().text = GameControlScript.gameControl.WeaponNames[2];
 
-        zonePlus.GetComponentInChildren<Text>().text = "Start Zone+";
-        zoneMinus.GetComponentInChildren<Text>().text = "Start Zone-";
 
         textUpgPoints.text = GameControlScript.gameControl.WeaponNames[GameControlScript.gameControl.SelectedWeapon] + " Upgrade Points: " + UpgPointsAvailable().ToString();
         if (GameControlScript.gameControl.WeaponUpgradePointsTotal[GameControlScript.gameControl.SelectedWeapon] < 24)
@@ -119,12 +122,38 @@ public class ArmoryScript : MonoBehaviour {
         }
     }
 
+    public void UpdateStartingZones()
+    {
+        ddSelectZone.ClearOptions();
+        RectTransform rect = ddSelectZone.transform.FindChild("Template").GetComponent<RectTransform>();
+        float size = 0;
+        for (int i = 0; i < GameControlScript.gameControl.startZones.Length; i++)
+        {
+            if (GameControlScript.gameControl.StartZoneUnlocked[i])
+            {
+                size += 120;
+                rect.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, size);
+                string newText = "Start Zone " + GameControlScript.gameControl.startZones[i].ToString();
+                ddSelectZone.options.Add(new Dropdown.OptionData() { text = newText });
+            }
+            else continue;
+        }
+        ddSelectZone.value = 0;
+        ddSelectZone.RefreshShownValue();
+    }
+
+    public void DropDownZoneSelected()
+    {
+        GameControlScript.gameControl.currentLevel = GameControlScript.gameControl.startZones[ddSelectZone.value];
+        UpdateArmoryUI();
+    }
+
     public void UpgradeSliderChanged(int sliderNumber)
     {
         //Debug.Log("Is this called");
         GameControlScript.gameControl.WeaponUpgrades[GameControlScript.gameControl.SelectedWeapon, sliderNumber] = (int)upgradeSliders[sliderNumber].value;
         GameControlScript.gameControl.Weapons[GameControlScript.gameControl.SelectedWeapon].UpdateValues(GameControlScript.gameControl.SelectedWeapon);
-        SetTextsAndUpdate();
+        UpdateArmoryUI();
 
     }
 
@@ -165,7 +194,7 @@ public class ArmoryScript : MonoBehaviour {
         if (GameControlScript.gameControl.WeaponUnlocked[weaponNumber])
         {
             GameControlScript.gameControl.SelectedWeapon = weaponNumber;
-            SetTextsAndUpdate();
+            UpdateArmoryUI();
         }
         else
         {
@@ -187,7 +216,7 @@ public class ArmoryScript : MonoBehaviour {
             view = ArmoryScript.ArmoryView.Ship;
             ShowShipUI(true);
             ShowWeaponUI(false);
-            SetTextsAndUpdate();
+            UpdateArmoryUI();
         }
 
         //Show ship upgrades UI
@@ -235,20 +264,6 @@ public class ArmoryScript : MonoBehaviour {
         }
     }
 
-    public void ZonePlusClicked()
-    {
-        GameControlScript.gameControl.currentLevel += 1;
-        SetTextsAndUpdate();
-    }
-
-    public void ZoneMinusClicked()
-    {
-        if (GameControlScript.gameControl.currentLevel > 2)
-            GameControlScript.gameControl.currentLevel -= 1;
-
-        SetTextsAndUpdate();
-    }
-
     public void BuyPointsClicked()
     {
         if (GameControlScript.gameControl.WeaponUpgradePointsTotal[GameControlScript.gameControl.SelectedWeapon] == 24)
@@ -267,7 +282,7 @@ public class ArmoryScript : MonoBehaviour {
             GameControlScript.gameControl.researchMaterialCount -= RMCost;
 
             GameControlScript.gameControl.WeaponUpgradePointsTotal[GameControlScript.gameControl.SelectedWeapon] += 1;
-            SetTextsAndUpdate();
+            UpdateArmoryUI();
         }
         else
             Debug.Log("Not enough materials!");
@@ -280,15 +295,18 @@ public class ArmoryScript : MonoBehaviour {
             case "FINISHED":
                 if (DAILY_RESEARCH)
                 {
-                    GameControlScript.gameControl.researchMaterialCount += 5;
                     DAILY_RESEARCH = false;
+                    GameControlScript.gameControl.researchMaterialCount += 5;
                     GameControlScript.gameControl.DateDailyResearchTime = System.DateTime.Now;
+                    UpdateArmoryUI();
                     GameControlScript.gameControl.SaveData();
                 }
                 break;
             case "SKIPPED":
+                DAILY_RESEARCH = false;
                 break;
             case "FAILED":
+                DAILY_RESEARCH = false;
                 break;
             default:
                 break;
@@ -297,10 +315,12 @@ public class ArmoryScript : MonoBehaviour {
 
     public void DailyResearchClicked()
     {
+        if (DAILY_RESEARCH)
+            return;
         if (IsDailyResearchAvailable())
         {
             DAILY_RESEARCH = true;
-            adManager.ShowAd();
+            StartCoroutine(adManager.ShowAd());
         }
     }
 

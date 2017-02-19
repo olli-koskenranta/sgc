@@ -10,6 +10,7 @@ public class GameControlScript : MonoBehaviour {
 
     public const int numberOfPowerUps = 3;
     public const int numberOfWeapons = 4;
+    public const int numberOfStartZones = 11;
 
     public static GameControlScript gameControl;
     public int scrapCount = 0;
@@ -21,6 +22,7 @@ public class GameControlScript : MonoBehaviour {
     public int[] WeaponSkill;
     public int ExpForSkillUp;
     private string GameVersion = "0.6c";
+    
 
     public int[] WeaponScrapCost;
     public int[] WeaponRMCost;
@@ -46,6 +48,9 @@ public class GameControlScript : MonoBehaviour {
 
     //Player attributes
     public int shipArmor;
+    public bool[] StartZoneUnlocked;
+    public int[] startZones;
+
 
     //Weapon types
     //0 = Basic Cannon
@@ -124,8 +129,10 @@ public class GameControlScript : MonoBehaviour {
         Experience = new int[numberOfWeapons];
         PowerUps = new bool[numberOfPowerUps];
         PowerUpNames = new string[numberOfPowerUps] { "Kinetic Bomb", "Repel Shield", "Gravity Bomb" }; //, "Slow Meteors", "Cluster Projectile", "Repel Shield", "Attack Speed" };
+        startZones = new int[] { 1, 5, 11, 21, 31, 41, 51, 61, 71, 81, 91 };
         WeaponSkill = new int[numberOfWeapons];
         WeaponUnlocked = new bool[numberOfWeapons] { true, false, false, false };
+        
         AttackSpeedReductions = new float[] { 0.15f, 0.5f, 0.25f, 0 };
         ExpForSkillUp = 10;
         currentLevel = 1;
@@ -138,6 +145,9 @@ public class GameControlScript : MonoBehaviour {
         WeaponUpgrades = new int[numberOfWeapons, 7];
         WeaponUpgradePointsTotal = new int[numberOfWeapons];
         WeaponUpgradePointsAvailable = new int[numberOfWeapons];
+
+        StartZoneUnlocked = new bool[numberOfStartZones] { true, false, false, false, false, false, false, false, false, false, false };
+        
 
         ClearArrays();
 
@@ -241,6 +251,7 @@ public class GameControlScript : MonoBehaviour {
         //WeaponUpgrades = new int[4, 7];
         ClearArrays();
         WeaponUnlocked = new bool[numberOfWeapons] { true, false, false, false };
+        StartZoneUnlocked = new bool[numberOfStartZones] { true, false, false, false, false, false, false, false, false, false, false };
 
         PlayerData playerData = GetPlayerData(true);
 
@@ -306,6 +317,7 @@ public class GameControlScript : MonoBehaviour {
         data.WeaponSkill = WeaponSkill;
         data.Experience = Experience;
         data.WeaponUnlocked = WeaponUnlocked;
+        data.StartZoneUnlocked = StartZoneUnlocked;
         data.WeaponUpgrades = WeaponUpgrades;
         data.WeaponUpgradePointsTotal = WeaponUpgradePointsTotal;
         data.WeaponUpgradePointsAvailable = WeaponUpgradePointsAvailable;
@@ -327,6 +339,8 @@ public class GameControlScript : MonoBehaviour {
         researchMaterialCount = data.researchMaterialCount;
         if (data.WeaponUnlocked != null)
             WeaponUnlocked = data.WeaponUnlocked;
+        if (data.StartZoneUnlocked != null)
+            StartZoneUnlocked = data.StartZoneUnlocked;
         if (data.WeaponUpgrades != null)
             WeaponUpgrades = data.WeaponUpgrades;
         if (data.WeaponUpgradePointsTotal != null)
@@ -353,6 +367,11 @@ public class GameControlScript : MonoBehaviour {
     public int GetNumberOfWeapons()
     {
         return numberOfWeapons;
+    }
+
+    public int GetNumberOfStartZones()
+    {
+        return numberOfStartZones;
     }
 
     public void ExperienceGained(int amount)
@@ -399,6 +418,8 @@ class PlayerData
 
     public bool[] WeaponUnlocked = new bool[GameControlScript.gameControl.GetNumberOfWeapons()];
 
+    public bool[] StartZoneUnlocked = new bool[GameControlScript.gameControl.GetNumberOfStartZones()];
+
     public int[,] WeaponUpgrades = new int[GameControlScript.gameControl.GetNumberOfWeapons(), 7];
 
     public int[] WeaponUpgradePointsTotal = new int[GameControlScript.gameControl.GetNumberOfWeapons()];
@@ -408,6 +429,8 @@ class PlayerData
     public DateTime DateDailyResearchTime;
 
     public int selectedWeapon;
+
+    
 
     public string GameVersion;
 }
