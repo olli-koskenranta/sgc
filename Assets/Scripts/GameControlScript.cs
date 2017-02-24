@@ -8,7 +8,7 @@ using System.IO;
 
 public class GameControlScript : MonoBehaviour {
 
-    public const int numberOfPowerUps = 3;
+    public const int numberOfPowerUps = 4;
     public const int numberOfWeapons = 4;
     public const int numberOfStartZones = 11;
 
@@ -34,9 +34,9 @@ public class GameControlScript : MonoBehaviour {
     //1 = mass
     //2 = damage
     //3 = crit multiplier
-    //4 = skill cap
+    //4 = unique ability
     //5 = special chance
-    //6 = bounces
+    //6 = skill cap increase
     public int[,] WeaponUpgrades;
     public int[] WeaponUpgradePointsTotal;
     public int[] WeaponUpgradePointsAvailable;
@@ -122,18 +122,18 @@ public class GameControlScript : MonoBehaviour {
     void Start()
     {
         //Debug.Log("GameControl START()!");
-        WeaponUpgradeCosts = new int[] { 1000, 5000, 10000, 20000 };
-        WeaponUpgradeRMCosts = new int[] { 0, 5, 10, 20 };
+        WeaponUpgradeCosts = new int[] { 1000, 100, 10000, 20000 };
+        WeaponUpgradeRMCosts = new int[] { 0, 0, 10, 20 };
         WeaponScrapCost = new int[numberOfWeapons] { 0, 20000, 100000, 1000000 };
         WeaponRMCost = new int[numberOfWeapons] { 0, 1, 5, 50 };
         Experience = new int[numberOfWeapons];
         PowerUps = new bool[numberOfPowerUps];
-        PowerUpNames = new string[numberOfPowerUps] { "Kinetic Bomb", "Repel Shield", "Gravity Bomb" }; //, "Slow Meteors", "Cluster Projectile", "Repel Shield", "Attack Speed" };
+        PowerUpNames = new string[numberOfPowerUps] { "Kinetic Bomb", "Repel Shield", "Gravity Bomb", "Max Weapon Power" }; //, "Slow Meteors", "Cluster Projectile", "Repel Shield", "Attack Speed" };
         startZones = new int[] { 1, 5, 11, 21, 31, 41, 51, 61, 71, 81, 91 };
         WeaponSkill = new int[numberOfWeapons];
         WeaponUnlocked = new bool[numberOfWeapons] { true, false, false, false };
         
-        AttackSpeedReductions = new float[] { 0.15f, 0.5f, 0.25f, 0 };
+        AttackSpeedReductions = new float[] { 0.15f, 0.05f, 0.025f, 0 };
         ExpForSkillUp = 10;
         currentLevel = 1;
         scrapRequiredForNextLevel = 200;
@@ -154,13 +154,13 @@ public class GameControlScript : MonoBehaviour {
         Weapons = new Turret[numberOfWeapons];
 
         //Create weapons
-        BlasterTurret = new Turret(10f, 2, 2, 1, 5, 2f, 0, SpecialType.GravityDamage);
-        BlasterTurret.SetUpgradeValuesPerSkillPoint(2, 2, 0.2f);
+        BlasterTurret = new Turret(10f, 2, 1, 1, 5, 2f, 0, SpecialType.GravityDamage, "Gravity Blast", "Bounces");
+        BlasterTurret.SetUpgradeValuesPerSkillPoint(2, 1, 0.2f);
 
-        PulseLaserTurret = new Turret(20f, 100, 0.0001f, 0.4f, 5, 2f, 1, SpecialType.Piercing);
+        PulseLaserTurret = new Turret(20f, 100, 0.0001f, 0.4f, 5, 2f, 1, SpecialType.Piercing, "Piercing", "Beam Split");
         PulseLaserTurret.SetUpgradeValuesPerSkillPoint(3, 0, 0.2f);
 
-        MassDriverTurret = new Turret(30f, 50, 0.1f, 0.2f, 5f, 2f, 2, SpecialType.Shrapnel);
+        MassDriverTurret = new Turret(30f, 50, 0.1f, 0.2f, 5f, 2f, 2, SpecialType.Shrapnel, "Shrapnel", "THINK OF SOMETHING");
         MassDriverTurret.SetUpgradeValuesPerSkillPoint(4, 0.1f, 0.2f);
 
         PlasmaTurret = new Turret(10f, 10, 3, 1, 5, 5, 3, SpecialType.Shrapnel);
@@ -376,7 +376,7 @@ public class GameControlScript : MonoBehaviour {
 
     public void ExperienceGained(int amount)
     {
-        Experience[SelectedWeapon] += amount * currentLevel;// * 100;
+        Experience[SelectedWeapon] += amount * currentLevel;
         if (Experience[SelectedWeapon] >= ExpForSkillUp * WeaponSkill[SelectedWeapon]) //if true -> +Skill point
         {
             Experience[SelectedWeapon] -= ExpForSkillUp * WeaponSkill[SelectedWeapon];
@@ -462,37 +462,42 @@ namespace ShipWeapons
     public class Turret
     {
         //Base stats
-        float baseSpeed;
-        int baseDamage;
-        float baseMass;
-        float baseROF;
-        float baseCritChance;
-        float baseCritMultiplier;
-        float baseSpecialChance;
-        SpecialType specialType;
-        int WeaponType;
-        float fireTime;
-        int bounces;
-        int skillCap;
+        private float baseSpeed;
+        private int baseDamage;
+        private float baseMass;
+        private float baseROF;
+        private float baseCritChance;
+        private float baseCritMultiplier;
+        private float baseSpecialChance;
+        private SpecialType specialType;
+        private int WeaponType;
+        private float fireTime;
+        private int bounces;
+        private int skillCap;
+
+        //Special names
+        string[] specials;
 
         //Upgrades per skill point
-        int uDamage;
-        float uMass;
-        float uROF;
-        float uCritChance;
-        float uSpecialChance;
+        private int uDamage;
+        private float uMass;
+        private float uROF;
+        private float uCritChance;
+        private float uSpecialChance;
 
         //Upgraded stats
-        int totalDamage;
-        float totalMass;
-        float totalROF;
-        float totalCritChance;
-        float totalSpecialChance;
-        float totalCritMultiplier;
+        private int totalDamage;
+        private float totalMass;
+        private float totalROF;
+        private float totalCritChance;
+        private float totalSpecialChance;
+        private float totalSpecial2Chance;
+        private float totalCritMultiplier;
 
         public Turret(float speed, int damage, float mass, float rof, float crit_chance,
-            float crit_multiplier, int weapon_type, SpecialType special_type = SpecialType.NONE)
+            float crit_multiplier, int weapon_type, SpecialType special_type = SpecialType.NONE, string special1 = "UNDEFINED", string special2="UNDEFINED")
         {
+            specials = new string[] { special1, special2 };
             baseSpeed = speed;
             baseDamage = damage;
             baseMass = mass;
@@ -534,22 +539,24 @@ namespace ShipWeapons
             //3 = crit multiplier
             //4 = unique ability
             //5 = special chance
-            //6 = super weapon, ultra weapon
+            //6 = skill cap increase
             totalROF = baseROF - GameControlScript.gameControl.AttackSpeedReductions[WeaponType] * GameControlScript.gameControl.WeaponUpgrades[WeaponType, 0];
             totalMass += totalMass * GameControlScript.gameControl.WeaponUpgrades[WeaponType, 1];
             totalDamage += (int)((float)totalDamage * (float)GameControlScript.gameControl.WeaponUpgrades[WeaponType, 2] * 0.25f);
             totalCritMultiplier = baseCritMultiplier + GameControlScript.gameControl.WeaponUpgrades[WeaponType, 3] * 0.5f;
             totalSpecialChance = baseSpecialChance * GameControlScript.gameControl.WeaponUpgrades[WeaponType, 5];
 
-            skillCap = 100 + 100 * GameControlScript.gameControl.WeaponUpgrades[WeaponType, 6];
+            skillCap = 100 + 5 * GameControlScript.gameControl.WeaponUpgrades[WeaponType, 6];
             //Debug.Log("Skill cap: " + skillCap.ToString());
    
 
             switch (WeaponType) //0 = blaster, 1 = laser, 2 = mass driver, 3 = plasma
             {
                 case 0:
-                    
                     bounces = GameControlScript.gameControl.WeaponUpgrades[WeaponType, 4];
+                    break;
+                case 1:
+                    totalSpecial2Chance = baseSpecialChance * GameControlScript.gameControl.WeaponUpgrades[WeaponType, 4];
                     break;
                 default:
                     break;
@@ -559,19 +566,19 @@ namespace ShipWeapons
         public int SkillCap
         {
             get { return skillCap; }
-            set { skillCap = value; }
+            //set { skillCap = value; }
         }
 
         public int Bounces
         {
             get { return bounces; }
-            set { bounces = value; }
+            //set { bounces = value; }
         }
 
         public float Speed
         {
             get { return baseSpeed; }
-            set { baseSpeed = value; }
+            //set { baseSpeed = value; }
         }
 
         public int Damage
@@ -610,16 +617,26 @@ namespace ShipWeapons
             //set { totalSpecialChance = value; }
         }
 
+        public float Special2Chance
+        {
+            get { return totalSpecial2Chance; }
+        }
+
         public SpecialType SpecialType
         {
             get { return specialType; }
-            set { specialType = value; }
+            //set { specialType = value; }
         }
 
         public float FireTime
         {
             get { return fireTime; }
             set { fireTime = value; }
+        }
+
+        public string[] SpecialNames
+        {
+            get { return specials; }
         }
     }
 }

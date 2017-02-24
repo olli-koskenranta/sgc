@@ -1,6 +1,6 @@
 fileFormatVersion: 2
-guid: 45c983d8739d09245a61a826bcc6dcc6
-timeCreated: 1481647368
+guid: 2221d2c1cb9eaa44f9842b7c557cdf21
+timeCreated: 1487569166
 licenseType: Free
 TrueTypeFontImporter:
   serializedVersion: 4
@@ -9,9 +9,11 @@ TrueTypeFontImporter:
   characterSpacing: 0
   characterPadding: 1
   includeFontData: 1
+  fontName: Orbitron
   fontNames:
-  - KenVector Future Thin
-  fallbackFontReferences: []
+  - Orbitron
+  fallbackFontReferences:
+  - {fileID: 12800000, guid: b1335b6552d90f742bd17c83e85dcf13, type: 3}
   customCharacters: 
   fontRenderingMode: 0
   ascentCalculationMode: 1

@@ -19,8 +19,6 @@ public class TurretScript : MonoBehaviour {
     private Turret turret;
     private GameObject ft;
 
-    //private float gravityBombTime = 0f;
-    //private float gravityBombInterval = 20f;
 
     void Start()
     {
@@ -93,6 +91,7 @@ public class TurretScript : MonoBehaviour {
         
         bool crit = false;
         bool special = false;
+        bool special2 = false;
         //Roll for crit
         int roll = Random.Range(1, 101);
         if (roll <= turret.CriticalChance)
@@ -132,7 +131,12 @@ public class TurretScript : MonoBehaviour {
                     LaserSound.Play();
                 }
 
-                bulletInstance = Instantiate(Bullet, firingPosition.position, firingPosition.rotation) as GameObject;
+                if (Random.Range(1, 101) <= turret.Special2Chance)
+                {
+                    special2 = true;
+                }
+
+                    bulletInstance = Instantiate(Bullet, firingPosition.position, firingPosition.rotation) as GameObject;
 
                 if (special)
                     bulletInstance.GetComponent<SpriteRenderer>().color = Color.yellow;
@@ -206,9 +210,37 @@ public class TurretScript : MonoBehaviour {
         bulletScript.critMultiplier = turret.CriticalMultiplier;
         bulletScript.bounces = turret.Bounces; 
         //Debug.Log("Bounces: " + bulletScript.bounces.ToString());
+        if (GameControlScript.gameControl.SelectedWeapon == 1 && special2)
+        {
+            BeamSplit(1, 0.25f, 0f, 0f, bulletInstance, crit, special);
+            BeamSplit(1, -0.25f, 0f, 0f, bulletInstance, crit, special);
+        }
         turret.FireTime = Time.time;
 
 
+    }
+
+    private void BeamSplit(float dirX, float dirY, float posX, float posY, GameObject splitBeam, bool isCrit, bool isSpecial)
+    {
+        GameObject bulletInstance;
+        Transf trans = new Transf(splitBeam.transform.localPosition, firingPosition.transform.localRotation, splitBeam.transform.localScale);
+        
+
+
+        float speed = turret.Speed;
+        float angle = Mathf.Atan2(dirY, dirX) * Mathf.Rad2Deg;
+        trans.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
+        trans.rotation *= splitBeam.transform.rotation;
+
+        bulletInstance = Instantiate(splitBeam, trans.position + new Vector3(posX, posY), trans.rotation) as GameObject;
+        PlayerProjectileScript bulletScript = bulletInstance.GetComponent<PlayerProjectileScript>();
+        bulletScript.Critical = isCrit;
+        bulletScript.Special = isSpecial;
+
+        //bulletInstance.GetComponent<Rigidbody2D>().mass = turret.Mass;
+        bulletInstance.GetComponent<Rigidbody2D>().velocity = bulletInstance.transform.TransformDirection(Vector3.right * turret.Speed);
+        //bulletInstance.GetComponent<SpriteRenderer>().color = GetComponent<SpriteRenderer>().color;
+        //bulletInstance.GetComponent<PlayerProjectileScript>().damage = turret.Damage;
     }
 
 

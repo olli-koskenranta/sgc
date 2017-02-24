@@ -207,7 +207,7 @@ public class PlayerProjectileScript : MonoBehaviour {
         bulletInstance = Instantiate(bullet_shrapnel, transform.position + new Vector3(posX, posY), this.gameObject.transform.rotation) as GameObject;
 
         bulletInstance.GetComponent<Rigidbody2D>().mass = mass;
-        bulletInstance.GetComponent<Rigidbody2D>().velocity = new Vector2(dirX, dirY) * speed;
+        bulletInstance.GetComponent<Rigidbody2D>().velocity = new Vector2(dirX, dirY).normalized * speed;
         bulletInstance.GetComponent<SpriteRenderer>().color = GetComponent<SpriteRenderer>().color;
         //bulletInstance.GetComponent<Transform>().localScale /= 2;
         bulletInstance.GetComponent<PlayerProjectileScript>().damage = damage / 4;

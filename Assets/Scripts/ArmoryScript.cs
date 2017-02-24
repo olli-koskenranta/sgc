@@ -7,6 +7,8 @@ public class ArmoryScript : MonoBehaviour {
 
     public Text textInfo;
     public Text textUpgPoints;
+    public Text textSpecial1;
+    public Text textSpecial2;
 
     public Button selectWeapon0;
     public Button selectWeapon1;
@@ -51,12 +53,26 @@ public class ArmoryScript : MonoBehaviour {
 
     public void UpdateArmoryUI()
     {
+        string specialText2;
+        if (GameControlScript.gameControl.SelectedWeapon == 0)
+        {
+            specialText2 = GameControlScript.gameControl.Weapons[GameControlScript.gameControl.SelectedWeapon].SpecialNames[1] + ": " 
+                + GameControlScript.gameControl.Weapons[GameControlScript.gameControl.SelectedWeapon].Bounces;
+        }
+        else
+        {
+            //specialText2 = "WORK THIS SHIT OUT";
+            //wololol
+            specialText2 = GameControlScript.gameControl.Weapons[GameControlScript.gameControl.SelectedWeapon].SpecialNames[1] + " Chance: "
+               + GameControlScript.gameControl.Weapons[GameControlScript.gameControl.SelectedWeapon].Special2Chance.ToString() + "%";
+        }
+
 
         textInfo.text = "Scrap Count: " + GameControlScript.gameControl.scrapCount.ToString()
             + "\nResearch Material: " + GameControlScript.gameControl.researchMaterialCount.ToString()
             + "\n\nSelected Weapon: " + GameControlScript.gameControl.WeaponNames[GameControlScript.gameControl.SelectedWeapon]
             + "\nWeapon Skill: " + GameControlScript.gameControl.WeaponSkill[GameControlScript.gameControl.SelectedWeapon].ToString() + "/" + GameControlScript.gameControl.Weapons[GameControlScript.gameControl.SelectedWeapon].SkillCap.ToString()
-                + "(+" + (GameControlScript.gameControl.WeaponUpgrades[GameControlScript.gameControl.SelectedWeapon, 6] * 100).ToString() + ")"
+                + "(+" + (GameControlScript.gameControl.WeaponUpgrades[GameControlScript.gameControl.SelectedWeapon, 6] * 5).ToString() + ")"
             + "\nCritical Chance: " + GameControlScript.gameControl.Weapons[GameControlScript.gameControl.SelectedWeapon].CriticalChance.ToString() + "%"
             + "\nRate of Fire: " + GameControlScript.gameControl.Weapons[GameControlScript.gameControl.SelectedWeapon].RateOfFire.ToString()
             + "\nProjectile Mass: " + GameControlScript.gameControl.Weapons[GameControlScript.gameControl.SelectedWeapon].Mass.ToString()
@@ -64,8 +80,9 @@ public class ArmoryScript : MonoBehaviour {
             + "\nWeapon Damage: " + GameControlScript.gameControl.Weapons[GameControlScript.gameControl.SelectedWeapon].Damage.ToString()
                 + "(+" + (GameControlScript.gameControl.WeaponUpgrades[GameControlScript.gameControl.SelectedWeapon, 2] * 25).ToString() + "%)"
             + "\nCritical Multiplier: " + GameControlScript.gameControl.Weapons[GameControlScript.gameControl.SelectedWeapon].CriticalMultiplier.ToString()
-            + "\nSpecial Chance: " + GameControlScript.gameControl.Weapons[GameControlScript.gameControl.SelectedWeapon].SpecialChance.ToString() + "%"
-            + "\nStart Zone: " + GameControlScript.gameControl.currentLevel.ToString();
+            + "\n" + GameControlScript.gameControl.Weapons[GameControlScript.gameControl.SelectedWeapon].SpecialNames[0] + " Chance: " + GameControlScript.gameControl.Weapons[GameControlScript.gameControl.SelectedWeapon].SpecialChance.ToString() + "%"
+            + "\n" + specialText2;
+            //+ "\nStart Zone: " + GameControlScript.gameControl.currentLevel.ToString();
 
         selectWeapon0.GetComponentInChildren<Text>().text = GameControlScript.gameControl.WeaponNames[0];
         if (!GameControlScript.gameControl.WeaponUnlocked[1])
@@ -107,9 +124,12 @@ public class ArmoryScript : MonoBehaviour {
             btnDailyResearch.GetComponentInChildren<Text>().text = "Daily Research\nCompleted";
         }
 
+        textSpecial1.text = GameControlScript.gameControl.Weapons[GameControlScript.gameControl.SelectedWeapon].SpecialNames[0];
+        textSpecial2.text = GameControlScript.gameControl.Weapons[GameControlScript.gameControl.SelectedWeapon].SpecialNames[1];
+
 
         //GameControlScript.gameControl.UpdatePlayerAttributes();
-        
+
 
 
     }
@@ -191,9 +211,10 @@ public class ArmoryScript : MonoBehaviour {
             ShowShipUI(false);
         }
 
-        if (GameControlScript.gameControl.WeaponUnlocked[weaponNumber])
+        if (true) //GameControlScript.gameControl.WeaponUnlocked[weaponNumber])
         {
             GameControlScript.gameControl.SelectedWeapon = weaponNumber;
+            UpdateSliders();
             UpdateArmoryUI();
         }
         else

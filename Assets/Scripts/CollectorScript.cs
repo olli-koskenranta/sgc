@@ -5,9 +5,7 @@ using System.Collections;
 public class CollectorScript : MonoBehaviour
 {
 
-    //private int sessionScrapCount;
-    private int scrapForNextLevel;
-    public Text totalScrapCountText;
+    public Text textInfo;
     public AudioSource ScrapCollectedSound;
     public AudioSource RMCollectedSound;
     private float powerUpDuration = 30;
@@ -24,8 +22,6 @@ public class CollectorScript : MonoBehaviour
 
     void Start()
     {
-        scrapForNextLevel = 0;
-        //sessionScrapCount = 0;
         levelStartTime = Time.time;
         PowerUpActive = new bool[GameControlScript.gameControl.GetNumberOfPowerUps()];
         PowerUpStartTime = new float[GameControlScript.gameControl.GetNumberOfPowerUps()];
@@ -34,7 +30,7 @@ public class CollectorScript : MonoBehaviour
             PowerUpActive[i] = false;
             PowerUpStartTime[i] = 0;
         }
-        SetScrapCountText();
+        UpdateInfoText();
     }
 
     void Update()
@@ -43,31 +39,14 @@ public class CollectorScript : MonoBehaviour
         {
             LevelUp();
         }
-        //Handle Power Up Duration, ***DEPRECATED***
-        /*for (int i = 0; i < PowerUpActive.Length; i++)
-        {
-            if (PowerUpActive[i])
-            {
-                if (Time.time - PowerUpStartTime[i] > powerUpDuration)
-                {
-                    GameControlScript.gameControl.PowerUps[i] = false;
-
-                    //announcer.GetComponent<AnnouncerTextScript>().Announce(GameControlScript.gameControl.PowerUpNames[i] + " expired!");
-                    //Debug.Log("Power up " + i.ToString() + " expired!");
-                    PowerUpActive[i] = false;
-
-
-                }
-            }
-        }*/
     }
 
-    private void SetScrapCountText()
+    private void UpdateInfoText()
     {
-        //int scrapforlevelup = GameControlScript.gameControl.scrapRequiredForNextLevel * GameControlScript.gameControl.currentLevel;
-        totalScrapCountText.text = "Scrap: " + GameControlScript.gameControl.scrapCount.ToString() + "\n"
+        textInfo.text = "Scrap: " + GameControlScript.gameControl.scrapCount.ToString() + "\n"
             + "Research Material: " + GameControlScript.gameControl.researchMaterialCount.ToString() + "\n"
-            + "Weapon power: " + GameControlScript.gameControl.WeaponSkill[GameControlScript.gameControl.SelectedWeapon].ToString() + "/100\nZone: " + GameControlScript.gameControl.currentLevel.ToString();
+            + "Weapon Power: " + GameControlScript.gameControl.WeaponSkill[GameControlScript.gameControl.SelectedWeapon].ToString() + "/" + GameControlScript.gameControl.Weapons[GameControlScript.gameControl.SelectedWeapon].SkillCap.ToString()
+            + "\nZone: " + GameControlScript.gameControl.currentLevel.ToString();
     }
 
     void OnCollisionEnter2D(Collision2D col)
@@ -140,26 +119,17 @@ public class CollectorScript : MonoBehaviour
             GameControlScript.gameControl.researchMaterialCount += amount;
         else
             GameControlScript.gameControl.scrapCount += amount;
-        //sessionScrapCount += amount;
 
-        
-        //scrapForNextLevel += amount;
 
-        SetScrapCountText();
+        UpdateInfoText();
 
-        /*if (scrapForNextLevel >= GameControlScript.gameControl.scrapRequiredForNextLevel * GameControlScript.gameControl.currentLevel)
-        {
-            scrapForNextLevel -= GameControlScript.gameControl.scrapRequiredForNextLevel * GameControlScript.gameControl.currentLevel;
-            GameControlScript.gameControl.currentLevel += 1;
-            SetScrapCountText();
-            announcer.GetComponent<AnnouncerScript>().Announce("Zone " + GameControlScript.gameControl.currentLevel.ToString() + "!", FloatingText.FTType.Announcement);
-        }*/
+
     }
 
     public void LevelUp()
     {
         GameControlScript.gameControl.currentLevel += 1;
-        SetScrapCountText();
+        UpdateInfoText();
         for (int i = 0; i < GameControlScript.gameControl.startZones.Length; i++)
         {
             if (GameControlScript.gameControl.startZones[i] == GameControlScript.gameControl.currentLevel && !GameControlScript.gameControl.StartZoneUnlocked[i])
@@ -190,12 +160,15 @@ public class CollectorScript : MonoBehaviour
 
         int PowerUpNumber = Random.Range(0, GameControlScript.gameControl.GetNumberOfPowerUps());
 
-        announcer.GetComponent<AnnouncerScript>().Announce(GameControlScript.gameControl.PowerUpNames[PowerUpNumber] + " gained!", FloatingText.FTType.PowerUp);
-        //Debug.Log("Power up " + PowerUpNumber.ToString() + " gained!");
+        if (GameControlScript.gameControl.WeaponUpgrades[GameControlScript.gameControl.SelectedWeapon, 6] == 40)
+        {
+            while (PowerUpNumber == 3)
+            {
+                PowerUpNumber = Random.Range(0, GameControlScript.gameControl.GetNumberOfPowerUps());
+            }
+        }
 
-        //GameControlScript.gameControl.PowerUps[PowerUpNumber] = true;
-        //PowerUpStartTime[PowerUpNumber] = Time.time;
-        //PowerUpActive[PowerUpNumber] = true;
+        
 
         if (PowerUpNumber == 0)
         {
@@ -211,6 +184,15 @@ public class CollectorScript : MonoBehaviour
         {
             LaunchBomb(PUBombs.PUBombType.Gravity);
         }
+
+        else if (PowerUpNumber == 3)
+        {
+            GameControlScript.gameControl.WeaponUpgrades[GameControlScript.gameControl.SelectedWeapon, 6] += 1;
+            GameObject.FindWithTag("PlayerTurret").GetComponent<TurretScript>().GetTurret().UpdateValues(GameControlScript.gameControl.SelectedWeapon);
+            UpdateInfoText();
+        }
+
+        announcer.GetComponent<AnnouncerScript>().Announce(GameControlScript.gameControl.PowerUpNames[PowerUpNumber] + " gained!", FloatingText.FTType.PowerUp);
 
     }
 
