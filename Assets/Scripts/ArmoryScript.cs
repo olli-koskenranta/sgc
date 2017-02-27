@@ -62,34 +62,51 @@ public class ArmoryScript : MonoBehaviour {
 
     public void UpdateArmoryUI()
     {
-        string specialText2;
-        if (GameControlScript.gameControl.SelectedWeapon == 0)
+        switch (view)
         {
-            specialText2 = GameControlScript.gameControl.Weapons[GameControlScript.gameControl.SelectedWeapon].SpecialNames[1] + ": " 
-                + GameControlScript.gameControl.Weapons[GameControlScript.gameControl.SelectedWeapon].Bounces;
-        }
-        else
-        {
-            specialText2 = GameControlScript.gameControl.Weapons[GameControlScript.gameControl.SelectedWeapon].SpecialNames[1] + " Chance: "
-               + GameControlScript.gameControl.Weapons[GameControlScript.gameControl.SelectedWeapon].Special2Chance.ToString() + "%";
-        }
+            case ArmoryView.Weapon:
+
+                string specialText2;
+                if (GameControlScript.gameControl.SelectedWeapon == 0)
+                {
+                    specialText2 = GameControlScript.gameControl.Weapons[GameControlScript.gameControl.SelectedWeapon].SpecialNames[1] + ": "
+                        + GameControlScript.gameControl.Weapons[GameControlScript.gameControl.SelectedWeapon].Bounces;
+                }
+                else
+                {
+                    specialText2 = GameControlScript.gameControl.Weapons[GameControlScript.gameControl.SelectedWeapon].SpecialNames[1] + " Chance: "
+                       + GameControlScript.gameControl.Weapons[GameControlScript.gameControl.SelectedWeapon].Special2Chance.ToString() + "%";
+                }
 
 
-        textInfo.text = "Scrap Count: " + GameControlScript.gameControl.scrapCount.ToString()
-            + "\nResearch Material: " + GameControlScript.gameControl.researchMaterialCount.ToString()
-            + "\n\nSelected Weapon: " + GameControlScript.gameControl.WeaponNames[GameControlScript.gameControl.SelectedWeapon]
-            + "\nWeapon Skill: " + GameControlScript.gameControl.WeaponSkill[GameControlScript.gameControl.SelectedWeapon].ToString() + "/" + GameControlScript.gameControl.Weapons[GameControlScript.gameControl.SelectedWeapon].SkillCap.ToString()
-                + "(+" + (GameControlScript.gameControl.WeaponUpgrades[GameControlScript.gameControl.SelectedWeapon, 6] * 5).ToString() + ")"
-            + "\nCritical Chance: " + GameControlScript.gameControl.Weapons[GameControlScript.gameControl.SelectedWeapon].CriticalChance.ToString() + "%"
-            + "\nRate of Fire: " + GameControlScript.gameControl.Weapons[GameControlScript.gameControl.SelectedWeapon].RateOfFire.ToString()
-            + "\nProjectile Mass: " + GameControlScript.gameControl.Weapons[GameControlScript.gameControl.SelectedWeapon].Mass.ToString()
-                + "(+" + (GameControlScript.gameControl.WeaponUpgrades[GameControlScript.gameControl.SelectedWeapon, 1] * 100).ToString() + "%)"
-            + "\nWeapon Damage: " + GameControlScript.gameControl.Weapons[GameControlScript.gameControl.SelectedWeapon].Damage.ToString()
-                + "(+" + (GameControlScript.gameControl.WeaponUpgrades[GameControlScript.gameControl.SelectedWeapon, 2] * 25).ToString() + "%)"
-            + "\nCritical Multiplier: " + GameControlScript.gameControl.Weapons[GameControlScript.gameControl.SelectedWeapon].CriticalMultiplier.ToString()
-            + "\n" + GameControlScript.gameControl.Weapons[GameControlScript.gameControl.SelectedWeapon].SpecialNames[0] + " Chance: " + GameControlScript.gameControl.Weapons[GameControlScript.gameControl.SelectedWeapon].SpecialChance.ToString() + "%"
-            + "\n" + specialText2;
-            //+ "\nStart Zone: " + GameControlScript.gameControl.currentLevel.ToString();
+                textInfo.text = "Scrap Count: " + GameControlScript.gameControl.scrapCount.ToString()
+                    + "\nResearch Material: " + GameControlScript.gameControl.researchMaterialCount.ToString()
+                    + "\n\nSelected Weapon: " + GameControlScript.gameControl.WeaponNames[GameControlScript.gameControl.SelectedWeapon]
+                    + "\nWeapon Skill: " + GameControlScript.gameControl.WeaponSkill[GameControlScript.gameControl.SelectedWeapon].ToString() + "/" + GameControlScript.gameControl.Weapons[GameControlScript.gameControl.SelectedWeapon].SkillCap.ToString()
+                        + "(+" + (GameControlScript.gameControl.WeaponUpgrades[GameControlScript.gameControl.SelectedWeapon, 6] * 5).ToString() + ")"
+                    + "\nCritical Chance: " + GameControlScript.gameControl.Weapons[GameControlScript.gameControl.SelectedWeapon].CriticalChance.ToString() + "%"
+                    + "\nRate of Fire: " + GameControlScript.gameControl.Weapons[GameControlScript.gameControl.SelectedWeapon].RateOfFire.ToString()
+                    + "\nProjectile Mass: " + GameControlScript.gameControl.Weapons[GameControlScript.gameControl.SelectedWeapon].Mass.ToString()
+                        + "(+" + (GameControlScript.gameControl.WeaponUpgrades[GameControlScript.gameControl.SelectedWeapon, 1] * 100).ToString() + "%)"
+                    + "\nWeapon Damage: " + GameControlScript.gameControl.Weapons[GameControlScript.gameControl.SelectedWeapon].Damage.ToString()
+                        + "(+" + (GameControlScript.gameControl.WeaponUpgrades[GameControlScript.gameControl.SelectedWeapon, 2] * 25).ToString() + "%)"
+                    + "\nCritical Multiplier: " + GameControlScript.gameControl.Weapons[GameControlScript.gameControl.SelectedWeapon].CriticalMultiplier.ToString()
+                    + "\n" + GameControlScript.gameControl.Weapons[GameControlScript.gameControl.SelectedWeapon].SpecialNames[0] + " Chance: " + GameControlScript.gameControl.Weapons[GameControlScript.gameControl.SelectedWeapon].SpecialChance.ToString() + "%"
+                    + "\n" + specialText2;
+                    //+ "\nStart Zone: " + GameControlScript.gameControl.currentLevel.ToString();
+                break;
+
+            case ArmoryView.Ship:
+                textInfo.text = "Scrap Count: " + GameControlScript.gameControl.scrapCount.ToString()
+                    + "\nResearch Material: " + GameControlScript.gameControl.researchMaterialCount.ToString()
+                    + "\n\nRepair Bots: Repair hull over time"
+                    + "\n\nShield Generator: Generates shields over time"
+                    + "\n\nReactive Armor: Destroys asteroids when they hit the hull";
+                break;
+            default:
+                textInfo.text = "What is happening?";
+                break;
+        }
 
         selectWeapon0.GetComponentInChildren<Text>().text = GameControlScript.gameControl.WeaponNames[0];
         if (!GameControlScript.gameControl.WeaponUnlocked[1])
