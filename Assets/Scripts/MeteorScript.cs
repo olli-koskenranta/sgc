@@ -45,7 +45,8 @@ public class MeteorScript : MonoBehaviour {
         //if (GameControlScript.gameControl.PowerUps[0])
         //    speed *= 0.5f;
         GetComponent<Rigidbody2D>().velocity = transform.TransformDirection(Vector3.left * speed);
-        GetComponent<SpriteRenderer>().transform.Rotate(Vector3.forward);
+        //GetComponent<SpriteRenderer>().transform.Rotate(Vector3.forward);
+        
 
         mainCamera = Camera.main;
         if (asteroidType != AsteroidType.Anomaly1)
@@ -90,6 +91,8 @@ public class MeteorScript : MonoBehaviour {
             default:
                 break;
         }
+
+        GetComponent<Rigidbody2D>().AddTorque(GetComponent<Rigidbody2D>().mass / 10, ForceMode2D.Impulse);
 
         if (HIT_BY_KINECTIC_DMG)
             hitPoints = 1;

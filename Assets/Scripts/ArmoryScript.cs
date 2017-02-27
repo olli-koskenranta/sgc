@@ -16,6 +16,8 @@ public class ArmoryScript : MonoBehaviour {
     public Button buttonShipUpgrades;
     public Button btnBuyPoints;
     public Button btnDailyResearch;
+    public Button btnDailyScrapBoost;
+    public Button btnDailyBoosts;
     public Dropdown ddSelectZone;
 
     public enum ArmoryView { Weapon, Ship };
@@ -29,6 +31,7 @@ public class ArmoryScript : MonoBehaviour {
 
     private AdManagerScript adManager;
     private bool DAILY_RESEARCH = false;
+    private bool DAILY_SCRAPBOOST = false;
 
     private int[] StartingZones;
 
@@ -38,7 +41,13 @@ public class ArmoryScript : MonoBehaviour {
         WeaponUpgradeUIElements = FindGameObjectsWithLayer(12);
         ShipUpgradeUIElements = FindGameObjectsWithLayer(13);
         ShowShipUI(false);
-        
+
+        GameObject temp = btnDailyBoosts.transform.FindChild("ButtonDailyResearch").gameObject;
+        temp.SetActive(false);
+        temp = btnDailyBoosts.transform.FindChild("ButtonDailyScrap").gameObject;
+        temp.SetActive(false);
+
+
         UpdateSliders();
         UpdateStartingZones();
         UpdateArmoryUI();
@@ -61,8 +70,6 @@ public class ArmoryScript : MonoBehaviour {
         }
         else
         {
-            //specialText2 = "WORK THIS SHIT OUT";
-            //wololol
             specialText2 = GameControlScript.gameControl.Weapons[GameControlScript.gameControl.SelectedWeapon].SpecialNames[1] + " Chance: "
                + GameControlScript.gameControl.Weapons[GameControlScript.gameControl.SelectedWeapon].Special2Chance.ToString() + "%";
         }
@@ -106,7 +113,7 @@ public class ArmoryScript : MonoBehaviour {
         textUpgPoints.text = GameControlScript.gameControl.WeaponNames[GameControlScript.gameControl.SelectedWeapon] + " Upgrade Points: " + UpgPointsAvailable().ToString();
         if (GameControlScript.gameControl.WeaponUpgradePointsTotal[GameControlScript.gameControl.SelectedWeapon] < 24)
         {
-            btnBuyPoints.GetComponentInChildren<Text>().text = "Buy Points\n" + GameControlScript.gameControl.UpgradePointCost(0).ToString() + "S/" + GameControlScript.gameControl.UpgradePointCost(1).ToString() + "RM";
+            btnBuyPoints.GetComponentInChildren<Text>().text = "Buy Points\n" + GameControlScript.gameControl.UpgradePointCost(0).ToString() + "S/" + GetRMCost().ToString() + "RM";
         }
         else
         {
@@ -116,12 +123,23 @@ public class ArmoryScript : MonoBehaviour {
         if (IsDailyResearchAvailable())
         {
             btnDailyResearch.interactable = true;
-            btnDailyResearch.GetComponentInChildren<Text>().text = "Daily Research\n+5 RM\nWatch Ad";
+            btnDailyResearch.GetComponentInChildren<Text>().text = "Research\n+5 R. Material!\nWatch Ad";
         }
         else
         {
             btnDailyResearch.interactable = false;
-            btnDailyResearch.GetComponentInChildren<Text>().text = "Daily Research\nCompleted";
+            btnDailyResearch.GetComponentInChildren<Text>().text = "Research\nCompleted";
+        }
+
+        if (IsDailyScrapBoostAvailable())
+        {
+            btnDailyScrapBoost.interactable = true;
+            btnDailyScrapBoost.GetComponentInChildren<Text>().text = "Scrap Boost\n+100% Scrap!\nWatch Ad";
+        }
+        else
+        {
+            btnDailyScrapBoost.interactable = false;
+            btnDailyScrapBoost.GetComponentInChildren<Text>().text = "Scrap Boost\nActive";
         }
 
         textSpecial1.text = GameControlScript.gameControl.Weapons[GameControlScript.gameControl.SelectedWeapon].SpecialNames[0];
@@ -132,6 +150,23 @@ public class ArmoryScript : MonoBehaviour {
 
 
 
+    }
+
+    public void DailyBoostsClicked()
+    {
+        GameObject temp = btnDailyBoosts.transform.FindChild("ButtonDailyResearch").gameObject;
+        if (temp.activeSelf)
+        {
+            temp.SetActive(false);
+            temp = btnDailyBoosts.transform.FindChild("ButtonDailyScrap").gameObject;
+            temp.SetActive(false);
+        }
+        else
+        {
+            temp.SetActive(true);
+            temp = btnDailyBoosts.transform.FindChild("ButtonDailyScrap").gameObject;
+            temp.SetActive(true);
+        }
     }
 
     public void UpdateSliders()
@@ -151,7 +186,8 @@ public class ArmoryScript : MonoBehaviour {
         {
             if (GameControlScript.gameControl.StartZoneUnlocked[i])
             {
-                size += 120;
+                if (size < 600)
+                    size += 120;
                 rect.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, size);
                 string newText = "Start Zone " + GameControlScript.gameControl.startZones[i].ToString();
                 ddSelectZone.options.Add(new Dropdown.OptionData() { text = newText });
@@ -170,7 +206,6 @@ public class ArmoryScript : MonoBehaviour {
 
     public void UpgradeSliderChanged(int sliderNumber)
     {
-        //Debug.Log("Is this called");
         GameControlScript.gameControl.WeaponUpgrades[GameControlScript.gameControl.SelectedWeapon, sliderNumber] = (int)upgradeSliders[sliderNumber].value;
         GameControlScript.gameControl.Weapons[GameControlScript.gameControl.SelectedWeapon].UpdateValues(GameControlScript.gameControl.SelectedWeapon);
         UpdateArmoryUI();
@@ -291,11 +326,8 @@ public class ArmoryScript : MonoBehaviour {
             return;
 
         int scrapCost = GameControlScript.gameControl.UpgradePointCost(0);
-        int RMCost = GameControlScript.gameControl.UpgradePointCost(1);
-        if (GameControlScript.gameControl.WeaponUpgradePointsTotal[GameControlScript.gameControl.SelectedWeapon] >= 10)
-        {
-            RMCost += 1;
-        }
+        int RMCost = GetRMCost();
+        
 
         if (GameControlScript.gameControl.scrapCount >= scrapCost && GameControlScript.gameControl.researchMaterialCount >= RMCost)
         {
@@ -307,6 +339,16 @@ public class ArmoryScript : MonoBehaviour {
         }
         else
             Debug.Log("Not enough materials!");
+    }
+
+    private int GetRMCost()
+    {
+        int RMCost = GameControlScript.gameControl.UpgradePointCost(1);
+        if (GameControlScript.gameControl.WeaponUpgradePointsTotal[GameControlScript.gameControl.SelectedWeapon] >= 10)
+        {
+            RMCost += 1;
+        }
+        return RMCost;
     }
 
     public void AdFinished(string result)
@@ -322,12 +364,24 @@ public class ArmoryScript : MonoBehaviour {
                     UpdateArmoryUI();
                     GameControlScript.gameControl.SaveData();
                 }
+                if (DAILY_SCRAPBOOST)
+                {
+                    DAILY_SCRAPBOOST = false;
+                    GameControlScript.gameControl.ScrapBoostActive = true;
+                    GameControlScript.gameControl.DateDailyScrapBoostTime = System.DateTime.Now;
+                    UpdateArmoryUI();
+                    GameControlScript.gameControl.SaveData();
+                }
                 break;
             case "SKIPPED":
+                Debug.Log("This should never happen");
                 DAILY_RESEARCH = false;
+                DAILY_SCRAPBOOST = false;
                 break;
             case "FAILED":
+                Debug.Log("Ad failed to show");
                 DAILY_RESEARCH = false;
+                DAILY_SCRAPBOOST = false;
                 break;
             default:
                 break;
@@ -345,10 +399,30 @@ public class ArmoryScript : MonoBehaviour {
         }
     }
 
+    public void DailyScrapBoostClicked()
+    {
+        if (DAILY_SCRAPBOOST)
+            return;
+        if (IsDailyScrapBoostAvailable())
+        {
+            DAILY_SCRAPBOOST = true;
+            StartCoroutine(adManager.ShowAd());
+        }
+    }
+
     private bool IsDailyResearchAvailable()
     {
         System.DateTime dateTime = System.DateTime.Now;
         if (dateTime.Day != GameControlScript.gameControl.DateDailyResearchTime.Day)
+            return true;
+        else
+            return false;
+    }
+
+    private bool IsDailyScrapBoostAvailable()
+    {
+        System.DateTime dateTime = System.DateTime.Now;
+        if (dateTime.Day != GameControlScript.gameControl.DateDailyScrapBoostTime.Day)
             return true;
         else
             return false;

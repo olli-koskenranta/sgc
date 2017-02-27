@@ -115,10 +115,14 @@ public class CollectorScript : MonoBehaviour
             }
         }
 
+
+
         if (isResearchMaterial)
             GameControlScript.gameControl.researchMaterialCount += amount;
         else
+        {
             GameControlScript.gameControl.scrapCount += amount;
+        }
 
 
         UpdateInfoText();

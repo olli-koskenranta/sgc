@@ -28,6 +28,9 @@ public class GameControlScript : MonoBehaviour {
     public int[] WeaponRMCost;
 
     public DateTime DateDailyResearchTime;
+    public DateTime DateDailyScrapBoostTime;
+
+    public bool ScrapBoostActive;
 
 
     //0 = attack speed
@@ -122,8 +125,8 @@ public class GameControlScript : MonoBehaviour {
     void Start()
     {
         //Debug.Log("GameControl START()!");
-        WeaponUpgradeCosts = new int[] { 1000, 100, 10000, 20000 };
-        WeaponUpgradeRMCosts = new int[] { 0, 0, 10, 20 };
+        WeaponUpgradeCosts = new int[] { 1000, 10000, 100000, 1000000 };
+        WeaponUpgradeRMCosts = new int[] { 0, 1, 5, 10 };
         WeaponScrapCost = new int[numberOfWeapons] { 0, 20000, 100000, 1000000 };
         WeaponRMCost = new int[numberOfWeapons] { 0, 1, 5, 50 };
         Experience = new int[numberOfWeapons];
@@ -138,6 +141,8 @@ public class GameControlScript : MonoBehaviour {
         currentLevel = 1;
         scrapRequiredForNextLevel = 200;
         DateDailyResearchTime = new DateTime(2001, 1, 1, 6, 0, 0);
+        DateDailyScrapBoostTime = new DateTime(2001, 1, 1, 6, 0, 0);
+        ScrapBoostActive = false;
 
         AUDIO_SOUNDS = false;
         AUDIO_MUSIC = false;
@@ -286,7 +291,7 @@ public class GameControlScript : MonoBehaviour {
         }
         else if (type == 1)
         {
-            int RMCost = WeaponUpgradeRMCosts[SelectedWeapon] + WeaponUpgradeRMCosts[SelectedWeapon] * WeaponUpgradePointsTotal[SelectedWeapon];
+            int RMCost = WeaponUpgradeRMCosts[SelectedWeapon]; // + WeaponUpgradeRMCosts[SelectedWeapon] * WeaponUpgradePointsTotal[SelectedWeapon];
             return RMCost;
         }
         else
@@ -303,7 +308,9 @@ public class GameControlScript : MonoBehaviour {
             data.selectedWeapon = 0;
             data.ArmorUpgrades = 0;
             data.researchMaterialCount = 0;
+            ScrapBoostActive = false;
             data.DateDailyResearchTime = new DateTime(2001, 1, 1, 6, 0, 0);
+            data.DateDailyScrapBoostTime = new DateTime(2001, 1, 1, 6, 0, 0);
         }
         else
         {
@@ -313,6 +320,8 @@ public class GameControlScript : MonoBehaviour {
             data.ArmorUpgrades = ArmorUpgrades;
             data.researchMaterialCount = researchMaterialCount;
             data.DateDailyResearchTime = DateDailyResearchTime;
+            data.DateDailyScrapBoostTime = DateDailyScrapBoostTime;
+            data.ScrapBoostActive = ScrapBoostActive;
         }
         data.WeaponSkill = WeaponSkill;
         data.Experience = Experience;
@@ -332,6 +341,7 @@ public class GameControlScript : MonoBehaviour {
         shipArmor = data.shipArmor;
         SelectedWeapon = data.selectedWeapon;
         ArmorUpgrades = data.ArmorUpgrades;
+        ScrapBoostActive = data.ScrapBoostActive;
         if (data.WeaponSkill != null)
             WeaponSkill = data.WeaponSkill;
         if (data.Experience != null)
@@ -349,6 +359,9 @@ public class GameControlScript : MonoBehaviour {
             WeaponUpgradePointsAvailable = data.WeaponUpgradePointsAvailable;
         if (data.DateDailyResearchTime != null)
             DateDailyResearchTime = data.DateDailyResearchTime;
+        if (data.DateDailyScrapBoostTime != null)
+            DateDailyScrapBoostTime = data.DateDailyScrapBoostTime;
+            
         
     }
 
@@ -427,6 +440,10 @@ class PlayerData
     public int[] WeaponUpgradePointsAvailable = new int[GameControlScript.gameControl.GetNumberOfWeapons()];
 
     public DateTime DateDailyResearchTime;
+
+    public DateTime DateDailyScrapBoostTime;
+
+    public bool ScrapBoostActive;
 
     public int selectedWeapon;
 

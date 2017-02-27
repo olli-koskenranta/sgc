@@ -11,6 +11,8 @@ public class ScrapPieceScript : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
         scrapAmount = 3 + GameControlScript.gameControl.currentLevel * 3;
+        if (GameControlScript.gameControl.ScrapBoostActive)
+            scrapAmount *= 2;
         researchMaterialAmount = 1;
         if (type == ScrapType.ResearchMaterial)
             GetComponent<SpriteRenderer>().color = Color.cyan;
@@ -33,8 +35,8 @@ public class ScrapPieceScript : MonoBehaviour {
             ft = Instantiate(floatingText, transform.position, Quaternion.identity) as GameObject;
             if (type == ScrapType.ResearchMaterial)
             {
-                ft.GetComponent<FloatingTextScript>().text = "+" + researchMaterialAmount.ToString();
                 ft.GetComponent<TextMesh>().color = Color.cyan;
+                ft.GetComponent<FloatingTextScript>().text = "+" + researchMaterialAmount.ToString();
             }
             else
             {
@@ -43,23 +45,6 @@ public class ScrapPieceScript : MonoBehaviour {
             ft.GetComponent<FloatingTextScript>().fttype = FloatingText.FTType.PopUp;
             Destroy(this.gameObject);
         }
-        /*
-        switch (col.gameObject.tag)
-        {
-            case "Collector":
-                GameObject ft;
-                GameObject floatingText = Resources.Load("FloatingText") as GameObject;
-                ft = Instantiate(floatingText, transform.position, Quaternion.identity) as GameObject;
-                ft.GetComponent<FloatingTextScript>().text = "+" + scrapAmount.ToString();
-                ft.GetComponent<FloatingTextScript>().fttype = FloatingText.FTType.Damage;
-                Destroy(this.gameObject);
-                break;
-
-            default:
-                break;
-
-        }
-        */
     }
 
 }
