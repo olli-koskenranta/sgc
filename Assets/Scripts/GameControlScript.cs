@@ -53,6 +53,9 @@ public class GameControlScript : MonoBehaviour {
     public int shipArmor;
     public bool[] StartZoneUnlocked;
     public int[] startZones;
+    public bool ShipRepairBots;
+    public bool ShipShieldGenerator;
+    public bool ShipReactiveArmor;
 
 
     //Weapon types
@@ -147,7 +150,11 @@ public class GameControlScript : MonoBehaviour {
         AUDIO_SOUNDS = false;
         AUDIO_MUSIC = false;
 
-        WeaponUpgrades = new int[numberOfWeapons, 7];
+        ShipRepairBots = false;
+        ShipShieldGenerator = false;
+        ShipReactiveArmor = false;
+
+    WeaponUpgrades = new int[numberOfWeapons, 7];
         WeaponUpgradePointsTotal = new int[numberOfWeapons];
         WeaponUpgradePointsAvailable = new int[numberOfWeapons];
 
@@ -308,9 +315,12 @@ public class GameControlScript : MonoBehaviour {
             data.selectedWeapon = 0;
             data.ArmorUpgrades = 0;
             data.researchMaterialCount = 0;
-            ScrapBoostActive = false;
+            data.ScrapBoostActive = false;
             data.DateDailyResearchTime = new DateTime(2001, 1, 1, 6, 0, 0);
             data.DateDailyScrapBoostTime = new DateTime(2001, 1, 1, 6, 0, 0);
+            data.ShipShieldGenerator = false;
+            data.ShipReactiveArmor = false;
+            data.ShipRepairBots = false;
         }
         else
         {
@@ -322,6 +332,9 @@ public class GameControlScript : MonoBehaviour {
             data.DateDailyResearchTime = DateDailyResearchTime;
             data.DateDailyScrapBoostTime = DateDailyScrapBoostTime;
             data.ScrapBoostActive = ScrapBoostActive;
+            data.ShipShieldGenerator = ShipShieldGenerator;
+            data.ShipReactiveArmor = ShipReactiveArmor;
+            data.ShipRepairBots = ShipRepairBots;
         }
         data.WeaponSkill = WeaponSkill;
         data.Experience = Experience;
@@ -342,6 +355,10 @@ public class GameControlScript : MonoBehaviour {
         SelectedWeapon = data.selectedWeapon;
         ArmorUpgrades = data.ArmorUpgrades;
         ScrapBoostActive = data.ScrapBoostActive;
+        ShipReactiveArmor = data.ShipReactiveArmor;
+        ShipRepairBots = data.ShipRepairBots;
+        ShipShieldGenerator = data.ShipShieldGenerator;
+
         if (data.WeaponSkill != null)
             WeaponSkill = data.WeaponSkill;
         if (data.Experience != null)
@@ -445,6 +462,12 @@ class PlayerData
 
     public bool ScrapBoostActive;
 
+    public bool ShipRepairBots;
+
+    public bool ShipShieldGenerator;
+
+    public bool ShipReactiveArmor;
+
     public int selectedWeapon;
 
     
@@ -470,6 +493,11 @@ namespace Scrap
 namespace PUBombs
 {
     public enum PUBombType { Gravity, Kinetic }
+}
+
+namespace ShipUpgrades
+{
+    public enum ShipUpgradeType { RepairBots, ShieldGenerator, ReactiveArmor }
 }
 
 namespace ShipWeapons

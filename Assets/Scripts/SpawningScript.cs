@@ -78,21 +78,21 @@ public class SpawningScript : MonoBehaviour {
         {
             GameObject.Find("UIControl").GetComponent<UIControlScript>().SetBossBarsActive(true);
             SpawnAnomaly(1);
-            announcer.GetComponent<AnnouncerScript>().Announce("ANOMALY DETECTED", FloatingText.FTType.Danger);
+            announcer.GetComponent<AnnouncerScript>().Announce("!ANOMALY DETECTED!", FloatingText.FTType.Danger);
         }
 
         if (GameControlScript.gameControl.currentLevel == 20 && !ANOMALY_SPAWNED && !ANOMALY_DESTROYED[1])
         {
             GameObject.Find("UIControl").GetComponent<UIControlScript>().SetBossBarsActive(true);
             SpawnAnomaly(2);
-            announcer.GetComponent<AnnouncerScript>().Announce("ANOMALY DETECTED", FloatingText.FTType.Danger);
+            announcer.GetComponent<AnnouncerScript>().Announce("!ANOMALY DETECTED!", FloatingText.FTType.Danger);
         }
 
         if (GameControlScript.gameControl.currentLevel == 30 && !ANOMALY_SPAWNED && !ANOMALY_DESTROYED[2])
         {
             GameObject.Find("UIControl").GetComponent<UIControlScript>().SetBossBarsActive(true);
             SpawnAnomaly(3);
-            announcer.GetComponent<AnnouncerScript>().Announce("ANOMALY DETECTED", FloatingText.FTType.Danger);
+            announcer.GetComponent<AnnouncerScript>().Announce("!ANOMALY DETECTED!", FloatingText.FTType.Danger);
         }
 
     }

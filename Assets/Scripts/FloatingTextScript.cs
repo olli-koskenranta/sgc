@@ -36,7 +36,7 @@ public class FloatingTextScript : MonoBehaviour {
                 newColor = Color.red;
                 GetComponent<TextMesh>().color = newColor;
                 GetComponent<TextMesh>().fontSize = 50;
-                GetComponent<TextMesh>().text = "!" + GetComponent<TextMesh>().text + "!";
+                GetComponent<TextMesh>().text = GetComponent<TextMesh>().text;
                 break;
             default:
                 break;

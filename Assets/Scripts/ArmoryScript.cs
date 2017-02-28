@@ -20,6 +20,8 @@ public class ArmoryScript : MonoBehaviour {
     public Button btnDailyBoosts;
     public Dropdown ddSelectZone;
 
+    private AnnouncerScript announcer;
+
     public enum ArmoryView { Weapon, Ship };
     public ArmoryView view;
 
@@ -51,7 +53,8 @@ public class ArmoryScript : MonoBehaviour {
         UpdateSliders();
         UpdateStartingZones();
         UpdateArmoryUI();
-        
+
+        announcer = GameObject.Find("Announcements").GetComponent<AnnouncerScript>();
 
         adManager = GameObject.Find("AdManager").GetComponent<AdManagerScript>();
         if (adManager)
@@ -82,7 +85,7 @@ public class ArmoryScript : MonoBehaviour {
                 textInfo.text = "Scrap Count: " + GameControlScript.gameControl.scrapCount.ToString()
                     + "\nResearch Material: " + GameControlScript.gameControl.researchMaterialCount.ToString()
                     + "\n\nSelected Weapon: " + GameControlScript.gameControl.WeaponNames[GameControlScript.gameControl.SelectedWeapon]
-                    + "\nWeapon Skill: " + GameControlScript.gameControl.WeaponSkill[GameControlScript.gameControl.SelectedWeapon].ToString() + "/" + GameControlScript.gameControl.Weapons[GameControlScript.gameControl.SelectedWeapon].SkillCap.ToString()
+                    + "\nWeapon Power: " + GameControlScript.gameControl.WeaponSkill[GameControlScript.gameControl.SelectedWeapon].ToString() + "/" + GameControlScript.gameControl.Weapons[GameControlScript.gameControl.SelectedWeapon].SkillCap.ToString()
                         + "(+" + (GameControlScript.gameControl.WeaponUpgrades[GameControlScript.gameControl.SelectedWeapon, 6] * 5).ToString() + ")"
                     + "\nCritical Chance: " + GameControlScript.gameControl.Weapons[GameControlScript.gameControl.SelectedWeapon].CriticalChance.ToString() + "%"
                     + "\nRate of Fire: " + GameControlScript.gameControl.Weapons[GameControlScript.gameControl.SelectedWeapon].RateOfFire.ToString()
@@ -98,10 +101,10 @@ public class ArmoryScript : MonoBehaviour {
 
             case ArmoryView.Ship:
                 textInfo.text = "Scrap Count: " + GameControlScript.gameControl.scrapCount.ToString()
-                    + "\nResearch Material: " + GameControlScript.gameControl.researchMaterialCount.ToString()
-                    + "\n\nRepair Bots: Repair hull over time"
-                    + "\n\nShield Generator: Generates shields over time"
-                    + "\n\nReactive Armor: Destroys asteroids when they hit the hull";
+                    + "\nResearch Material: " + GameControlScript.gameControl.researchMaterialCount.ToString();
+                    /*+ "\n\n\nRepair hull over time"
+                    + "\n\n\nGenerates shields over time"
+                    + "\n\n\nDestroys asteroids when they hit the hull";*/
                 break;
             default:
                 textInfo.text = "What is happening?";
@@ -344,7 +347,7 @@ public class ArmoryScript : MonoBehaviour {
 
         int scrapCost = GameControlScript.gameControl.UpgradePointCost(0);
         int RMCost = GetRMCost();
-        
+
 
         if (GameControlScript.gameControl.scrapCount >= scrapCost && GameControlScript.gameControl.researchMaterialCount >= RMCost)
         {
@@ -355,7 +358,10 @@ public class ArmoryScript : MonoBehaviour {
             UpdateArmoryUI();
         }
         else
-            Debug.Log("Not enough materials!");
+        {
+            Debug.Log("Not enough resources");
+            announcer.Announce("Not enough resources", FloatingText.FTType.Danger);
+        }
     }
 
     private int GetRMCost()
