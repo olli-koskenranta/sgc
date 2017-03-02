@@ -145,6 +145,7 @@ public class GameControlScript : MonoBehaviour {
         scrapRequiredForNextLevel = 200;
         DateDailyResearchTime = new DateTime(2001, 1, 1, 6, 0, 0);
         DateDailyScrapBoostTime = new DateTime(2001, 1, 1, 6, 0, 0);
+        
         ScrapBoostActive = false;
 
         AUDIO_SOUNDS = false;
@@ -154,7 +155,7 @@ public class GameControlScript : MonoBehaviour {
         ShipShieldGenerator = false;
         ShipReactiveArmor = false;
 
-    WeaponUpgrades = new int[numberOfWeapons, 7];
+        WeaponUpgrades = new int[numberOfWeapons, 7];
         WeaponUpgradePointsTotal = new int[numberOfWeapons];
         WeaponUpgradePointsAvailable = new int[numberOfWeapons];
 
@@ -191,6 +192,9 @@ public class GameControlScript : MonoBehaviour {
         {
             Weapons[i].UpdateValues(i);
         }
+
+        TimeSpan timeSpan = DateTime.Now - DateDailyScrapBoostTime;
+        Debug.Log(timeSpan.Hours.ToString());
 
     }
 
@@ -358,28 +362,47 @@ public class GameControlScript : MonoBehaviour {
         ShipReactiveArmor = data.ShipReactiveArmor;
         ShipRepairBots = data.ShipRepairBots;
         ShipShieldGenerator = data.ShipShieldGenerator;
+        researchMaterialCount = data.researchMaterialCount;
 
         if (data.WeaponSkill != null)
             WeaponSkill = data.WeaponSkill;
+        else
+            Debug.Log("WeaponSkill[] is null");
         if (data.Experience != null)
             Experience = data.Experience;
-        researchMaterialCount = data.researchMaterialCount;
+        else
+            Debug.Log("Experience[] is null");
+        
         if (data.WeaponUnlocked != null)
             WeaponUnlocked = data.WeaponUnlocked;
+        else
+            Debug.Log("WeaponUnlocked[] is null");
         if (data.StartZoneUnlocked != null)
             StartZoneUnlocked = data.StartZoneUnlocked;
+        else
+            Debug.Log("StartZoneUnlocked[] is null");
         if (data.WeaponUpgrades != null)
             WeaponUpgrades = data.WeaponUpgrades;
+        else
+            Debug.Log("WeaponUpgrades[] is null");
         if (data.WeaponUpgradePointsTotal != null)
             WeaponUpgradePointsTotal = data.WeaponUpgradePointsTotal;
+        else
+            Debug.Log("WeaponUpgradePointsTotal[] is null");
         if (data.WeaponUpgradePointsAvailable != null)
             WeaponUpgradePointsAvailable = data.WeaponUpgradePointsAvailable;
+        else
+            Debug.Log("WeaponUpgradePointsAvailable[] is null");
         if (data.DateDailyResearchTime != null)
             DateDailyResearchTime = data.DateDailyResearchTime;
+        else
+            Debug.Log("DateDailyResearchTime is null");
         if (data.DateDailyScrapBoostTime != null)
             DateDailyScrapBoostTime = data.DateDailyScrapBoostTime;
-            
-        
+        else
+            Debug.Log("DateDailyScrapBoostTime[] is null");
+
+
     }
 
     public void ResetPowerUps()
@@ -495,193 +518,9 @@ namespace PUBombs
     public enum PUBombType { Gravity, Kinetic }
 }
 
-namespace ShipUpgrades
+namespace Research
 {
-    public enum ShipUpgradeType { RepairBots, ShieldGenerator, ReactiveArmor }
+    public enum ResearchType { RepairBots, ShieldGenerator, ReactiveArmor, PulseLaser, MassDriver }
 }
 
-namespace ShipWeapons
-{
-    public enum SpecialType { NONE, GravityDamage, Piercing, Shrapnel }
 
-    public class Turret
-    {
-        //Base stats
-        private float baseSpeed;
-        private int baseDamage;
-        private float baseMass;
-        private float baseROF;
-        private float baseCritChance;
-        private float baseCritMultiplier;
-        private float baseSpecialChance;
-        private SpecialType specialType;
-        private int WeaponType;
-        private float fireTime;
-        private int bounces;
-        private int skillCap;
-
-        //Special names
-        string[] specials;
-
-        //Upgrades per skill point
-        private int uDamage;
-        private float uMass;
-        private float uROF;
-        private float uCritChance;
-        private float uSpecialChance;
-
-        //Upgraded stats
-        private int totalDamage;
-        private float totalMass;
-        private float totalROF;
-        private float totalCritChance;
-        private float totalSpecialChance;
-        private float totalSpecial2Chance;
-        private float totalCritMultiplier;
-
-        public Turret(float speed, int damage, float mass, float rof, float crit_chance,
-            float crit_multiplier, int weapon_type, SpecialType special_type = SpecialType.NONE, string special1 = "UNDEFINED", string special2="UNDEFINED")
-        {
-            specials = new string[] { special1, special2 };
-            baseSpeed = speed;
-            baseDamage = damage;
-            baseMass = mass;
-            baseROF = rof;
-            baseCritChance = crit_chance;
-            baseCritMultiplier = crit_multiplier;
-            baseSpecialChance = 25;
-            WeaponType = weapon_type;
-            specialType = special_type;
-            bounces = 0;
-            skillCap = 100;
-            fireTime = Time.time;
-        }
-
-        public void SetUpgradeValuesPerSkillPoint(int damage, float mass, float crit)
-        {
-            uDamage = damage;
-            uMass = mass;
-            uCritChance = crit;
-        }
-
-        public void UpdateValues(int weaponNumber)
-        {
-            //Debug.Log("Updating weapon number " + weaponNumber.ToString());
-            int skillLevel = GameControlScript.gameControl.WeaponSkill[weaponNumber];
-            totalDamage = baseDamage + skillLevel * uDamage;
-            totalMass = baseMass + skillLevel * uMass;
-            totalCritChance = baseCritChance + skillLevel * uCritChance;
-            UpdateUpgrades();
-
-            
-        }
-
-        private void UpdateUpgrades()
-        {
-            //0 = attack speed
-            //1 = mass
-            //2 = damage
-            //3 = crit multiplier
-            //4 = unique ability
-            //5 = special chance
-            //6 = skill cap increase
-            totalROF = baseROF - GameControlScript.gameControl.AttackSpeedReductions[WeaponType] * GameControlScript.gameControl.WeaponUpgrades[WeaponType, 0];
-            totalMass += totalMass * GameControlScript.gameControl.WeaponUpgrades[WeaponType, 1];
-            totalDamage += (int)((float)totalDamage * (float)GameControlScript.gameControl.WeaponUpgrades[WeaponType, 2] * 0.25f);
-            totalCritMultiplier = baseCritMultiplier + GameControlScript.gameControl.WeaponUpgrades[WeaponType, 3] * 0.5f;
-            totalSpecialChance = baseSpecialChance * GameControlScript.gameControl.WeaponUpgrades[WeaponType, 5];
-
-            skillCap = 100 + 5 * GameControlScript.gameControl.WeaponUpgrades[WeaponType, 6];
-            //Debug.Log("Skill cap: " + skillCap.ToString());
-   
-
-            switch (WeaponType) //0 = blaster, 1 = laser, 2 = mass driver, 3 = plasma
-            {
-                case 0:
-                    bounces = GameControlScript.gameControl.WeaponUpgrades[WeaponType, 4];
-                    break;
-                case 1:
-                    totalSpecial2Chance = baseSpecialChance * GameControlScript.gameControl.WeaponUpgrades[WeaponType, 4];
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        public int SkillCap
-        {
-            get { return skillCap; }
-            //set { skillCap = value; }
-        }
-
-        public int Bounces
-        {
-            get { return bounces; }
-            //set { bounces = value; }
-        }
-
-        public float Speed
-        {
-            get { return baseSpeed; }
-            //set { baseSpeed = value; }
-        }
-
-        public int Damage
-        {
-            get { return totalDamage; }
-            //set { totalDamage = value; }
-        }
-
-        public float Mass
-        {
-            get { return totalMass; }
-            //set { totalMass = value; }
-        }
-
-        public float RateOfFire
-        {
-            get { return totalROF; }
-            //set { totalROF = value; }
-        }
-
-        public float CriticalChance
-        {
-            get { return totalCritChance; }
-            //set { totalCritChance = value; }
-        }
-
-        public float CriticalMultiplier
-        {
-            get { return totalCritMultiplier; }
-            //set { baseCritMultiplier = value; }
-        }
-
-        public float SpecialChance
-        {
-            get { return totalSpecialChance; }
-            //set { totalSpecialChance = value; }
-        }
-
-        public float Special2Chance
-        {
-            get { return totalSpecial2Chance; }
-        }
-
-        public SpecialType SpecialType
-        {
-            get { return specialType; }
-            //set { specialType = value; }
-        }
-
-        public float FireTime
-        {
-            get { return fireTime; }
-            set { fireTime = value; }
-        }
-
-        public string[] SpecialNames
-        {
-            get { return specials; }
-        }
-    }
-}

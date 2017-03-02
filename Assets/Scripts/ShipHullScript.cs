@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 
 public class ShipHullScript : MonoBehaviour {
@@ -9,13 +10,20 @@ public class ShipHullScript : MonoBehaviour {
     public GameObject hit_effect;
     private float destroyed_time;
     private float destroyed_interval = 0.3f;
-    public GameObject hullBar;
+    public Slider hullBar;
+    private int maxHitPoints;
+
+    private float repairBotsInterval = 1f;
+    private float repairBotsTime;
 
 
     void Start () {
         hitPoints = 100;
+        maxHitPoints = hitPoints;
+        hullBar.maxValue = maxHitPoints;
         GameControlScript.gameControl.PLAYER_ALIVE = true;
         UpdateHullBar();
+        repairBotsTime = Time.time;
 	}
 	
 	void Update () {
@@ -34,6 +42,21 @@ public class ShipHullScript : MonoBehaviour {
                 GameObject.Find("UIControl").GetComponent<UIControlScript>().ReturnToBaseClicked();
             }
         }
+        else
+        {
+            if (GameControlScript.gameControl.ShipRepairBots)
+            {
+                if (Time.time - repairBotsTime >= repairBotsInterval)
+                {
+                    if (hitPoints < 100)
+                    {
+                        hitPoints += 1;
+                        UpdateHullBar();
+                    }
+                    repairBotsTime = Time.time;
+                }
+            }
+        }
 	}
 
     void OnCollisionEnter2D(Collision2D col)
@@ -42,6 +65,10 @@ public class ShipHullScript : MonoBehaviour {
         {
             MeteorScript asteroid = col.gameObject.GetComponent<MeteorScript>();
             isHit(asteroid.damage);
+            if (GameControlScript.gameControl.ShipReactiveArmor)
+            {
+                asteroid.isHit(asteroid.hitPoints);
+            }
         }
 
         if (col.gameObject.GetComponent<EnemyProjectileScript>() != null)
@@ -76,6 +103,6 @@ public class ShipHullScript : MonoBehaviour {
 
     private void UpdateHullBar()
     {
-        hullBar.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, hitPoints);
+        hullBar.value = hitPoints;
     }
 }

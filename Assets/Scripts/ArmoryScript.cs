@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using ShipWeapons;
+using Research;
 using System.Collections;
 
 public class ArmoryScript : MonoBehaviour {
@@ -20,6 +21,7 @@ public class ArmoryScript : MonoBehaviour {
     public Button btnDailyBoosts;
     public Dropdown ddSelectZone;
 
+    private ResearchType researchType;
     private AnnouncerScript announcer;
 
     public enum ArmoryView { Weapon, Ship };
@@ -47,6 +49,8 @@ public class ArmoryScript : MonoBehaviour {
         GameObject temp = btnDailyBoosts.transform.FindChild("ButtonDailyResearch").gameObject;
         temp.SetActive(false);
         temp = btnDailyBoosts.transform.FindChild("ButtonDailyScrap").gameObject;
+        temp.SetActive(false);
+        temp = GameObject.Find("Canvas").transform.FindChild("PanelResearch").gameObject;
         temp.SetActive(false);
 
 
@@ -112,18 +116,19 @@ public class ArmoryScript : MonoBehaviour {
         }
 
         selectWeapon0.GetComponentInChildren<Text>().text = GameControlScript.gameControl.WeaponNames[0];
+
         if (!GameControlScript.gameControl.WeaponUnlocked[1])
         {
-            selectWeapon1.GetComponentInChildren<Text>().text = GameControlScript.gameControl.WeaponNames[1];
-            //selectWeapon1.GetComponentInChildren<Text>().text = "Unlock " + GameControlScript.gameControl.WeaponNames[1] + "\n(20 000 SRAP, 1 RM)";
+            selectWeapon1.GetComponentInChildren<Text>().text = "Research\n" + GameControlScript.gameControl.WeaponNames[1];
         }
             
         else
             selectWeapon1.GetComponentInChildren<Text>().text = GameControlScript.gameControl.WeaponNames[1];
+
         if (!GameControlScript.gameControl.WeaponUnlocked[2])
         {
             selectWeapon2.GetComponentInChildren<Text>().text = GameControlScript.gameControl.WeaponNames[2];
-            //selectWeapon2.GetComponentInChildren<Text>().text = "Unlock " + GameControlScript.gameControl.WeaponNames[2] + "\n(100 000 SCRAP, 5 RM)";
+            selectWeapon2.GetComponentInChildren<Text>().text = "Research\n" + GameControlScript.gameControl.WeaponNames[2];
         }
             
         else
@@ -169,6 +174,54 @@ public class ArmoryScript : MonoBehaviour {
         //GameControlScript.gameControl.UpdatePlayerAttributes();
 
 
+
+    }
+
+    public void BeginResearch(int type)
+    {
+        /*
+         * RepairBots = 0
+         * ShieldGenerator = 1
+         * ReactiveArmor = 2
+         * PulseLaser = 3
+         * MassDriver = 4
+         */
+        researchType = (ResearchType)type;
+        bool instant = true;
+        switch (researchType)
+        {
+            case ResearchType.RepairBots:
+                if (instant)
+                {
+                    GameControlScript.gameControl.ShipRepairBots = true;
+                }
+                break;
+            case ResearchType.ShieldGenerator:
+                if (instant)
+                {
+                    GameControlScript.gameControl.ShipShieldGenerator = true;
+                }
+                break;
+            case ResearchType.ReactiveArmor:
+                if (instant)
+                {
+                    GameControlScript.gameControl.ShipReactiveArmor = true;
+                }
+                break;
+            case ResearchType.PulseLaser:
+                break;
+            case ResearchType.MassDriver:
+                break;
+            default:
+                break;
+        }
+    }
+
+    public void ShowResearchPanel(bool value)
+    {
+        GameObject temp;
+        temp = GameObject.Find("Canvas").transform.FindChild("PanelResearch").gameObject;
+        temp.SetActive(value);
 
     }
 
@@ -266,7 +319,7 @@ public class ArmoryScript : MonoBehaviour {
             ShowShipUI(false);
         }
 
-        if (true) //GameControlScript.gameControl.WeaponUnlocked[weaponNumber])
+        if (GameControlScript.gameControl.WeaponUnlocked[weaponNumber])
         {
             GameControlScript.gameControl.SelectedWeapon = weaponNumber;
             UpdateSliders();
@@ -446,9 +499,15 @@ public class ArmoryScript : MonoBehaviour {
     {
         System.DateTime dateTime = System.DateTime.Now;
         if (dateTime.Day != GameControlScript.gameControl.DateDailyScrapBoostTime.Day)
+        {
+            GameControlScript.gameControl.ScrapBoostActive = false;
             return true;
+        }
         else
+        {
+            GameControlScript.gameControl.ScrapBoostActive = true;
             return false;
+        }
     }
 
 

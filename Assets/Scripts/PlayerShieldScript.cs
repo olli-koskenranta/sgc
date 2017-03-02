@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 
 public class PlayerShieldScript : MonoBehaviour {
@@ -8,22 +9,26 @@ public class PlayerShieldScript : MonoBehaviour {
     private Color newColor;
     public AudioSource shieldSound;
     private int hpBoost = 0;
-    public GameObject shieldBar;
+    public Slider shieldBar;
     private float spawnTime;
+    private int maxShieldAmount = 100;
 
     void Start () {
         sr = gameObject.GetComponent<SpriteRenderer>();
         newColor = sr.color;
+        newColor.a = 0f;
+        sr.color = newColor;
         UpdateShieldBar();
         gameObject.SetActive(false);
         spawnTime = Time.time;
+        shieldBar.maxValue = maxShieldAmount;
 	}
 
     void Update()
     {
         if (hpBoost > 0)
         {
-            if (hitPoints + 1 < 100)
+            if (hitPoints < 100)
                 hitPoints++;
 
             UpdateShieldBar();
@@ -90,7 +95,7 @@ public class PlayerShieldScript : MonoBehaviour {
 
     void UpdateShieldBar()
     {
-        shieldBar.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, hitPoints);
+        shieldBar.value = hitPoints;
     }
 
 }

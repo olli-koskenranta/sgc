@@ -66,9 +66,7 @@ public class UIControlScript : MonoBehaviour {
         {
             GameObject canvas;
             canvas = GameObject.Find("Canvas");
-            canvas.transform.FindChild("BossHPBG").gameObject.SetActive(value);
-            canvas.transform.FindChild("BossHP").gameObject.SetActive(value);
-            canvas.transform.FindChild("BossText").gameObject.SetActive(value);
+            canvas.transform.FindChild("SliderBossHP").gameObject.SetActive(value);
         }
     }
 

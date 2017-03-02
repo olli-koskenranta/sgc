@@ -1,14 +1,16 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 
 public class Anomaly3Script : MonoBehaviour {
 
     public int hitPoints;
+    public int maxHitPoints;
     private Transform standingPosition;
     private GameObject shipHull;
     private int XP = 3000;
     public bool ALIVE = false;
-    public GameObject BossHPBar;
+    public Slider BossHPBar;
     private GameObject fighter;
     private Transform spawnPosition;
     private float spawnInterval = 1.5f;
@@ -30,7 +32,10 @@ public class Anomaly3Script : MonoBehaviour {
         mainCamera = Camera.main;
         spawnTime = Time.time;
         hitPoints = 100000;
-        BossHPBar = GameObject.Find("Canvas/BossHP");
+        maxHitPoints = hitPoints;
+        GameObject temp = GameObject.Find("Canvas/BossHP");
+        BossHPBar = temp.GetComponent<Slider>();
+        BossHPBar.maxValue = maxHitPoints;
         GameObject.Find("Music").GetComponent<MusicScript>().PlayTrack(2);
         shipHull = GameObject.FindWithTag("ShipHull");
         standingPosition = GameObject.Find("BossStandsHere").GetComponent<Transform>();
@@ -106,7 +111,7 @@ public class Anomaly3Script : MonoBehaviour {
 
     void UpdateBossHPBar()
     {
-        BossHPBar.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, hitPoints / 1000);
+        BossHPBar.value = hitPoints;
     }
 
     private void SpawnFighter(float dirX = -1f, float dirY = 0f)

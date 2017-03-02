@@ -1,10 +1,12 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using ShipWeapons;
 using System.Collections;
 
 public class Anomaly1Script : MonoBehaviour {
 
     public int hitPoints;
+    public int maxHitPoints;
     private float mass;
     private GameObject shipHull;
     public bool ALIVE = false;
@@ -12,7 +14,7 @@ public class Anomaly1Script : MonoBehaviour {
     private GameObject[] bigMeteors;
     private GameObject[] hugeMeteors;
     private int XP = 1000;
-    public GameObject BossHPBar;
+    public Slider BossHPBar;
     public int damage = 100;
 
 
@@ -23,7 +25,10 @@ public class Anomaly1Script : MonoBehaviour {
 
 	void Start () {
         hitPoints = 1000;
-        BossHPBar = GameObject.Find("Canvas/BossHP");
+        maxHitPoints = hitPoints;
+        GameObject temp = GameObject.Find("Canvas/SliderBossHP");
+        BossHPBar = temp.GetComponent<Slider>();
+        BossHPBar.maxValue = maxHitPoints;
         GameObject.Find("Music").GetComponent<MusicScript>().PlayTrack(2);
         shipHull = GameObject.FindWithTag("ShipHull");
         medMeteors = GameObject.FindGameObjectsWithTag("medMeteor");
@@ -108,6 +113,6 @@ public class Anomaly1Script : MonoBehaviour {
 
     void UpdateBossHPBar()
     {
-        BossHPBar.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, hitPoints/10);
+        BossHPBar.value = hitPoints;
     }
 }

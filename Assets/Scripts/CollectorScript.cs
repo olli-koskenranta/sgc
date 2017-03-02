@@ -20,8 +20,12 @@ public class CollectorScript : MonoBehaviour
     private float levelStartTime;
     private float levelUpInterval = 30f;
 
+    private float shieldGenTime;
+    private float shieldGenInterval = 10f;
+
     void Start()
     {
+        shieldGenTime = Time.time;
         levelStartTime = Time.time;
         PowerUpActive = new bool[GameControlScript.gameControl.GetNumberOfPowerUps()];
         PowerUpStartTime = new float[GameControlScript.gameControl.GetNumberOfPowerUps()];
@@ -38,6 +42,15 @@ public class CollectorScript : MonoBehaviour
         if (Time.time - levelStartTime >= levelUpInterval && !IsBossPresent())
         {
             LevelUp();
+        }
+
+        if (GameControlScript.gameControl.ShipShieldGenerator)
+        {
+            if (Time.time - shieldGenTime >= shieldGenInterval && GameControlScript.gameControl.PLAYER_ALIVE)
+            {
+                repelShield.GetComponent<PlayerShieldScript>().ActivateShield(10);
+                shieldGenTime = Time.time;
+            }
         }
     }
 
