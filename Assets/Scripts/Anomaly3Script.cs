@@ -33,7 +33,7 @@ public class Anomaly3Script : MonoBehaviour {
         spawnTime = Time.time;
         hitPoints = 100000;
         maxHitPoints = hitPoints;
-        GameObject temp = GameObject.Find("Canvas/BossHP");
+        GameObject temp = GameObject.Find("Canvas/SliderBossHP");
         BossHPBar = temp.GetComponent<Slider>();
         BossHPBar.maxValue = maxHitPoints;
         GameObject.Find("Music").GetComponent<MusicScript>().PlayTrack(2);
@@ -100,7 +100,7 @@ public class Anomaly3Script : MonoBehaviour {
         if (hitPoints <= 0)
         {
             GameObject.Find("Music").GetComponent<MusicScript>().PlayTrack(1);
-            GameControlScript.gameControl.ExperienceGained(XP);
+            GameControl.gc.ExperienceGained(XP);
             ALIVE = false;
             GameObject.Find("MeteorSpawning").GetComponent<SpawningScript>().ANOMALY_DESTROYED[2] = true;
             GameObject.Find("MeteorSpawning").GetComponent<SpawningScript>().ANOMALY_SPAWNED = false;

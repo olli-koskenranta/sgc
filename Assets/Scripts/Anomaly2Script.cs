@@ -70,7 +70,7 @@ public class Anomaly2Script : MonoBehaviour {
         if (hitPoints <= 0)
         {
             GameObject.Find("Music").GetComponent<MusicScript>().PlayTrack(1);
-            GameControlScript.gameControl.ExperienceGained(XP);
+            GameControl.gc.ExperienceGained(XP);
             ALIVE = false;
             GameObject.Find("MeteorSpawning").GetComponent<SpawningScript>().ANOMALY_DESTROYED[1] = true;
             GameObject.Find("MeteorSpawning").GetComponent<SpawningScript>().ANOMALY_SPAWNED = false;

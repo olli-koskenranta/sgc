@@ -21,13 +21,13 @@ public class ShipHullScript : MonoBehaviour {
         hitPoints = 100;
         maxHitPoints = hitPoints;
         hullBar.maxValue = maxHitPoints;
-        GameControlScript.gameControl.PLAYER_ALIVE = true;
+        GameControl.gc.PLAYER_ALIVE = true;
         UpdateHullBar();
         repairBotsTime = Time.time;
 	}
 	
 	void Update () {
-	    if (!GameControlScript.gameControl.PLAYER_ALIVE)
+	    if (!GameControl.gc.PLAYER_ALIVE)
         {
             if (Time.time - destroyed_time >= destroyed_interval)
             {
@@ -44,7 +44,7 @@ public class ShipHullScript : MonoBehaviour {
         }
         else
         {
-            if (GameControlScript.gameControl.ShipRepairBots)
+            if (GameControl.gc.ShipRepairBots)
             {
                 if (Time.time - repairBotsTime >= repairBotsInterval)
                 {
@@ -65,7 +65,7 @@ public class ShipHullScript : MonoBehaviour {
         {
             MeteorScript asteroid = col.gameObject.GetComponent<MeteorScript>();
             isHit(asteroid.damage);
-            if (GameControlScript.gameControl.ShipReactiveArmor)
+            if (GameControl.gc.ShipReactiveArmor)
             {
                 asteroid.isHit(asteroid.hitPoints);
             }
@@ -80,7 +80,7 @@ public class ShipHullScript : MonoBehaviour {
 
     public void isHit(int Damage)
     {
-        if (GameControlScript.gameControl.AUDIO_SOUNDS)
+        if (GameControl.gc.AUDIO_SOUNDS)
             soundHullHit.Play();
 
         if (hitPoints - Damage > 0)
@@ -92,10 +92,10 @@ public class ShipHullScript : MonoBehaviour {
             hitPoints = 0;
         }
 
-        if (hitPoints <= 0 && GameControlScript.gameControl.PLAYER_ALIVE)
+        if (hitPoints <= 0 && GameControl.gc.PLAYER_ALIVE)
         {
             destroyed_time = Time.time;
-            GameControlScript.gameControl.PLAYER_ALIVE = false;
+            GameControl.gc.PLAYER_ALIVE = false;
         }
 
         UpdateHullBar();

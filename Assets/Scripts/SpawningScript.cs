@@ -74,21 +74,21 @@ public class SpawningScript : MonoBehaviour {
             SpawnPowerUp();
         }*/
 
-        if (GameControlScript.gameControl.currentLevel == 10 && !ANOMALY_SPAWNED && !ANOMALY_DESTROYED[0])
+        if (GameControl.gc.currentLevel == 10 && !ANOMALY_SPAWNED && !ANOMALY_DESTROYED[0])
         {
             GameObject.Find("UIControl").GetComponent<UIControlScript>().SetBossBarsActive(true);
             SpawnAnomaly(1);
             announcer.GetComponent<AnnouncerScript>().Announce("!ANOMALY DETECTED!", FloatingText.FTType.Danger);
         }
 
-        if (GameControlScript.gameControl.currentLevel == 20 && !ANOMALY_SPAWNED && !ANOMALY_DESTROYED[1])
+        if (GameControl.gc.currentLevel == 20 && !ANOMALY_SPAWNED && !ANOMALY_DESTROYED[1])
         {
             GameObject.Find("UIControl").GetComponent<UIControlScript>().SetBossBarsActive(true);
             SpawnAnomaly(2);
             announcer.GetComponent<AnnouncerScript>().Announce("!ANOMALY DETECTED!", FloatingText.FTType.Danger);
         }
 
-        if (GameControlScript.gameControl.currentLevel == 30 && !ANOMALY_SPAWNED && !ANOMALY_DESTROYED[2])
+        if (GameControl.gc.currentLevel == 30 && !ANOMALY_SPAWNED && !ANOMALY_DESTROYED[2])
         {
             GameObject.Find("UIControl").GetComponent<UIControlScript>().SetBossBarsActive(true);
             SpawnAnomaly(3);
@@ -107,7 +107,7 @@ public class SpawningScript : MonoBehaviour {
 
 
         //Huge Asteroid
-        if (GameControlScript.gameControl.currentLevel >= 5)
+        if (GameControl.gc.currentLevel >= 5)
         {
             if (RollDice(100) <= HugeAsteroidChance)
             {
@@ -131,7 +131,7 @@ public class SpawningScript : MonoBehaviour {
         }
 
         //Nebula
-        if (GameControlScript.gameControl.currentLevel >= 11 && GameControlScript.gameControl.currentLevel % 10 != 0)
+        if (GameControl.gc.currentLevel >= 11 && GameControl.gc.currentLevel % 10 != 0)
         {
             if (RollDice(100) <= NebulaChance)
             {
@@ -140,7 +140,7 @@ public class SpawningScript : MonoBehaviour {
             }
         }
 
-        if (GameControlScript.gameControl.currentLevel >= 21)
+        if (GameControl.gc.currentLevel >= 21)
         {
             //Enemy Fighter
             if (RollDice(100) <= EnemyFighterChance)
@@ -155,7 +155,7 @@ public class SpawningScript : MonoBehaviour {
         }
 
         //Enemy Missile Cruiser
-        if (GameControlScript.gameControl.currentLevel >= 31)
+        if (GameControl.gc.currentLevel >= 31)
         if (RollDice(100) <= EnemyMissileCruiserChance)
         {
 
@@ -175,8 +175,8 @@ public class SpawningScript : MonoBehaviour {
 
         spawnTime = Time.time;
 
-        spawnInterval = 1.1f - (GameControlScript.gameControl.currentLevel % 10) / 10f;
-        if (spawnInterval < 0.3f || GameControlScript.gameControl.currentLevel % 10 == 0)
+        spawnInterval = 1.1f - (GameControl.gc.currentLevel % 10) / 10f;
+        if (spawnInterval < 0.3f || GameControl.gc.currentLevel % 10 == 0)
             spawnInterval = 0.3f;
     }
 

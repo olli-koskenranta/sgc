@@ -27,8 +27,8 @@ public class CollectorScript : MonoBehaviour
     {
         shieldGenTime = Time.time;
         levelStartTime = Time.time;
-        PowerUpActive = new bool[GameControlScript.gameControl.GetNumberOfPowerUps()];
-        PowerUpStartTime = new float[GameControlScript.gameControl.GetNumberOfPowerUps()];
+        PowerUpActive = new bool[GameControl.gc.GetNumberOfPowerUps()];
+        PowerUpStartTime = new float[GameControl.gc.GetNumberOfPowerUps()];
         for (int i = 0; i < PowerUpActive.Length; i++)
         {
             PowerUpActive[i] = false;
@@ -44,9 +44,9 @@ public class CollectorScript : MonoBehaviour
             LevelUp();
         }
 
-        if (GameControlScript.gameControl.ShipShieldGenerator)
+        if (GameControl.gc.ShipShieldGenerator)
         {
-            if (Time.time - shieldGenTime >= shieldGenInterval && GameControlScript.gameControl.PLAYER_ALIVE)
+            if (Time.time - shieldGenTime >= shieldGenInterval && GameControl.gc.PLAYER_ALIVE)
             {
                 repelShield.GetComponent<PlayerShieldScript>().ActivateShield(10);
                 shieldGenTime = Time.time;
@@ -56,10 +56,10 @@ public class CollectorScript : MonoBehaviour
 
     private void UpdateInfoText()
     {
-        textInfo.text = "Scrap: " + GameControlScript.gameControl.scrapCount.ToString() + "\n"
-            + "Research Material: " + GameControlScript.gameControl.researchMaterialCount.ToString() + "\n"
-            + "Weapon Power: " + GameControlScript.gameControl.WeaponSkill[GameControlScript.gameControl.SelectedWeapon].ToString() + "/" + GameControlScript.gameControl.Weapons[GameControlScript.gameControl.SelectedWeapon].SkillCap.ToString()
-            + "\nZone: " + GameControlScript.gameControl.currentLevel.ToString();
+        textInfo.text = "Scrap: " + GameControl.gc.scrapCount.ToString() + "\n"
+            + "Research Material: " + GameControl.gc.researchMaterialCount.ToString() + "\n"
+            + "Weapon Power: " + GameControl.gc.WeaponSkill[GameControl.gc.SelectedWeapon].ToString() + "/" + GameControl.gc.Weapons[GameControl.gc.SelectedWeapon].SkillCap.ToString()
+            + "\nZone: " + GameControl.gc.currentLevel.ToString();
     }
 
     void OnCollisionEnter2D(Collision2D col)
@@ -113,7 +113,7 @@ public class CollectorScript : MonoBehaviour
 
     private void ScrapCollected(int amount, bool isResearchMaterial = false)
     {
-        if (GameControlScript.gameControl.AUDIO_SOUNDS)
+        if (GameControl.gc.AUDIO_SOUNDS)
         {
             float randomPitch = 1f + Random.Range(-0.05f, 0.05f);
             if (isResearchMaterial)
@@ -131,10 +131,10 @@ public class CollectorScript : MonoBehaviour
 
 
         if (isResearchMaterial)
-            GameControlScript.gameControl.researchMaterialCount += amount;
+            GameControl.gc.researchMaterialCount += amount;
         else
         {
-            GameControlScript.gameControl.scrapCount += amount;
+            GameControl.gc.scrapCount += amount;
         }
 
 
@@ -145,21 +145,21 @@ public class CollectorScript : MonoBehaviour
 
     public void LevelUp()
     {
-        GameControlScript.gameControl.currentLevel += 1;
+        GameControl.gc.currentLevel += 1;
         UpdateInfoText();
-        for (int i = 0; i < GameControlScript.gameControl.startZones.Length; i++)
+        for (int i = 0; i < GameControl.gc.startZones.Length; i++)
         {
-            if (GameControlScript.gameControl.startZones[i] == GameControlScript.gameControl.currentLevel && !GameControlScript.gameControl.StartZoneUnlocked[i])
+            if (GameControl.gc.startZones[i] == GameControl.gc.currentLevel && !GameControl.gc.StartZoneUnlocked[i])
             {
-                GameControlScript.gameControl.StartZoneUnlocked[i] = true;
-                announcer.GetComponent<AnnouncerScript>().Announce("Zone " + GameControlScript.gameControl.currentLevel.ToString() + "!"
+                GameControl.gc.StartZoneUnlocked[i] = true;
+                announcer.GetComponent<AnnouncerScript>().Announce("Zone " + GameControl.gc.currentLevel.ToString() + "!"
                     + "\nNew Start Zone Unlocked!", FloatingText.FTType.Announcement);
                 levelStartTime = Time.time;
-                GameControlScript.gameControl.SaveData();
+                GameControl.gc.SaveData();
                 return;
             }
         }
-        announcer.GetComponent<AnnouncerScript>().Announce("Zone " + GameControlScript.gameControl.currentLevel.ToString() + "!", FloatingText.FTType.Announcement);
+        announcer.GetComponent<AnnouncerScript>().Announce("Zone " + GameControl.gc.currentLevel.ToString() + "!", FloatingText.FTType.Announcement);
         levelStartTime = Time.time;
     }
 
@@ -175,13 +175,13 @@ public class CollectorScript : MonoBehaviour
     {
         //Randomize powerup
 
-        int PowerUpNumber = Random.Range(0, GameControlScript.gameControl.GetNumberOfPowerUps());
+        int PowerUpNumber = Random.Range(0, GameControl.gc.GetNumberOfPowerUps());
 
-        if (GameControlScript.gameControl.WeaponUpgrades[GameControlScript.gameControl.SelectedWeapon, 6] == 40)
+        if (GameControl.gc.WeaponUpgrades[GameControl.gc.SelectedWeapon, 6] == 40)
         {
             while (PowerUpNumber == 3)
             {
-                PowerUpNumber = Random.Range(0, GameControlScript.gameControl.GetNumberOfPowerUps());
+                PowerUpNumber = Random.Range(0, GameControl.gc.GetNumberOfPowerUps());
             }
         }
 
@@ -204,12 +204,12 @@ public class CollectorScript : MonoBehaviour
 
         else if (PowerUpNumber == 3)
         {
-            GameControlScript.gameControl.WeaponUpgrades[GameControlScript.gameControl.SelectedWeapon, 6] += 1;
-            GameObject.FindWithTag("PlayerTurret").GetComponent<TurretScript>().GetTurret().UpdateValues(GameControlScript.gameControl.SelectedWeapon);
+            GameControl.gc.WeaponUpgrades[GameControl.gc.SelectedWeapon, 6] += 1;
+            GameObject.FindWithTag("PlayerTurret").GetComponent<TurretScript>().GetTurret().UpdateValues(GameControl.gc.SelectedWeapon);
             UpdateInfoText();
         }
 
-        announcer.GetComponent<AnnouncerScript>().Announce(GameControlScript.gameControl.PowerUpNames[PowerUpNumber] + " gained!", FloatingText.FTType.PowerUp);
+        announcer.GetComponent<AnnouncerScript>().Announce(GameControl.gc.PowerUpNames[PowerUpNumber] + " gained!", FloatingText.FTType.PowerUp);
 
     }
 

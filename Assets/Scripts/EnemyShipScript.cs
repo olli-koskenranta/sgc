@@ -53,9 +53,9 @@ public class EnemyShipScript : MonoBehaviour {
                 projectile_speed = 2f;
                 fire_interval = 2f;
                 Bullet = Resources.Load("EnemyBullet1") as GameObject;
-                GetComponent<Rigidbody2D>().mass = enemyFighterMass * GameControlScript.gameControl.currentLevel;
+                GetComponent<Rigidbody2D>().mass = enemyFighterMass * GameControl.gc.currentLevel;
                 damage = enemyFighterDamage; // * GameControlScript.gameControl.currentLevel;
-                hitPoints = enemyFighterHitPoints * GameControlScript.gameControl.currentLevel; // + 200 * GameControlScript.gameControl.currentLevel / 10;
+                hitPoints = enemyFighterHitPoints * GameControl.gc.currentLevel; // + 200 * GameControlScript.gameControl.currentLevel / 10;
                 break;
             case ShipType.MissileCruiser:
                 XP = 12;
@@ -63,9 +63,9 @@ public class EnemyShipScript : MonoBehaviour {
                 projectile_speed = 0.5f;
                 fire_interval = 1f;
                 Bullet = Resources.Load("Missile") as GameObject;
-                GetComponent<Rigidbody2D>().mass = enemyMissileCruiserMass * GameControlScript.gameControl.currentLevel;
+                GetComponent<Rigidbody2D>().mass = enemyMissileCruiserMass * GameControl.gc.currentLevel;
                 damage = enemyMissileCruiserDamage; // * GameControlScript.gameControl.currentLevel;
-                hitPoints = enemyMissileCruiserHitPoints * GameControlScript.gameControl.currentLevel; // + 200 * GameControlScript.gameControl.currentLevel / 10;
+                hitPoints = enemyMissileCruiserHitPoints * GameControl.gc.currentLevel; // + 200 * GameControlScript.gameControl.currentLevel / 10;
                 break;
             default:
                 break;
@@ -213,7 +213,7 @@ public class EnemyShipScript : MonoBehaviour {
         //if (GameControlScript.gameControl.AUDIO_SOUNDS)
         //    soundExplode.Play();
 
-        GameControlScript.gameControl.ExperienceGained(XP);
+        GameControl.gc.ExperienceGained(XP);
         //GetComponent<SpriteRenderer>().enabled = false;
         //GetComponent<PolygonCollider2D>().enabled = false;
         //Destroy(this.gameObject, 1);

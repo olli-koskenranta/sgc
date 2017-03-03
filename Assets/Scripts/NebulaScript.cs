@@ -16,7 +16,7 @@ public class NebulaScript : MonoBehaviour {
 	void Start () {
         mainCamera = Camera.main;
         preferredScale = transform.localScale;
-        hitPoints *= GameControlScript.gameControl.currentLevel;
+        hitPoints *= GameControl.gc.currentLevel;
     }
 	
 	// Update is called once per frame
@@ -122,14 +122,14 @@ public class NebulaScript : MonoBehaviour {
     {
         if (!ALIVE)
             return;
-        GameControlScript.gameControl.ExperienceGained(XP);
+        GameControl.gc.ExperienceGained(XP);
         asteroidFragment = Resources.Load("ScrapPiece") as GameObject;
         for (int i = 0; i <= consumedObjects; i++)
         {
             Vector3 rngpos = new Vector3(Random.Range(-1f, 1f), Random.Range(-1f, 1f), 0f);
             GameObject fragmentInstance = Instantiate(asteroidFragment, this.transform.position + rngpos, this.transform.rotation) as GameObject;
             fragmentInstance.GetComponent<ScrapPieceScript>().type = Scrap.ScrapType.Normal;
-            if (Random.Range(1, 1001) >= 1000 - GameControlScript.gameControl.currentLevel / 10)
+            if (Random.Range(1, 1001) >= 1000 - GameControl.gc.currentLevel / 10)
             {
                 fragmentInstance.GetComponent<ScrapPieceScript>().type = Scrap.ScrapType.ResearchMaterial;
             }

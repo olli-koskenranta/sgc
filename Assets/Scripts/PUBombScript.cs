@@ -20,7 +20,7 @@ public class PUBombScript : MonoBehaviour {
         gameObject.transform.localScale = new Vector3(0.1f, 0.1f, 1f);
         growTime = Time.time;
 
-        if (GameControlScript.gameControl.AUDIO_SOUNDS)
+        if (GameControl.gc.AUDIO_SOUNDS)
             GetComponent<AudioSource>().Play();
 	}
 	

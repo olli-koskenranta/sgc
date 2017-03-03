@@ -10,8 +10,8 @@ public class ScrapPieceScript : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-        scrapAmount = 3 + GameControlScript.gameControl.currentLevel * 3;
-        if (GameControlScript.gameControl.ScrapBoostActive)
+        scrapAmount = 3 + GameControl.gc.currentLevel * 3;
+        if (GameControl.gc.ScrapBoostActive)
             scrapAmount *= 2;
         researchMaterialAmount = 1;
         if (type == ScrapType.ResearchMaterial)

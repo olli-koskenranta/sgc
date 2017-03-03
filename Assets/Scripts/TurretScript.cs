@@ -30,22 +30,22 @@ public class TurretScript : MonoBehaviour {
         //1 = Laser Cannon
         //2 = Mass Driver
         //3 = Plasma Cannon
-        switch (GameControlScript.gameControl.SelectedWeapon)
+        switch (GameControl.gc.SelectedWeapon)
         {
             case 0:
-                turret = GameControlScript.gameControl.Weapons[0];
+                turret = GameControl.gc.Weapons[0];
                 Bullet = Resources.Load("Bullet2") as GameObject;
                 break;
             case 1:
-                turret = GameControlScript.gameControl.Weapons[1];
+                turret = GameControl.gc.Weapons[1];
                 Bullet = Resources.Load("ProjectileLaser") as GameObject;
                 break;
             case 2:
-                turret = GameControlScript.gameControl.Weapons[2];
+                turret = GameControl.gc.Weapons[2];
                 Bullet = Resources.Load("MassDriverBullet") as GameObject;
                 break;
             case 3:
-                turret = GameControlScript.gameControl.Weapons[3];
+                turret = GameControl.gc.Weapons[3];
                 Bullet = Resources.Load("PlasmaBall") as GameObject;
                 break;
             default:
@@ -105,11 +105,11 @@ public class TurretScript : MonoBehaviour {
         PlayerProjectileScript bulletScript;
         float randomPitch = 1f + Random.Range(-0.05f, 0.05f); //+ Random.Range(-0.5f, 0.5f);
 
-        switch (GameControlScript.gameControl.SelectedWeapon)
+        switch (GameControl.gc.SelectedWeapon)
         {
             case 0:
 
-                if (GameControlScript.gameControl.AUDIO_SOUNDS)
+                if (GameControl.gc.AUDIO_SOUNDS)
                 {
                     BlasterSound.pitch = randomPitch;
                     BlasterSound.Play();
@@ -124,7 +124,7 @@ public class TurretScript : MonoBehaviour {
                 break;
 
             case 1:
-                if (GameControlScript.gameControl.AUDIO_SOUNDS)
+                if (GameControl.gc.AUDIO_SOUNDS)
                 {
 
                     LaserSound.pitch = randomPitch;
@@ -150,7 +150,7 @@ public class TurretScript : MonoBehaviour {
                 break;
 
             case 2:
-                if (GameControlScript.gameControl.AUDIO_SOUNDS)
+                if (GameControl.gc.AUDIO_SOUNDS)
                 {
                     MassDriverSound.pitch = randomPitch;
                     MassDriverSound.Play();
@@ -165,7 +165,7 @@ public class TurretScript : MonoBehaviour {
                 break;
 
             case 3:
-                if (GameControlScript.gameControl.AUDIO_SOUNDS)
+                if (GameControl.gc.AUDIO_SOUNDS)
                 {
                     LaserSound.pitch = randomPitch;
                     LaserSound.Play();
@@ -210,7 +210,7 @@ public class TurretScript : MonoBehaviour {
         bulletScript.critMultiplier = turret.CriticalMultiplier;
         bulletScript.bounces = turret.Bounces; 
         //Debug.Log("Bounces: " + bulletScript.bounces.ToString());
-        if (GameControlScript.gameControl.SelectedWeapon == 1 && special2)
+        if (GameControl.gc.SelectedWeapon == 1 && special2)
         {
             float distance = 1 - Input.mousePosition.x / (Screen.width - Screen.width / 10);
             if (distance > 0.5f)

@@ -7,13 +7,13 @@ public class MusicScript : MonoBehaviour {
     public AudioSource track2;
 	void Start ()
     {
-        if (GameControlScript.gameControl.AUDIO_MUSIC)
+        if (GameControl.gc.AUDIO_MUSIC)
             track1.Play();
 	}
 
     public void PlayTrack(int number)
     {
-        if (!GameControlScript.gameControl.AUDIO_MUSIC)
+        if (!GameControl.gc.AUDIO_MUSIC)
             return;
 
         if (number == 1)

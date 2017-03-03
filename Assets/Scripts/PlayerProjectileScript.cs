@@ -33,14 +33,14 @@ public class PlayerProjectileScript : MonoBehaviour {
         gameObject.GetComponent<Rigidbody2D>().mass = mass;
         floatingText = Resources.Load("FloatingText") as GameObject;
 
-        if (GameControlScript.gameControl.SelectedWeapon == 0)
+        if (GameControl.gc.SelectedWeapon == 0)
             BOUNCE = true;
 
 
 
         if (SPECIAL)
         {
-            switch (GameControlScript.gameControl.SelectedWeapon)
+            switch (GameControl.gc.SelectedWeapon)
             {
                 case 0:
                     
@@ -91,7 +91,7 @@ public class PlayerProjectileScript : MonoBehaviour {
 
         if (hugeMeteor != null && hugeMeteor.GetComponent<MeteorScript>().IsOnScreen())
         {
-            Vector2 forceVector = (hugeMeteor.transform.position - transform.position).normalized * GameControlScript.gameControl.currentLevel;
+            Vector2 forceVector = (hugeMeteor.transform.position - transform.position).normalized * GameControl.gc.currentLevel;
             GetComponent<Rigidbody2D>().AddForce(new Vector2(0, forceVector.y), ForceMode2D.Impulse);
         }
     }
@@ -101,7 +101,7 @@ public class PlayerProjectileScript : MonoBehaviour {
         HitEffect();
         DamageText();
 
-        if (GameControlScript.gameControl.SelectedWeapon == 0)
+        if (GameControl.gc.SelectedWeapon == 0)
         {
             bounces--;
 

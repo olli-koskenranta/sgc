@@ -64,7 +64,7 @@ public class PlayerShieldScript : MonoBehaviour {
 
         gameObject.SetActive(true);
 
-        if (GameControlScript.gameControl.AUDIO_SOUNDS)
+        if (GameControl.gc.AUDIO_SOUNDS)
         {
             shieldSound.Play();
         }

@@ -74,7 +74,7 @@ public class BGSwitchScript : MonoBehaviour
 
     private int GetBackGroundIndex()
     {
-        int index = GameControlScript.gameControl.currentLevel;
+        int index = GameControl.gc.currentLevel;
         if (index >= 50)
         {
             index -= 50 * index / 50;

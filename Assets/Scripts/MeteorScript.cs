@@ -73,20 +73,20 @@ public class MeteorScript : MonoBehaviour {
             case AsteroidType.Medium:
                 XP = 1;
                 damage = medMeteorDamage;
-                GetComponent<Rigidbody2D>().mass = medMeteorMass * GameControlScript.gameControl.currentLevel;
-                hitPoints = medMeteorHitPoints * GameControlScript.gameControl.currentLevel; // + 100 * GameControlScript.gameControl.currentLevel / 10; ;
+                GetComponent<Rigidbody2D>().mass = medMeteorMass * GameControl.gc.currentLevel;
+                hitPoints = medMeteorHitPoints * GameControl.gc.currentLevel; // + 100 * GameControlScript.gameControl.currentLevel / 10; ;
                 break;
             case AsteroidType.Big:
                 XP = 3;
                 damage = bigMeteorDamage;
-                GetComponent<Rigidbody2D>().mass = bigMeteorMass * GameControlScript.gameControl.currentLevel;
-                hitPoints = bigMeteorHitPoints * GameControlScript.gameControl.currentLevel; // + 300 * GameControlScript.gameControl.currentLevel / 10; ;
+                GetComponent<Rigidbody2D>().mass = bigMeteorMass * GameControl.gc.currentLevel;
+                hitPoints = bigMeteorHitPoints * GameControl.gc.currentLevel; // + 300 * GameControlScript.gameControl.currentLevel / 10; ;
                 break;
             case AsteroidType.Huge:
                 XP = 9;
                 damage = hugeMeteorDamage;
-                GetComponent<Rigidbody2D>().mass = hugeMeteorMass * GameControlScript.gameControl.currentLevel;
-                hitPoints = hugeMeteorHitPoints * GameControlScript.gameControl.currentLevel; // + 900 * GameControlScript.gameControl.currentLevel / 10; ;
+                GetComponent<Rigidbody2D>().mass = hugeMeteorMass * GameControl.gc.currentLevel;
+                hitPoints = hugeMeteorHitPoints * GameControl.gc.currentLevel; // + 900 * GameControlScript.gameControl.currentLevel / 10; ;
                 break;
             default:
                 break;
@@ -244,10 +244,10 @@ public class MeteorScript : MonoBehaviour {
 
     public void Explode()
     {
-        if (GameControlScript.gameControl.AUDIO_SOUNDS)
+        if (GameControl.gc.AUDIO_SOUNDS)
             soundExplode.Play();
 
-        GameControlScript.gameControl.ExperienceGained(XP);
+        GameControl.gc.ExperienceGained(XP);
         GetComponent<SpriteRenderer>().enabled = false;
         GetComponent<PolygonCollider2D>().enabled = false;
         Destroy(this.gameObject, 1);
@@ -281,7 +281,7 @@ public class MeteorScript : MonoBehaviour {
         
         asteroidFragment = Resources.Load("ScrapPiece") as GameObject;
         GameObject fragmentInstance = Instantiate(asteroidFragment, this.transform.position, this.transform.rotation) as GameObject;
-        if (Random.Range(1, 1001) >= 1000 - GameControlScript.gameControl.currentLevel / 10)
+        if (Random.Range(1, 1001) >= 1000 - GameControl.gc.currentLevel / 10)
         {
             fragmentInstance.GetComponent<ScrapPieceScript>().type = Scrap.ScrapType.ResearchMaterial;
         }

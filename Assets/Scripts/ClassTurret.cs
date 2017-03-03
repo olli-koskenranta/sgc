@@ -69,7 +69,7 @@ namespace ShipWeapons
         public void UpdateValues(int weaponNumber)
         {
             //Debug.Log("Updating weapon number " + weaponNumber.ToString());
-            int skillLevel = GameControlScript.gameControl.WeaponSkill[weaponNumber];
+            int skillLevel = GameControl.gc.WeaponSkill[weaponNumber];
             totalDamage = baseDamage + skillLevel * uDamage;
             totalMass = baseMass + skillLevel * uMass;
             totalCritChance = baseCritChance + skillLevel * uCritChance;
@@ -87,23 +87,23 @@ namespace ShipWeapons
             //4 = unique ability
             //5 = special chance
             //6 = skill cap increase
-            totalROF = baseROF - GameControlScript.gameControl.AttackSpeedReductions[WeaponType] * GameControlScript.gameControl.WeaponUpgrades[WeaponType, 0];
-            totalMass += totalMass * GameControlScript.gameControl.WeaponUpgrades[WeaponType, 1];
-            totalDamage += (int)((float)totalDamage * (float)GameControlScript.gameControl.WeaponUpgrades[WeaponType, 2] * 0.25f);
-            totalCritMultiplier = baseCritMultiplier + GameControlScript.gameControl.WeaponUpgrades[WeaponType, 3] * 0.5f;
-            totalSpecialChance = baseSpecialChance * GameControlScript.gameControl.WeaponUpgrades[WeaponType, 5];
+            totalROF = baseROF - GameControl.gc.AttackSpeedReductions[WeaponType] * GameControl.gc.WeaponUpgrades[WeaponType, 0];
+            totalMass += totalMass * GameControl.gc.WeaponUpgrades[WeaponType, 1];
+            totalDamage += (int)((float)totalDamage * (float)GameControl.gc.WeaponUpgrades[WeaponType, 2] * 0.25f);
+            totalCritMultiplier = baseCritMultiplier + GameControl.gc.WeaponUpgrades[WeaponType, 3] * 0.5f;
+            totalSpecialChance = baseSpecialChance * GameControl.gc.WeaponUpgrades[WeaponType, 5];
 
-            skillCap = 100 + 5 * GameControlScript.gameControl.WeaponUpgrades[WeaponType, 6];
+            skillCap = 100 + 5 * GameControl.gc.WeaponUpgrades[WeaponType, 6];
             //Debug.Log("Skill cap: " + skillCap.ToString());
 
 
             switch (WeaponType) //0 = blaster, 1 = laser, 2 = mass driver, 3 = plasma
             {
                 case 0:
-                    bounces = GameControlScript.gameControl.WeaponUpgrades[WeaponType, 4];
+                    bounces = GameControl.gc.WeaponUpgrades[WeaponType, 4];
                     break;
                 case 1:
-                    totalSpecial2Chance = baseSpecialChance * GameControlScript.gameControl.WeaponUpgrades[WeaponType, 4];
+                    totalSpecial2Chance = baseSpecialChance * GameControl.gc.WeaponUpgrades[WeaponType, 4];
                     break;
                 default:
                     break;
