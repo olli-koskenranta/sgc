@@ -21,6 +21,10 @@ public class ArmoryScript : MonoBehaviour {
     public Button btnDailyBoosts;
     public Dropdown ddSelectZone;
 
+    public Text textShipUpgrade0;
+    public Text textShipUpgrade1;
+    public Text textShipUpgrade2;
+
     private ResearchType researchType = 0;
     private AnnouncerScript announcer;
 
@@ -91,7 +95,7 @@ public class ArmoryScript : MonoBehaviour {
                 textInfo.text = "Scrap Count: " + GameControl.gc.scrapCount.ToString()
                     + "\nResearch Material: " + GameControl.gc.researchMaterialCount.ToString()
                     + "\n\nSelected Weapon: " + GameControl.gc.WeaponNames[GameControl.gc.SelectedWeapon]
-                    + "\nWeapon Power: " + GameControl.gc.WeaponSkill[GameControl.gc.SelectedWeapon].ToString() + "/" + GameControl.gc.Weapons[GameControl.gc.SelectedWeapon].SkillCap.ToString()
+                    + "\nWeapon Skill: " + GameControl.gc.WeaponSkill[GameControl.gc.SelectedWeapon].ToString() + "/" + GameControl.gc.Weapons[GameControl.gc.SelectedWeapon].SkillCap.ToString()
                         + "(+" + (GameControl.gc.WeaponUpgrades[GameControl.gc.SelectedWeapon, 6] * 5).ToString() + ")"
                     + "\nCritical Chance: " + GameControl.gc.Weapons[GameControl.gc.SelectedWeapon].CriticalChance.ToString() + "%"
                     + "\nRate of Fire: " + GameControl.gc.Weapons[GameControl.gc.SelectedWeapon].RateOfFire.ToString()
@@ -108,9 +112,45 @@ public class ArmoryScript : MonoBehaviour {
             case ArmoryView.Ship:
                 textInfo.text = "Scrap Count: " + GameControl.gc.scrapCount.ToString()
                     + "\nResearch Material: " + GameControl.gc.researchMaterialCount.ToString();
-                    /*+ "\n\n\nRepair hull over time"
-                    + "\n\n\nGenerates shields over time"
-                    + "\n\n\nDestroys asteroids when they hit the hull";*/
+                /*+ "\n\n\nRepair hull over time"
+                + "\n\n\nGenerates shields over time"
+                + "\n\n\nDestroys asteroids when they hit the hull";*/
+
+                if (GameControl.gc.ShipRepairBots)
+                {
+                    textShipUpgrade0.text = "Repair Bots Active";
+                }
+                else if (!GameControl.gc.ShipRepairBots && GameControl.gc.ResearchStarted[0])
+                {
+                    textShipUpgrade0.text = "Researching Repair Bots\nTime left: " 
+                        + IsResearchFinished(ResearchType.RepairBots).ToString() + "h";
+                }
+                else
+                    textShipUpgrade0.text = "Research Repair Bots";
+
+                if (GameControl.gc.ShipShieldGenerator)
+                {
+                    textShipUpgrade1.text = "Shield Generator Active";
+                }
+                else if (!GameControl.gc.ShipShieldGenerator && GameControl.gc.ResearchStarted[1])
+                {
+                    textShipUpgrade1.text = "Researching Shield Generator\nTime left: " 
+                        + IsResearchFinished(ResearchType.ShieldGenerator).ToString() + "h";
+                }
+                else
+                    textShipUpgrade1.text = "Research Shield Generator";
+
+                if (GameControl.gc.ShipReactiveArmor)
+                {
+                    textShipUpgrade2.text = "Reactive Armor Active";
+                }
+                else if (!GameControl.gc.ShipReactiveArmor && GameControl.gc.ResearchStarted[2])
+                {
+                    textShipUpgrade2.text = "Researching Reactive Armor\nTime left: " 
+                        + IsResearchFinished(ResearchType.ReactiveArmor).ToString() + "h";
+                }
+                else
+                    textShipUpgrade2.text = "Research Reactive Armor";
                 break;
             default:
                 textInfo.text = "What is happening?";
@@ -119,9 +159,14 @@ public class ArmoryScript : MonoBehaviour {
 
         selectWeapon0.GetComponentInChildren<Text>().text = GameControl.gc.WeaponNames[0];
 
-        if (!GameControl.gc.WeaponUnlocked[1])
+        if (!GameControl.gc.WeaponUnlocked[1] && !GameControl.gc.ResearchStarted[3])
         {
             selectWeapon1.GetComponentInChildren<Text>().text = "Research\n" + GameControl.gc.WeaponNames[1];
+        }
+        else if (!GameControl.gc.WeaponUnlocked[1] && GameControl.gc.ResearchStarted[3])
+        {
+            selectWeapon1.GetComponentInChildren<Text>().text = "Researching\n" + GameControl.gc.WeaponNames[1]
+                + "\nTime left: " + IsResearchFinished(ResearchType.PulseLaser).ToString() + "h";
         }
             
         else
@@ -132,25 +177,30 @@ public class ArmoryScript : MonoBehaviour {
             selectWeapon2.GetComponentInChildren<Text>().text = GameControl.gc.WeaponNames[2];
             selectWeapon2.GetComponentInChildren<Text>().text = "Research\n" + GameControl.gc.WeaponNames[2];
         }
-            
+        else if (!GameControl.gc.WeaponUnlocked[2] && GameControl.gc.ResearchStarted[4])
+        {
+            selectWeapon2.GetComponentInChildren<Text>().text = "Researching\n" + GameControl.gc.WeaponNames[2]
+                + "\nTime left: " + IsResearchFinished(ResearchType.MassDriver).ToString() + "h";
+        }
+
         else
             selectWeapon2.GetComponentInChildren<Text>().text = GameControl.gc.WeaponNames[2];
 
 
-        textUpgPoints.text = GameControl.gc.WeaponNames[GameControl.gc.SelectedWeapon] + " Upgrade Points: " + UpgPointsAvailable().ToString();
+        textUpgPoints.text = "Allocate " + GameControl.gc.WeaponNames[GameControl.gc.SelectedWeapon] + " Weapon Power: " + UpgPointsAvailable().ToString();
         if (GameControl.gc.WeaponUpgradePointsTotal[GameControl.gc.SelectedWeapon] < 24)
         {
-            btnBuyPoints.GetComponentInChildren<Text>().text = "Buy Points\n" + GameControl.gc.UpgradePointCost(0).ToString() + "S/" + GetRMCost().ToString() + "RM";
+            btnBuyPoints.GetComponentInChildren<Text>().text = "Add Weapon Power\n" + GameControl.gc.UpgradePointCost(0).ToString() + "S/" + GetRMCost().ToString() + "RM";
         }
         else
         {
-            btnBuyPoints.GetComponentInChildren<Text>().text = "Points Maxed";
+            btnBuyPoints.GetComponentInChildren<Text>().text = "Weapon Power Maxed";
         }
 
         if (IsDailyResearchAvailable())
         {
             btnDailyResearch.interactable = true;
-            btnDailyResearch.GetComponentInChildren<Text>().text = "Research\n+5 R. Material!\nWatch Ad";
+            btnDailyResearch.GetComponentInChildren<Text>().text = "Research\n+10 R. Material!\nWatch Ad";
         }
         else
         {
@@ -179,7 +229,7 @@ public class ArmoryScript : MonoBehaviour {
 
     }
 
-    public void BeginResearch(int type)
+    public void BeginResearch(bool adReward)
     {
         /*
          * RepairBots = 0
@@ -188,40 +238,58 @@ public class ArmoryScript : MonoBehaviour {
          * PulseLaser = 3
          * MassDriver = 4
          */
-        researchType = (ResearchType)type;
-        bool instant = true;
-        switch (researchType)
+
+        if (GameControl.gc.scrapCount >= GameControl.gc.ResearchScrapCost[(int)researchType]
+                && GameControl.gc.researchMaterialCount >= GameControl.gc.ResearchRMCost[(int)researchType])
         {
-            case ResearchType.RepairBots:
-                if (instant)
-                {
-                    GameControl.gc.ShipRepairBots = true;
-                }
-                
-                break;
-            case ResearchType.ShieldGenerator:
-                if (instant)
-                {
-                    GameControl.gc.ShipShieldGenerator = true;
-                }
-                break;
-            case ResearchType.ReactiveArmor:
-                if (instant)
-                {
-                    GameControl.gc.ShipReactiveArmor = true;
-                }
-                break;
-            case ResearchType.PulseLaser:
-                break;
-            case ResearchType.MassDriver:
-                break;
-            default:
-                break;
+            GameControl.gc.scrapCount -= GameControl.gc.ResearchScrapCost[(int)researchType];
+            GameControl.gc.researchMaterialCount -= GameControl.gc.ResearchRMCost[(int)researchType];
+            GameControl.gc.ResearchStarted[(int)researchType] = true;
+            GameControl.gc.ResearchStartTimes[(int)researchType] = System.DateTime.Now;
         }
+        else
+        {
+            announcer.Announce("Not enough resources", FloatingText.FTType.Danger);
+            Debug.Log("Not eonugh resources");
+            return;
+        }
+        
+        if (adReward)
+        {
+            StartCoroutine(adManager.ShowAd());
+        }
+
+        ShowResearchPanel(false);
+        UpdateArmoryUI();
+    }
+
+    public int IsResearchFinished(ResearchType rType)
+    {
+        if (GameControl.gc.ResearchStarted[(int)rType])
+        {
+            System.TimeSpan timeSpan = System.DateTime.Now - GameControl.gc.ResearchStartTimes[(int)rType];
+            if (timeSpan.Hours >= 4)
+            {
+
+                CompleteStartedResearch();
+            }
+            else
+            {
+                return 4 - timeSpan.Hours;
+            }
+        }
+
+        return 4;
+
+
+        //TimeSpan timeSpan = DateTime.Now - DateDailyScrapBoostTime;
+        //Debug.Log(timeSpan.Hours.ToString());
     }
 
     public void ResearchButtonClicked(int value)
     {
+        if (GameControl.gc.ResearchStarted[value])
+            return;
         researchType = (ResearchType)value;
         ShowResearchPanel(true);
     }
@@ -356,15 +424,14 @@ public class ArmoryScript : MonoBehaviour {
 
     public void SelectWeaponClicked(int weaponNumber)
     {
-        if (view != ArmoryView.Weapon)
-        {
-            view = ArmoryScript.ArmoryView.Weapon;
-            ShowWeaponUI(true);
-            ShowShipUI(false);
-        }
-
         if (GameControl.gc.WeaponUnlocked[weaponNumber])
         {
+            if (view != ArmoryView.Weapon)
+            {
+                view = ArmoryScript.ArmoryView.Weapon;
+                ShowWeaponUI(true);
+                ShowShipUI(false);
+            }
             GameControl.gc.SelectedWeapon = weaponNumber;
             UpdateSliders();
             UpdateArmoryUI();
@@ -373,14 +440,6 @@ public class ArmoryScript : MonoBehaviour {
         {
             researchType = (ResearchType)(weaponNumber + 2);
             ShowResearchPanel(true);
-            /*if (GameControl.gc.scrapCount >= GameControl.gc.ResearchScrapCost[weaponNumber]
-                && GameControl.gc.researchMaterialCount >= GameControl.gc.ResearchRMCost[weaponNumber])
-            {
-                GameControl.gc.scrapCount -= GameControl.gc.ResearchScrapCost[weaponNumber];
-                GameControl.gc.researchMaterialCount -= GameControl.gc.ResearchRMCost[weaponNumber];
-                GameControl.gc.WeaponUnlocked[weaponNumber] = true;
-                SelectWeaponClicked(weaponNumber);
-            }*/
         }
     }
 
@@ -481,29 +540,36 @@ public class ArmoryScript : MonoBehaviour {
                 if (DAILY_RESEARCH)
                 {
                     DAILY_RESEARCH = false;
-                    GameControl.gc.researchMaterialCount += 5;
+                    GameControl.gc.researchMaterialCount += 10;
                     GameControl.gc.DateDailyResearchTime = System.DateTime.Now;
-                    UpdateArmoryUI();
                     GameControl.gc.SaveData();
                 }
-                if (DAILY_SCRAPBOOST)
+                else if (DAILY_SCRAPBOOST)
                 {
                     DAILY_SCRAPBOOST = false;
                     GameControl.gc.ScrapBoostActive = true;
                     GameControl.gc.DateDailyScrapBoostTime = System.DateTime.Now;
-                    UpdateArmoryUI();
                     GameControl.gc.SaveData();
                 }
+                else
+                {
+                    CompleteStartedResearch();
+                }
+                UpdateArmoryUI();
+
                 break;
             case "SKIPPED":
                 Debug.Log("This should never happen");
                 DAILY_RESEARCH = false;
                 DAILY_SCRAPBOOST = false;
+                UpdateArmoryUI();
                 break;
             case "FAILED":
                 Debug.Log("Ad failed to show");
+                announcer.Announce("Ad failed to show!", FloatingText.FTType.Danger);
                 DAILY_RESEARCH = false;
                 DAILY_SCRAPBOOST = false;
+                UpdateArmoryUI();
                 break;
             default:
                 break;
@@ -553,6 +619,41 @@ public class ArmoryScript : MonoBehaviour {
         {
             GameControl.gc.ScrapBoostActive = true;
             return false;
+        }
+    }
+
+    private void CompleteStartedResearch()
+    {
+        for (int i = 0; i < GameControl.gc.ResearchStarted.Length; i++)
+        {
+            if (GameControl.gc.ResearchStarted[i] == true)
+            {
+                /*
+                 * RepairBots = 0
+                 * ShieldGenerator = 1
+                 * ReactiveArmor = 2
+                 * PulseLaser = 3
+                 * MassDriver = 4
+                 */
+                switch (i)
+                {
+                    case 0:
+                        GameControl.gc.ShipRepairBots = true;
+                        break;
+                    case 1:
+                        GameControl.gc.ShipShieldGenerator = true;
+                        break;
+                    case 2:
+                        GameControl.gc.ShipReactiveArmor = true;
+                        break;
+                    case 3:
+                        GameControl.gc.WeaponUnlocked[1] = true;
+                        break;
+                    case 4:
+                        GameControl.gc.WeaponUnlocked[2] = true;
+                        break;
+                }
+            }
         }
     }
 

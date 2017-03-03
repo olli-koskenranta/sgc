@@ -58,7 +58,7 @@ public class CollectorScript : MonoBehaviour
     {
         textInfo.text = "Scrap: " + GameControl.gc.scrapCount.ToString() + "\n"
             + "Research Material: " + GameControl.gc.researchMaterialCount.ToString() + "\n"
-            + "Weapon Power: " + GameControl.gc.WeaponSkill[GameControl.gc.SelectedWeapon].ToString() + "/" + GameControl.gc.Weapons[GameControl.gc.SelectedWeapon].SkillCap.ToString()
+            + "Weapon Skill: " + GameControl.gc.WeaponSkill[GameControl.gc.SelectedWeapon].ToString() + "/" + GameControl.gc.Weapons[GameControl.gc.SelectedWeapon].SkillCap.ToString()
             + "\nZone: " + GameControl.gc.currentLevel.ToString();
     }
 

@@ -22,7 +22,7 @@ public class GameControl : MonoBehaviour {
     public int[] Experience;
     public int[] WeaponSkill;
     public int ExpForSkillUp;
-    private string GameVersion = "0.6c";
+    public string GameVersion = "0.6c";
     
 
     public int[] ResearchScrapCost;
@@ -146,7 +146,7 @@ public class GameControl : MonoBehaviour {
 
         Experience = new int[numberOfWeapons];
         PowerUps = new bool[numberOfPowerUps];
-        PowerUpNames = new string[numberOfPowerUps] { "Kinetic Bomb", "Repel Shield", "Gravity Bomb", "Max Weapon Power" }; //, "Slow Meteors", "Cluster Projectile", "Repel Shield", "Attack Speed" };
+        PowerUpNames = new string[numberOfPowerUps] { "Kinetic Bomb", "Shield", "Gravity Bomb", "Max Weapon Skill" }; //, "Slow Meteors", "Cluster Projectile", "Repel Shield", "Attack Speed" };
         startZones = new int[] { 1, 5, 11, 21, 31, 41, 51, 61, 71, 81, 91 };
         WeaponSkill = new int[numberOfWeapons];
         WeaponUnlocked = new bool[numberOfWeapons] { true, false, false, false };
@@ -207,9 +207,6 @@ public class GameControl : MonoBehaviour {
             Weapons[i].UpdateValues(i);
         }
 
-        TimeSpan timeSpan = DateTime.Now - DateDailyScrapBoostTime;
-        Debug.Log(timeSpan.Hours.ToString());
-
     }
 
     public void UpdatePlayerAttributes()
@@ -247,7 +244,7 @@ public class GameControl : MonoBehaviour {
             SetPlayerData(playerData);
 
             Debug.Log("Player data loaded!");
-            if (playerData.GameVersion == null)
+            /*if (playerData.GameVersion == null || playerData.GameVersion.Equals(""))
             {
                 Debug.Log("New game version found, resetting data!");
                 ResetData();
@@ -261,7 +258,7 @@ public class GameControl : MonoBehaviour {
                     ResetData();
                     return;
                 }
-            }
+            }*/
 
         }
         else
