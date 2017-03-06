@@ -27,4 +27,15 @@ public class MusicScript : MonoBehaviour {
             track2.Play();
         }
     }
+
+    public void StopTheMusic()
+    {
+        track1.Stop();
+        track2.Stop();
+    }
+
+    public void PlayTheMusic()
+    {
+        track1.Play();
+    }
 }

@@ -93,7 +93,7 @@ namespace ShipWeapons
             totalCritMultiplier = baseCritMultiplier + GameControl.gc.WeaponUpgrades[WeaponType, 3] * 0.5f;
             totalSpecialChance = baseSpecialChance * GameControl.gc.WeaponUpgrades[WeaponType, 5];
 
-            skillCap = 100 + 5 * GameControl.gc.WeaponUpgrades[WeaponType, 6];
+            skillCap = 100 + 10 * GameControl.gc.WeaponUpgrades[WeaponType, 6];
             //Debug.Log("Skill cap: " + skillCap.ToString());
 
 

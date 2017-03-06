@@ -24,7 +24,7 @@ public class AdManagerScript : MonoBehaviour {
         }
     }
 
-    public IEnumerator ShowAd(string type = "")
+    public IEnumerator ShowAd(string type = "rewardedVideo")
     {
     //#if UNITY_EDITOR
     //        StartCoroutine(WaitForAd());

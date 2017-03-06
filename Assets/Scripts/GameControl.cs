@@ -22,7 +22,7 @@ public class GameControl : MonoBehaviour {
     public int[] Experience;
     public int[] WeaponSkill;
     public int ExpForSkillUp;
-    public string GameVersion = "0.6c";
+    public string GameVersion = "0.8";
     
 
     public int[] ResearchScrapCost;
@@ -34,7 +34,37 @@ public class GameControl : MonoBehaviour {
     public bool[] ResearchStarted;
 
     public bool ScrapBoostActive;
+    public bool GAME_PAUSED;
 
+    public int highestLevelAchieved;
+    
+    
+
+
+
+    //Player status
+    public bool PLAYER_ALIVE = true;
+
+    //Player attributes
+    public int shipArmor;
+    public bool[] StartZoneUnlocked;
+    public int[] startZones;
+    
+
+
+    //Weapon types
+    //0 = Basic Cannon
+    //1 = Laser Cannon
+    //2 = Mass Driver
+    //3 = Plasma Cannon
+    public int SelectedWeapon = 0;
+
+    //Player upgrades
+    public int ArmorUpgrades;
+    public bool[] WeaponUnlocked;
+    public bool ShipRepairBots;
+    public bool ShipShieldGenerator;
+    public bool ShipReactiveArmor;
 
     //0 = attack speed
     //1 = mass
@@ -47,45 +77,24 @@ public class GameControl : MonoBehaviour {
     public int[] WeaponUpgradePointsTotal;
     public int[] WeaponUpgradePointsAvailable;
 
-
-
-    //Player status
-    public bool PLAYER_ALIVE = true;
-
-    //Player attributes
-    public int shipArmor;
-    public bool[] StartZoneUnlocked;
-    public int[] startZones;
-    public bool ShipRepairBots;
-    public bool ShipShieldGenerator;
-    public bool ShipReactiveArmor;
-
-
-    //Weapon types
-    //0 = Basic Cannon
-    //1 = Laser Cannon
-    //2 = Mass Driver
-    //3 = Plasma Cannon
-    public int SelectedWeapon = 0;
-
-    //Player upgrades
-    public int ArmorUpgrades;
-
     //Player weapons
     public Turret[] Weapons;
     public Turret BlasterTurret;
     public Turret PulseLaserTurret;
     public Turret MassDriverTurret;
     public Turret PlasmaTurret;
-    public bool[] WeaponUnlocked;
+    
     public string[] WeaponNames = new string[] { "Blaster", "Pulse Laser", "Mass Driver", "Plasma" };
     public float[] AttackSpeedReductions;
     public int[] WeaponUpgradeCosts;
     public int[] WeaponUpgradeRMCosts;
 
     //Preferences
-    public bool AUDIO_SOUNDS = false;
-    public bool AUDIO_MUSIC = false;
+    public bool AUDIO_SOUNDS;
+    public bool AUDIO_MUSIC;
+
+    public const string playerSound = "playerSound";
+    public const string playerMusic  = "playerMusic";
 
     //Power Ups
     //0 = Gravity Gun
@@ -95,12 +104,9 @@ public class GameControl : MonoBehaviour {
     //4 = Cluster Projectile
     //5 = Repel Shield,
     //6 = Attack speed
-    
+
     public bool[] PowerUps;
     public string[] PowerUpNames;
-    
-
-
 
     void Awake()
     {
@@ -131,8 +137,12 @@ public class GameControl : MonoBehaviour {
     void Start()
     {
         //Debug.Log("GameControl START()!");
+        GAME_PAUSED = false;
+
         WeaponUpgradeCosts = new int[] { 1000, 10000, 100000, 1000000 };
         WeaponUpgradeRMCosts = new int[] { 0, 1, 5, 10 };
+
+        highestLevelAchieved = 1;
 
         /*
          * RepairBots = 0
@@ -162,8 +172,15 @@ public class GameControl : MonoBehaviour {
         
         ScrapBoostActive = false;
 
-        AUDIO_SOUNDS = false;
-        AUDIO_MUSIC = false;
+        if (PlayerPrefs.GetInt(playerSound, 1) == 1)
+            AUDIO_SOUNDS = true;
+        else
+            AUDIO_SOUNDS = false;
+
+        if (PlayerPrefs.GetInt(playerMusic, 1) == 1)
+            AUDIO_MUSIC = true;
+        else
+            AUDIO_MUSIC = false;
 
         ShipRepairBots = false;
         ShipShieldGenerator = false;
@@ -187,7 +204,7 @@ public class GameControl : MonoBehaviour {
         PulseLaserTurret = new Turret(20f, 100, 0.0001f, 0.4f, 5, 2f, 1, SpecialType.Piercing, "Piercing", "Beam Split");
         PulseLaserTurret.SetUpgradeValuesPerSkillPoint(3, 0, 0.2f);
 
-        MassDriverTurret = new Turret(30f, 50, 0.1f, 0.2f, 5f, 2f, 2, SpecialType.Shrapnel, "Shrapnel", "THINK OF SOMETHING");
+        MassDriverTurret = new Turret(30f, 50, 0.1f, 0.2f, 5f, 2f, 2, SpecialType.Shrapnel, "Shrapnel", "Armor Piercing");
         MassDriverTurret.SetUpgradeValuesPerSkillPoint(4, 0.1f, 0.2f);
 
         PlasmaTurret = new Turret(10f, 10, 3, 1, 5, 5, 3, SpecialType.Shrapnel);
@@ -287,7 +304,7 @@ public class GameControl : MonoBehaviour {
         file.Close();
         Debug.Log("Player data RESET!");
         LoadData();
-        SaveData();
+        //SaveData();
 
         for (int i = 0; i < Weapons.Length; i++)
         {
@@ -332,6 +349,7 @@ public class GameControl : MonoBehaviour {
             data.selectedWeapon = 0;
             data.ArmorUpgrades = 0;
             data.researchMaterialCount = 0;
+            data.highestLevelAchieved = 1;
             data.ScrapBoostActive = false;
             data.DateDailyResearchTime = new DateTime(2001, 1, 1, 6, 0, 0);
             data.DateDailyScrapBoostTime = new DateTime(2001, 1, 1, 6, 0, 0);
@@ -352,6 +370,7 @@ public class GameControl : MonoBehaviour {
             data.ShipShieldGenerator = ShipShieldGenerator;
             data.ShipReactiveArmor = ShipReactiveArmor;
             data.ShipRepairBots = ShipRepairBots;
+            data.highestLevelAchieved = highestLevelAchieved;
         }
         data.WeaponSkill = WeaponSkill;
         data.Experience = Experience;
@@ -377,6 +396,9 @@ public class GameControl : MonoBehaviour {
         ShipRepairBots = data.ShipRepairBots;
         ShipShieldGenerator = data.ShipShieldGenerator;
         researchMaterialCount = data.researchMaterialCount;
+
+        if (data.highestLevelAchieved != 0)
+            highestLevelAchieved = data.highestLevelAchieved;
 
         if (data.WeaponSkill != null)
             WeaponSkill = data.WeaponSkill;
@@ -453,6 +475,16 @@ public class GameControl : MonoBehaviour {
         return numberOfResearches;
     }
 
+    public string GetSoundKey()
+    {
+        return playerSound;
+    }
+
+    public string GetMusicKey()
+    {
+        return playerMusic;
+    }
+
     public void ExperienceGained(int amount)
     {
         Experience[SelectedWeapon] += amount * currentLevel;
@@ -477,6 +509,20 @@ public class GameControl : MonoBehaviour {
     {
         int expNeeded = ExpForSkillUp * WeaponSkill[SelectedWeapon];
         return expNeeded;
+    }
+
+    public void PauseGame(bool resumeWithFalse = true)
+    {
+        if (resumeWithFalse == true)
+        {
+            Time.timeScale = 0f;
+            GAME_PAUSED = true;
+        }
+        else
+        {
+            Time.timeScale = 1f;
+            GAME_PAUSED = false;
+        }
     }
 }
 
@@ -523,7 +569,7 @@ class PlayerData
 
     public int selectedWeapon;
 
-    
+    public int highestLevelAchieved;
 
     public string GameVersion;
 }

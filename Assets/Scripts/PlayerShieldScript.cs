@@ -64,9 +64,12 @@ public class PlayerShieldScript : MonoBehaviour {
 
         gameObject.SetActive(true);
 
-        if (GameControl.gc.AUDIO_SOUNDS)
+        if (hitPoints < 100)
         {
-            shieldSound.Play();
+            if (GameControl.gc.AUDIO_SOUNDS)
+            {
+                shieldSound.Play();
+            }
         }
     }
 

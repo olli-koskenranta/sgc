@@ -146,6 +146,8 @@ public class CollectorScript : MonoBehaviour
     public void LevelUp()
     {
         GameControl.gc.currentLevel += 1;
+        if (GameControl.gc.highestLevelAchieved < GameControl.gc.currentLevel)
+            GameControl.gc.highestLevelAchieved = GameControl.gc.currentLevel;
         UpdateInfoText();
         for (int i = 0; i < GameControl.gc.startZones.Length; i++)
         {
@@ -155,7 +157,7 @@ public class CollectorScript : MonoBehaviour
                 announcer.GetComponent<AnnouncerScript>().Announce("Zone " + GameControl.gc.currentLevel.ToString() + "!"
                     + "\nNew Start Zone Unlocked!", FloatingText.FTType.Announcement);
                 levelStartTime = Time.time;
-                GameControl.gc.SaveData();
+                //GameControl.gc.SaveData();
                 return;
             }
         }
@@ -177,7 +179,7 @@ public class CollectorScript : MonoBehaviour
 
         int PowerUpNumber = Random.Range(0, GameControl.gc.GetNumberOfPowerUps());
 
-        if (GameControl.gc.WeaponUpgrades[GameControl.gc.SelectedWeapon, 6] == 40)
+        if (GameControl.gc.WeaponUpgrades[GameControl.gc.SelectedWeapon, 6] == 20)
         {
             while (PowerUpNumber == 3)
             {
@@ -207,9 +209,11 @@ public class CollectorScript : MonoBehaviour
             GameControl.gc.WeaponUpgrades[GameControl.gc.SelectedWeapon, 6] += 1;
             GameObject.FindWithTag("PlayerTurret").GetComponent<TurretScript>().GetTurret().UpdateValues(GameControl.gc.SelectedWeapon);
             UpdateInfoText();
+            announcer.GetComponent<AnnouncerScript>().Announce(GameControl.gc.PowerUpNames[PowerUpNumber] + " increased!", FloatingText.FTType.PowerUp);
         }
 
-        announcer.GetComponent<AnnouncerScript>().Announce(GameControl.gc.PowerUpNames[PowerUpNumber] + " gained!", FloatingText.FTType.PowerUp);
+        if (PowerUpNumber != 3)
+            announcer.GetComponent<AnnouncerScript>().Announce(GameControl.gc.PowerUpNames[PowerUpNumber] + " gained!", FloatingText.FTType.PowerUp);
 
     }
 

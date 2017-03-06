@@ -6,11 +6,30 @@ using UnityEngine;
 public class MainMenuScript : MonoBehaviour {
 
     public Text TextVersion;
+    public Text textSounds;
+    public Text textMusic;
 
 	void Start ()
     {
+        GameControl.gc.PauseGame(false);
         TextVersion.text = "Version " + GameControl.gc.GameVersion;
-	}
-	
+    }
+
+    
+
+    public void RateAppClicked()
+    {
+        //#if UNITY_ANDROID
+        //Application.OpenURL("market://details?id=YOUR_ID");
+        Application.OpenURL("http://www.google.com");
+    }
+
+    public void CreditsClicked()
+    {
+
+    }
+
+    
+
 
 }

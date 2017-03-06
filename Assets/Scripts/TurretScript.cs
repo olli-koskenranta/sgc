@@ -56,7 +56,8 @@ public class TurretScript : MonoBehaviour {
 
     void Update()
     {
-
+        if (GameControl.gc.GAME_PAUSED)
+            return;
         //Look at mouse cursor
         mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         float AngleRad = Mathf.Atan2(mousePos.y - this.transform.position.y, mousePos.x - this.transform.position.x);
