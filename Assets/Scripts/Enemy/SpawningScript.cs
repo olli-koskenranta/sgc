@@ -20,6 +20,7 @@ public class SpawningScript : MonoBehaviour {
     public GameObject anomaly1;
     public GameObject anomaly2;
     public GameObject anomaly3;
+    public GameObject anomaly4;
 
     private float PUSpawnTime;
 
@@ -36,7 +37,7 @@ public class SpawningScript : MonoBehaviour {
     void Start () {
 
         GameObject.Find("UIControl").GetComponent<UIControlScript>().SetBossBarsActive(false);
-        ANOMALY_DESTROYED = new bool[3];
+        ANOMALY_DESTROYED = new bool[4];
         for (int i = 0; i < ANOMALY_DESTROYED.Length; i++)
             ANOMALY_DESTROYED[i] = false;
 
@@ -55,7 +56,9 @@ public class SpawningScript : MonoBehaviour {
         hugeMeteor1 = Resources.Load("hugeMeteor1") as GameObject;
         powerUpContainer = Resources.Load("PowerUpContainer") as GameObject;
         anomaly1 = Resources.Load("Anomaly1") as GameObject;
+        anomaly2 = Resources.Load("Anomaly2") as GameObject;
         anomaly3 = Resources.Load("Carrier") as GameObject;
+        anomaly4 = Resources.Load("BattleStation") as GameObject;
         enemyFighter = Resources.Load("AlienShip1") as GameObject;
         enemyMissileCruiser = Resources.Load("MissileCruiser") as GameObject;
         Nebula = Resources.Load("Nebula") as GameObject;
@@ -95,16 +98,27 @@ public class SpawningScript : MonoBehaviour {
             announcer.GetComponent<AnnouncerScript>().Announce("!ANOMALY DETECTED!", FloatingText.FTType.Danger);
         }
 
+        if (GameControl.gc.currentLevel == 40 && !ANOMALY_SPAWNED && !ANOMALY_DESTROYED[3])
+        {
+            GameObject.Find("UIControl").GetComponent<UIControlScript>().SetBossBarsActive(true);
+            SpawnAnomaly(4);
+            announcer.GetComponent<AnnouncerScript>().Announce("!ANOMALY DETECTED!", FloatingText.FTType.Danger);
+        }
+
     }
 
     void SpawnMeteor()
     {
+        if (FindAnomaly(3) || FindAnomaly(4))
+            return;
+
         Transform spawnPosition = transform;
         float randomScaleFactor;
 
         if (RollDice(100) <= PUChance )
             SpawnPowerUp();
 
+        
 
         //Huge Asteroid
         if (GameControl.gc.currentLevel >= 5)
@@ -204,12 +218,24 @@ public class SpawningScript : MonoBehaviour {
             case 3:
                 Instantiate(anomaly3, spawnPosition.position, spawnPosition.rotation);
                 break;
+            case 4:
+                Instantiate(anomaly4, spawnPosition.position, spawnPosition.rotation);
+                break;
             default:
                 break;
         }
 
         ANOMALY_SPAWNED = true;
 
+    }
+
+    public bool FindAnomaly(int anomalyNumber)
+    {
+        string name = "Anomaly" + anomalyNumber.ToString();
+        if (GameObject.FindWithTag(name) != null)
+            return true;
+        else
+            return false;
     }
 
     //Roll a number between 1 and maxValue

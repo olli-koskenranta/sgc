@@ -1,14 +1,17 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 
 public class MusicScript : MonoBehaviour {
 
     public AudioSource track1;
     public AudioSource track2;
-	void Start ()
+
+    void Start ()
     {
         if (GameControl.gc.AUDIO_MUSIC)
             track1.Play();
+
 	}
 
     public void PlayTrack(int number)
@@ -38,4 +41,6 @@ public class MusicScript : MonoBehaviour {
     {
         track1.Play();
     }
+    
+
 }

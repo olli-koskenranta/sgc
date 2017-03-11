@@ -98,6 +98,7 @@ public class PlayerProjectileScript : MonoBehaviour {
 
     void OnCollisionEnter2D(Collision2D col)
     {
+
         HitEffect();
         DamageText();
 
@@ -124,7 +125,7 @@ public class PlayerProjectileScript : MonoBehaviour {
 
         if (!BOUNCE)
         {
-            Destroy(this.gameObject);
+                Destroy(this.gameObject);
         }
         else
             gameObject.GetComponent<Rigidbody2D>().gravityScale = 1f;
@@ -136,8 +137,12 @@ public class PlayerProjectileScript : MonoBehaviour {
 
     void OnTriggerEnter2D(Collider2D col)
     {
+        if (col.gameObject.name.Equals("EnemyShield"))
+        {
+            damage = 0;
+            return;
+        }
 
-        
         HitEffect();
         DamageText();
 
@@ -155,7 +160,9 @@ public class PlayerProjectileScript : MonoBehaviour {
         else
         {
             if (!BOUNCE)
-                Destroy(gameObject);
+            {
+                Destroy(this.gameObject);
+            }
         }
     }
 

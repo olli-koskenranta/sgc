@@ -85,6 +85,13 @@ public class TurretScript : MonoBehaviour {
                 }
         }
 
+        if (Input.GetKeyDown(KeyCode.Keypad0))
+            ChangeWeapon(0);
+        if (Input.GetKeyDown(KeyCode.Keypad1))
+            ChangeWeapon(1);
+        if (Input.GetKeyDown(KeyCode.Keypad2))
+            ChangeWeapon(2);
+
     }
 
     private void Shoot()
@@ -267,7 +274,11 @@ public class TurretScript : MonoBehaviour {
         ftInstance.GetComponent<TextMesh>().fontSize = 15;
     }
 
-
+    public void ChangeWeapon(int weaponNumber)
+    {
+        GameControl.gc.SelectedWeapon = weaponNumber;
+        Start();
+    }
 
     
 }

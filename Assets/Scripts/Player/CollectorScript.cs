@@ -167,7 +167,7 @@ public class CollectorScript : MonoBehaviour
 
     public bool IsBossPresent()
     {
-        if (FindAnomaly(1) || FindAnomaly(2) || FindAnomaly(3))
+        if (FindAnomaly(1) || FindAnomaly(2) || FindAnomaly(3) || FindAnomaly(4))
             return true;
         else
             return false;
@@ -225,23 +225,9 @@ public class CollectorScript : MonoBehaviour
 
     public GameObject FindAnomaly(int anomalyNumber)
     {
-        //Shit code
         GameObject anomaly;
-        switch (anomalyNumber)
-        {
-            case 1:
-                anomaly = GameObject.FindWithTag("Anomaly1");
-                break;
-            case 2:
-                anomaly = GameObject.FindWithTag("Anomaly2");
-                break;
-            case 3:
-                anomaly = GameObject.FindWithTag("Anomaly3");
-                break;
-            default:
-                anomaly = null;
-                break;
-        }
+        string name = "Anomaly" + anomalyNumber.ToString();
+        anomaly = GameObject.FindWithTag(name);
         return anomaly;
     }
 }

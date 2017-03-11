@@ -37,10 +37,13 @@ public class MeteorScript : MonoBehaviour {
     private int hugeMeteorDamage = 18;
     private int collisionCounter = 0;
 
+    private float originalPitch;
+
     void Start()
     {
         spawnProtection = true;
         spawnTime = Time.time;
+        originalPitch = soundExplode.pitch;
 
         //if (GameControlScript.gameControl.PowerUps[0])
         //    speed *= 0.5f;
@@ -244,8 +247,12 @@ public class MeteorScript : MonoBehaviour {
 
     public void Explode()
     {
+        float randomPitch = originalPitch + Random.Range(-0.05f, 0.05f);
         if (GameControl.gc.AUDIO_SOUNDS)
+        {
+            soundExplode.pitch = randomPitch;
             soundExplode.Play();
+        }
 
         GameControl.gc.ExperienceGained(XP);
         GetComponent<SpriteRenderer>().enabled = false;
