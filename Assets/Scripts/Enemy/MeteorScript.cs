@@ -135,7 +135,7 @@ public class MeteorScript : MonoBehaviour {
         {
             if (anomaly1.GetComponent<AnomalyScript>().ALIVE)
             {
-                Vector2 forceVector = (anomaly1.transform.position - transform.position).normalized; // * GameControlScript.gameControl.currentLevel;
+                Vector2 forceVector = (anomaly1.transform.position - transform.position).normalized * gameObject.GetComponent<Rigidbody2D>().mass / 100; // * GameControlScript.gameControl.currentLevel;
                 GetComponent<Rigidbody2D>().AddForce(forceVector, ForceMode2D.Impulse);
             }
         }
@@ -145,7 +145,7 @@ public class MeteorScript : MonoBehaviour {
             if (anomaly2.GetComponent<AnomalyScript>().ALIVE)
             {
                 
-                Vector2 forceVector = (shipHull.transform.position - transform.position).normalized; // * GameControlScript.gameControl.currentLevel;
+                Vector2 forceVector = (shipHull.transform.position - transform.position).normalized * gameObject.GetComponent<Rigidbody2D>().mass / 100; // * GameControlScript.gameControl.currentLevel;
                 GetComponent<Rigidbody2D>().AddForce(forceVector, ForceMode2D.Impulse);
             }
         }

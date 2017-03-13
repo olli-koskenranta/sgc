@@ -18,6 +18,8 @@ public class AnomalyScript : MonoBehaviour {
     public float armor;
     public bool iscrit = false;
     private GameObject floatingText;
+    private float destroyed_time;
+    private float destroyed_interval = 0.1f;
 
 
     //Boss spesific variables
@@ -67,6 +69,7 @@ public class AnomalyScript : MonoBehaviour {
         standingPosition = GameObject.Find("BossStandsHere").GetComponent<Transform>();
         hit_effect = Resources.Load("Explosion") as GameObject;
         floatingText = Resources.Load("FloatingText") as GameObject;
+        destroyed_time = Time.time;
 
         //1
         switch (anomalyNumber)
@@ -125,7 +128,7 @@ public class AnomalyScript : MonoBehaviour {
         {
             case 1:
                 GetComponent<SpriteRenderer>().transform.Rotate(Vector3.forward * 0.5f);
-                if (shipHull != null)
+                if (shipHull != null && ALIVE)
                 {
                     GetComponent<Rigidbody2D>().velocity = (shipHull.transform.position - transform.position).normalized * 0.3f;
                 }
@@ -133,7 +136,7 @@ public class AnomalyScript : MonoBehaviour {
 
             case 2:
                 GetComponent<SpriteRenderer>().transform.Rotate(Vector3.forward * 0.2f);
-                if (shipHull != null)
+                if (shipHull != null && ALIVE)
                 {
                     GetComponent<Rigidbody2D>().velocity = (standingPosition.position - transform.position).normalized * 0.3f;
                 }
@@ -144,7 +147,7 @@ public class AnomalyScript : MonoBehaviour {
                 target.x -= 1;
                 RotateTowards(target);
 
-                if (shipHull != null)
+                if (shipHull != null && ALIVE)
                 {
                     GetComponent<Rigidbody2D>().velocity = (standingPosition.position - transform.position).normalized * 0.3f;
                 }
@@ -153,7 +156,7 @@ public class AnomalyScript : MonoBehaviour {
                 //    return;
 
                 if (!ALIVE)
-                    return;
+                    break;
 
                 if (Time.time - spawnTime >= spawnInterval && fighterCounter > 0)
                 {
@@ -174,14 +177,24 @@ public class AnomalyScript : MonoBehaviour {
 
                 GetComponent<SpriteRenderer>().transform.Rotate(Vector3.back * 0.2f);
 
-                if (shipHull != null)
+                if (shipHull != null && ALIVE)
                 {
                     GetComponent<Rigidbody2D>().velocity = (standingPosition.position - transform.position).normalized * 0.3f;
                 }
                 break;
-
         }
-	}
+
+        if (Time.time - destroyed_time >= destroyed_interval && !ALIVE)
+        {
+            Vector3 rngpos = new Vector3(Random.Range(-0.5f, 0.5f), Random.Range(-0.5f, 0.5f), 0f);
+
+            HitEffect();
+            destroyed_time = Time.time;
+        }
+
+
+
+    }
 
     void OnCollisionEnter2D(Collision2D col)
     {
@@ -197,6 +210,11 @@ public class AnomalyScript : MonoBehaviour {
         if (col.gameObject.GetComponent<ShipHullScript>() != null)
         {
             col.gameObject.GetComponent<ShipHullScript>().isHit(collisionDamage);
+        }
+
+        if (col.gameObject.GetComponent<CollectorScript>() != null && !ALIVE)
+        {
+            Explode();
         }
     }
 
@@ -265,15 +283,20 @@ public class AnomalyScript : MonoBehaviour {
             GameObject.Find("MeteorSpawning").GetComponent<SpawningScript>().ANOMALY_DESTROYED[anomalyNumber - 1] = true;
             GameObject.Find("MeteorSpawning").GetComponent<SpawningScript>().ANOMALY_SPAWNED = false;
             GameObject.Find("UIControl").GetComponent<UIControlScript>().SetBossBarsActive(false);
-            Destroy(gameObject);
+            gameObject.GetComponent<Rigidbody2D>().isKinematic = false;
+            gameObject.GetComponent<Rigidbody2D>().mass = 1000000;
+            gameObject.GetComponent<Rigidbody2D>().gravityScale = 0.1f;
+
+            //Destroy(gameObject);
         }
     }
 
     private void HitEffect()
     {
+        Vector3 rngpos = new Vector3(Random.Range(-1f, 1f), Random.Range(-1f, 1f), 0f);
         ParticleSystem.MainModule mm;
         GameObject hiteffect;
-        hiteffect = Instantiate(hit_effect, transform.position, Quaternion.identity) as GameObject;
+        hiteffect = Instantiate(hit_effect, transform.position + rngpos, Quaternion.identity) as GameObject;
         mm = hiteffect.GetComponent<ParticleSystem>().main;
         mm.startColor = gameObject.GetComponent<SpriteRenderer>().color;
     }
@@ -325,5 +348,19 @@ public class AnomalyScript : MonoBehaviour {
     void UpdateBossHPBar()
     {
         BossHPBar.value = hitPoints;
+    }
+
+    private void Explode()
+    {
+        GameObject asteroidFragment = Resources.Load("ScrapPiece") as GameObject;
+        int amount = GameControl.gc.currentLevel / 10;
+
+        for (int i = 0; i < amount; i++)
+        {
+            Vector3 rngpos = new Vector3(Random.Range(-1f, 1f), Random.Range(-1f, 1f), 0f);
+            GameObject fragmentInstance = Instantiate(asteroidFragment, this.transform.position + rngpos, this.transform.rotation) as GameObject;
+            fragmentInstance.GetComponent<ScrapPieceScript>().type = Scrap.ScrapType.ResearchMaterial;
+        }
+        Destroy(gameObject);
     }
 }

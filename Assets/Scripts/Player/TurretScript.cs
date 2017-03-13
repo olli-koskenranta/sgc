@@ -222,11 +222,13 @@ public class TurretScript : MonoBehaviour {
         //Debug.Log("Bounces: " + bulletScript.bounces.ToString());
         if (GameControl.gc.SelectedWeapon == 1 && special2)
         {
-            float distance = 1 - Input.mousePosition.x / (Screen.width - Screen.width / 10);
-            if (distance > 0.5f)
+            
+            //float distance = 1 - Input.mousePosition.x / (Screen.width - Screen.width / 10);
+            float distance = 0.05f;
+            /*if (distance > 0.5f)
                 distance = 0.5f;
             else if (distance < 0.05f)
-                distance = 0.05f;
+                distance = 0.05f;*/
             //Debug.Log(distance.ToString());
             BeamSplit(1, distance, 0f, 0f, bulletInstance, crit, special);
             BeamSplit(1, -distance, 0f, 0f, bulletInstance, crit, special);
