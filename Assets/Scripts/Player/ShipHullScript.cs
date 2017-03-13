@@ -16,8 +16,11 @@ public class ShipHullScript : MonoBehaviour {
     private float repairBotsInterval = 1f;
     private float repairBotsTime;
 
+    private GameObject floatingText;
+
 
     void Start () {
+        floatingText = Resources.Load("FloatingText") as GameObject;
         hitPoints = 100;
         maxHitPoints = hitPoints;
         hullBar.maxValue = maxHitPoints;
@@ -67,7 +70,7 @@ public class ShipHullScript : MonoBehaviour {
             isHit(asteroid.damage);
             if (GameControl.gc.ShipReactiveArmor)
             {
-                asteroid.isHit(asteroid.hitPoints);
+                asteroid.isHit(asteroid.hitPoints, true, true);
             }
         }
 
@@ -92,17 +95,32 @@ public class ShipHullScript : MonoBehaviour {
             hitPoints = 0;
         }
 
+        DamageText(Damage);
+
         if (hitPoints <= 0 && GameControl.gc.PLAYER_ALIVE)
         {
             destroyed_time = Time.time;
             GameControl.gc.PLAYER_ALIVE = false;
         }
-
         UpdateHullBar();
     }
 
     private void UpdateHullBar()
     {
+        Color newColor = gameObject.GetComponent<SpriteRenderer>().color;
+        newColor.g = (float)hitPoints / 100;
+        newColor.b = (float)hitPoints / 100;
+        gameObject.GetComponent<SpriteRenderer>().color = newColor;
         hullBar.value = hitPoints;
+    }
+
+    private void DamageText(int dmg)
+    {
+        GameObject ft;
+        ft = Instantiate(floatingText, transform.position, Quaternion.identity) as GameObject;
+        ft.GetComponent<FloatingTextScript>().text = dmg.ToString();
+        ft.GetComponent<FloatingTextScript>().fttype = FloatingText.FTType.PopUp;
+        ft.GetComponent<TextMesh>().fontSize = 50;
+        ft.GetComponent<TextMesh>().color = Color.red;
     }
 }

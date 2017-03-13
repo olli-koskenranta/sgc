@@ -10,6 +10,7 @@ public class MeteorScript : MonoBehaviour {
     private float spawnTime;
     float speed = 1.5f;
     public int hitPoints;
+    public int maxHitPoints;
     public int meteorFragments = 3;
     public GameObject scrapMeteor;
     public GameObject asteroidFragment;
@@ -37,10 +38,17 @@ public class MeteorScript : MonoBehaviour {
     private int hugeMeteorDamage = 18;
     private int collisionCounter = 0;
 
+    public float armor = 0;
+    public bool iscrit = false;
+
+    private GameObject floatingText;
+
     private float originalPitch;
 
     void Start()
     {
+
+        floatingText = Resources.Load("FloatingText") as GameObject;
         spawnProtection = true;
         spawnTime = Time.time;
         originalPitch = soundExplode.pitch;
@@ -99,7 +107,20 @@ public class MeteorScript : MonoBehaviour {
 
         if (HIT_BY_KINECTIC_DMG)
             hitPoints = 1;
-        
+
+        armor = 0.01f * GameControl.gc.currentLevel;
+
+        //if (armor > 0.9f)
+        //    armor = 0.9f;
+
+        if (GameControl.gc.currentLevel > 20)
+            hitPoints *= GameControl.gc.currentLevel / 10;
+
+        if (GameControl.gc.currentLevel > 20)
+            GetComponent<Rigidbody2D>().mass *= GameControl.gc.currentLevel / 10;
+
+        maxHitPoints = hitPoints;
+
 
     }
 
@@ -110,26 +131,23 @@ public class MeteorScript : MonoBehaviour {
         if (gameObject.transform.position.x > 19 || gameObject.transform.position.x < -9 || gameObject.transform.position.y < -7 || gameObject.transform.position.y > 7)
             Destroy(gameObject);
 
-        //GetComponent<SpriteRenderer>().transform.Rotate(Vector3.forward);
-
         if (anomaly1 != null)
         {
-            if (anomaly1.GetComponent<Anomaly1Script>().ALIVE)
+            if (anomaly1.GetComponent<AnomalyScript>().ALIVE)
             {
                 Vector2 forceVector = (anomaly1.transform.position - transform.position).normalized; // * GameControlScript.gameControl.currentLevel;
                 GetComponent<Rigidbody2D>().AddForce(forceVector, ForceMode2D.Impulse);
             }
-                //GetComponent<Rigidbody2D>().velocity = (anomaly1.transform.position - transform.position).normalized;
         }
 
         if (anomaly2 != null)
         {
-            if (anomaly2.GetComponent<Anomaly2Script>().ALIVE)
+            if (anomaly2.GetComponent<AnomalyScript>().ALIVE)
             {
-                Vector2 forceVector = (shipHull.transform.position - transform.position).normalized * 0.5f; // * GameControlScript.gameControl.currentLevel;
+                
+                Vector2 forceVector = (shipHull.transform.position - transform.position).normalized; // * GameControlScript.gameControl.currentLevel;
                 GetComponent<Rigidbody2D>().AddForce(forceVector, ForceMode2D.Impulse);
             }
-            //GetComponent<Rigidbody2D>().velocity = (anomaly1.transform.position - transform.position).normalized;
         }
 
         if (Time.time - spawnTime > 1)
@@ -141,11 +159,17 @@ public class MeteorScript : MonoBehaviour {
 
     void OnCollisionEnter2D(Collision2D col)
     {
-        if (!IsOnScreen())
-            return;
+        iscrit = false;
+
+       
 
         if (col.gameObject.GetComponent<PlayerProjectileScript>() != null)
         {
+            if (col.gameObject.GetComponent<PlayerProjectileScript>().Critical)
+                iscrit = true;
+            else
+                iscrit = false;
+
             if (col.gameObject.GetComponent<PlayerProjectileScript>().GravityDamage)
             {
                 HIT_BY_GRAVITY_DMG = true;
@@ -153,11 +177,14 @@ public class MeteorScript : MonoBehaviour {
                 gameObject.GetComponent<Rigidbody2D>().gravityScale += col.gameObject.GetComponent<PlayerProjectileScript>().gravityDmgAmount;
             }
 
-            isHit(col.gameObject.GetComponent<PlayerProjectileScript>().damage);
+            isHit(col.gameObject.GetComponent<PlayerProjectileScript>().damage, false, true, col.gameObject.GetComponent<PlayerProjectileScript>().armorPierce);
         }
 
         else if (col.gameObject.GetComponent<MeteorScript>() != null)
         {
+            if (!IsOnScreen())
+                return;
+
             if (anomaly1 != null)
             {
                 return;
@@ -166,7 +193,7 @@ public class MeteorScript : MonoBehaviour {
             else
             {
                 if (!spawnProtection)
-                    isHit(col.gameObject.GetComponent<MeteorScript>().damage);
+                    isHit(col.gameObject.GetComponent<MeteorScript>().damage, true, false);
             }
         }
         
@@ -180,31 +207,22 @@ public class MeteorScript : MonoBehaviour {
     {
         if (!IsOnScreen())
             return;
-        if (col.gameObject.GetComponent<MeteorScript>() != null)
-        {
-            if (anomaly1 != null)
-            {
-                return;
-            }
-            else
-            {
-                collisionCounter++;
-                if (collisionCounter % 10 == 0)
-                {
-                    if (!spawnProtection)
-                        isHit(col.gameObject.GetComponent<MeteorScript>().damage);
-                }
-            }
-        }
     }
 
     void OnTriggerEnter2D(Collider2D col)
     {
-        if (!IsOnScreen())
-            return;
+        iscrit = false;
+
+        //if (!IsOnScreen())
+        //    return;
 
         if (col.gameObject.GetComponent<PlayerProjectileScript>() != null)
         {
+            if (col.gameObject.GetComponent<PlayerProjectileScript>().Critical)
+                iscrit = true;
+            else
+                iscrit = false;
+
             if (col.gameObject.GetComponent<PlayerProjectileScript>().GravityDamage)
             {
                 HIT_BY_GRAVITY_DMG = true;
@@ -212,7 +230,7 @@ public class MeteorScript : MonoBehaviour {
                 gameObject.GetComponent<Rigidbody2D>().gravityScale += col.gameObject.GetComponent<PlayerProjectileScript>().gravityDmgAmount;
             }
 
-            isHit(col.gameObject.GetComponent<PlayerProjectileScript>().damage);
+            isHit(col.gameObject.GetComponent<PlayerProjectileScript>().damage, false, true, col.gameObject.GetComponent<PlayerProjectileScript>().armorPierce);
         }
 
         else if (col.gameObject.GetComponent<PUBombScript>() != null)
@@ -235,20 +253,30 @@ public class MeteorScript : MonoBehaviour {
         }
     }
 
-    public void isHit(int Damage)
+    public void isHit(int incomingDamage, bool ignoreArmor, bool showDmg, float armorPierce = 0f)
     {
+        float newDamage = incomingDamage;
+        if (!ignoreArmor)
+        {
+            newDamage -= (armor - armor * armorPierce) * (float)incomingDamage;
+            incomingDamage = (int)(newDamage);
 
-        hitPoints -= Damage;
+            if (incomingDamage <= 1)
+                incomingDamage = 1;
+        }
+        hitPoints -= incomingDamage;
         if (hitPoints <= 0)
         {
             Explode();
         }
+        if (showDmg)
+            DamageText(iscrit, incomingDamage);
     }
 
     public void Explode()
     {
         float randomPitch = originalPitch + Random.Range(-0.05f, 0.05f);
-        if (GameControl.gc.AUDIO_SOUNDS)
+        if (GameControl.gc.AUDIO_SOUNDS && !GameControl.gc.GetSceneName().Equals("MainMenu"))
         {
             soundExplode.pitch = randomPitch;
             soundExplode.Play();
@@ -316,6 +344,19 @@ public class MeteorScript : MonoBehaviour {
                 break;
             default:
                 break;
+        }
+    }
+
+    private void DamageText(bool CRITICAL, int dmg)
+    {
+        GameObject ft;
+        ft = Instantiate(floatingText, transform.position, Quaternion.identity) as GameObject;
+        ft.GetComponent<FloatingTextScript>().text = dmg.ToString();
+        ft.GetComponent<FloatingTextScript>().fttype = FloatingText.FTType.PopUp;
+        if (CRITICAL)
+        {
+            ft.GetComponent<TextMesh>().fontSize = 50;
+            ft.GetComponent<TextMesh>().color = Color.yellow;
         }
     }
 }

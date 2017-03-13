@@ -83,9 +83,9 @@ public class PlayerShieldScript : MonoBehaviour {
         {
             isHit(col.gameObject.GetComponent<EnemyProjectileScript>().damage);
         }
-        else if (col.gameObject.GetComponent<Anomaly1Script>() != null)
+        else if (col.gameObject.GetComponent<AnomalyScript>() != null)
         {
-            isHit(col.gameObject.GetComponent<Anomaly1Script>().damage);
+            isHit(col.gameObject.GetComponent<AnomalyScript>().collisionDamage);
         }
     }
 

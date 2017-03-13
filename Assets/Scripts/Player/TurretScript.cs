@@ -91,6 +91,8 @@ public class TurretScript : MonoBehaviour {
             ChangeWeapon(1);
         if (Input.GetKeyDown(KeyCode.Keypad2))
             ChangeWeapon(2);
+        if (Input.GetKeyDown(KeyCode.R))
+            GameControl.gc.ResetData();
 
     }
 

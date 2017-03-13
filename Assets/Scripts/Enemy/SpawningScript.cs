@@ -70,6 +70,7 @@ public class SpawningScript : MonoBehaviour {
         if (Time.time - spawnTime >= spawnInterval)
         {
             SpawnMeteor();
+            spawnTime = Time.time;
         }
 
         /*if (Time.time - PUSpawnTime > 60)
@@ -109,14 +110,16 @@ public class SpawningScript : MonoBehaviour {
 
     void SpawnMeteor()
     {
+        if (RollDice(100) <= PUChance)
+            SpawnPowerUp();
+
         if (FindAnomaly(3) || FindAnomaly(4))
             return;
 
         Transform spawnPosition = transform;
         float randomScaleFactor;
 
-        if (RollDice(100) <= PUChance )
-            SpawnPowerUp();
+        
 
         
 
@@ -187,7 +190,7 @@ public class SpawningScript : MonoBehaviour {
         medMeteorInstance.GetComponent<Transform>().localScale += new Vector3(randomScaleFactor, randomScaleFactor, 0);
 
 
-        spawnTime = Time.time;
+        
 
         spawnInterval = 1.1f - (GameControl.gc.currentLevel % 10) / 10f;
         if (spawnInterval < 0.3f || GameControl.gc.currentLevel % 10 == 0)
@@ -206,20 +209,25 @@ public class SpawningScript : MonoBehaviour {
     {
         Transform spawnPosition = transform;
         spawnPosition.position = new Vector3(15f, 3f, 0f);
+        GameObject anomaly;
         switch (anomalyNumber)
         {
             case 1:
-                //anomaly1.GetComponent<Anomaly1Script>().hitPoints = 1000;
-                Instantiate(anomaly1, spawnPosition.position, spawnPosition.rotation);
+                
+                anomaly = Instantiate(anomaly1, spawnPosition.position, spawnPosition.rotation);
+                anomaly.GetComponent<AnomalyScript>().anomalyNumber = anomalyNumber;
                 break;
             case 2:
-                Instantiate(anomaly2, spawnPosition.position, spawnPosition.rotation);
+                anomaly = Instantiate(anomaly2, spawnPosition.position, spawnPosition.rotation);
+                anomaly.GetComponent<AnomalyScript>().anomalyNumber = anomalyNumber;
                 break;
             case 3:
-                Instantiate(anomaly3, spawnPosition.position, spawnPosition.rotation);
+                anomaly = Instantiate(anomaly3, spawnPosition.position, spawnPosition.rotation);
+                anomaly.GetComponent<AnomalyScript>().anomalyNumber = anomalyNumber;
                 break;
             case 4:
-                Instantiate(anomaly4, spawnPosition.position, spawnPosition.rotation);
+                anomaly = Instantiate(anomaly4, spawnPosition.position, spawnPosition.rotation);
+                anomaly.GetComponent<AnomalyScript>().anomalyNumber = anomalyNumber;
                 break;
             default:
                 break;

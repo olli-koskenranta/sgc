@@ -485,6 +485,11 @@ public class GameControl : MonoBehaviour {
         return playerMusic;
     }
 
+    public string GetSceneName()
+    {
+        return SceneManager.GetActiveScene().name;
+    }
+
     public void ExperienceGained(int amount)
     {
         Experience[SelectedWeapon] += amount * currentLevel;

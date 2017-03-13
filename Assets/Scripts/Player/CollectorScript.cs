@@ -5,7 +5,10 @@ using System.Collections;
 public class CollectorScript : MonoBehaviour
 {
 
-    public Text textInfo;
+    public Text textScrap;
+    public Text textRM;
+    public Text textWeaponSkill;
+    public Text textCurrentZone;
     public AudioSource ScrapCollectedSound;
     public AudioSource RMCollectedSound;
     private float powerUpDuration = 30;
@@ -56,17 +59,16 @@ public class CollectorScript : MonoBehaviour
 
     private void UpdateInfoText()
     {
-        textInfo.text = "Scrap: " + GameControl.gc.scrapCount.ToString() + "\n"
-            + "Research Material: " + GameControl.gc.researchMaterialCount.ToString() + "\n"
-            + "Weapon Skill: " + GameControl.gc.WeaponSkill[GameControl.gc.SelectedWeapon].ToString() + "/" + GameControl.gc.Weapons[GameControl.gc.SelectedWeapon].SkillCap.ToString()
-            + "\nZone: " + GameControl.gc.currentLevel.ToString();
+        textScrap.text = GameControl.gc.scrapCount.ToString();
+        textRM.text = GameControl.gc.researchMaterialCount.ToString();
+        textWeaponSkill.text = "Weapon Skill: " + GameControl.gc.WeaponSkill[GameControl.gc.SelectedWeapon].ToString() + "/" + GameControl.gc.Weapons[GameControl.gc.SelectedWeapon].SkillCap.ToString();
+        textCurrentZone.text ="Zone: " + GameControl.gc.currentLevel.ToString();
     }
 
     void OnCollisionEnter2D(Collision2D col)
     {
         if (col.gameObject.GetComponent<MeteorScript>() != null)
         {
-            col.gameObject.GetComponent<MeteorScript>().isHit(grinderDamage);
             col.gameObject.GetComponent<Rigidbody2D>().gravityScale = 1f;
         }
         else if (col.gameObject.GetComponent<ScrapPieceScript>() != null)
@@ -84,7 +86,9 @@ public class CollectorScript : MonoBehaviour
     {
         if (col.gameObject.GetComponent<MeteorScript>() != null)
         {
-            col.gameObject.GetComponent<MeteorScript>().isHit(grinderDamage);
+            int grinderdmg = col.gameObject.GetComponent<MeteorScript>().maxHitPoints / 100;
+            if (grinderdmg == 0) grinderdmg = 1;
+            col.gameObject.GetComponent<MeteorScript>().isHit(grinderdmg, true, false);
         }
     }
 

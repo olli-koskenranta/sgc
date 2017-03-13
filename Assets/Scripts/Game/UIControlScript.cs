@@ -51,7 +51,7 @@ public class UIControlScript : MonoBehaviour {
     public void PlayGameClicked()
     {
         LoadingText.GetComponent<Text>().enabled = true;
-        GameControl.gc.LoadData();
+        //GameControl.gc.LoadData();
         SceneManager.LoadScene("Armory");
     }
 
@@ -66,24 +66,25 @@ public class UIControlScript : MonoBehaviour {
         canvas = GameObject.Find("Canvas");
         LoadingText = canvas.transform.FindChild("LoadingText").gameObject;
 
-        LoadingText.GetComponent<Text>().enabled = true;
-        //GameControl.gc.SaveData();
+        
+        GameControl.gc.SaveData();
         GameControl.gc.currentLevel = 1;
         GameControl.gc.ResetPowerUps();
+        LoadingText.GetComponent<Text>().enabled = true;
         SceneManager.LoadScene("Armory");
     }
 
     public void ArmoryPlayClicked()
     {
         LoadingText.GetComponent<Text>().enabled = true;
-        //GameControl.gc.SaveData();
+        GameControl.gc.SaveData();
         SceneManager.LoadScene("GameWorld1");
     }
 
     public void ArmoryExitClicked()
     {
         LoadingText.GetComponent<Text>().enabled = true;
-        //GameControl.gc.SaveData();
+        GameControl.gc.SaveData();
         SceneManager.LoadScene("MainMenu");
     }
 

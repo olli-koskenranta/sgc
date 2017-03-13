@@ -13,11 +13,6 @@ public class ShieldGeneratorScript : MonoBehaviour {
 
     void OnCollisionEnter2D(Collision2D col)
     {
-        battlestation.GetComponent<Anomaly4Script>().OnGeneratorCollisionEnter(col);
-    }
-
-    void OnTriggerEnter2D(Collider2D col)
-    {
-        battlestation.GetComponent<Anomaly4Script>().OnGeneratorTriggerEnter(col);
+        battlestation.GetComponent<AnomalyScript>().OnGeneratorCollisionEnter(col);
     }
 }

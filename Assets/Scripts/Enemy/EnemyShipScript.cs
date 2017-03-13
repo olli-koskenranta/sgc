@@ -8,6 +8,7 @@ public class EnemyShipScript : MonoBehaviour {
     public ShipType sType = ShipType.Fighter;
     public float projectile_speed;
     public int hitPoints;
+    public int maxHitPoints;
     public int damage = 0;
     private GameObject playerShip;
     private float booster_time;
@@ -42,7 +43,14 @@ public class EnemyShipScript : MonoBehaviour {
     private int enemyFighterDamage = 6;
     private int enemyMissileCruiserDamage = 18;
 
+    public float armor = 0f;
+    public bool iscrit = false;
+
+    private GameObject floatingText;
+
     void Start () {
+
+        floatingText = Resources.Load("FloatingText") as GameObject;
         rotateSpeed = 1f;
         ALIVE = true;
 
@@ -54,8 +62,8 @@ public class EnemyShipScript : MonoBehaviour {
                 fire_interval = 2f;
                 Bullet = Resources.Load("EnemyBullet1") as GameObject;
                 GetComponent<Rigidbody2D>().mass = enemyFighterMass * GameControl.gc.currentLevel;
-                damage = enemyFighterDamage; // * GameControlScript.gameControl.currentLevel;
-                hitPoints = enemyFighterHitPoints * GameControl.gc.currentLevel; // + 200 * GameControlScript.gameControl.currentLevel / 10;
+                damage = enemyFighterDamage;
+                hitPoints = enemyFighterHitPoints * GameControl.gc.currentLevel;
                 break;
             case ShipType.MissileCruiser:
                 XP = 12;
@@ -64,8 +72,8 @@ public class EnemyShipScript : MonoBehaviour {
                 fire_interval = 1f;
                 Bullet = Resources.Load("Missile") as GameObject;
                 GetComponent<Rigidbody2D>().mass = enemyMissileCruiserMass * GameControl.gc.currentLevel;
-                damage = enemyMissileCruiserDamage; // * GameControlScript.gameControl.currentLevel;
-                hitPoints = enemyMissileCruiserHitPoints * GameControl.gc.currentLevel; // + 200 * GameControlScript.gameControl.currentLevel / 10;
+                damage = enemyMissileCruiserDamage;
+                hitPoints = enemyMissileCruiserHitPoints * GameControl.gc.currentLevel;
                 break;
             default:
                 break;
@@ -85,6 +93,19 @@ public class EnemyShipScript : MonoBehaviour {
         booster_time = Time.time;
         fire_time = Time.time;
         hit_effect = Resources.Load("Explosion") as GameObject;
+
+        armor = 0.01f * GameControl.gc.currentLevel;
+
+        //if (armor > 0.9f)
+        //    armor = 0.9f;
+
+        if (GameControl.gc.currentLevel > 30)
+            hitPoints *= GameControl.gc.currentLevel / 10;
+
+        if (GameControl.gc.currentLevel > 30)
+            GetComponent<Rigidbody2D>().mass *= GameControl.gc.currentLevel / 10;
+
+        maxHitPoints = hitPoints;
     }
 	
 	void Update () {
@@ -143,35 +164,37 @@ public class EnemyShipScript : MonoBehaviour {
 
     void OnCollisionEnter2D(Collision2D col)
     {
-        if (!IsOnScreen())
-            return;
+        iscrit = false;
+
+        
 
         if (col.gameObject.GetComponent<PlayerProjectileScript>() != null)
         {
-            isHit(col.gameObject.GetComponent<PlayerProjectileScript>().damage);
+            if (col.gameObject.GetComponent<PlayerProjectileScript>().Critical)
+                iscrit = true;
+            else
+                iscrit = false;
+            isHit(col.gameObject.GetComponent<PlayerProjectileScript>().damage, false, true, col.gameObject.GetComponent<PlayerProjectileScript>().armorPierce);
         }
 
         if (col.gameObject.GetComponent<MeteorScript>() != null)
         {
-            isHit(col.gameObject.GetComponent<MeteorScript>().damage);
+            if (!IsOnScreen())
+                return;
+
+            int dmg = maxHitPoints / 10;
+            isHit(dmg, true, true);
         }
 
         if (col.gameObject.GetComponent<CollectorScript>() != null)
         {
             if (!ALIVE)
                 Destroy(gameObject);
-            else
-                isHit(col.gameObject.GetComponent<CollectorScript>().grinderDamage);
         }
     }
 
     void OnCollisionStay2D(Collision2D col)
     {
-        if (col.gameObject.GetComponent<MeteorScript>() != null)
-        {
-            isHit(col.gameObject.GetComponent<MeteorScript>().damage);
-        }
-
         if (col.gameObject.GetComponent<CollectorScript>() != null)
         {
             if (!ALIVE)
@@ -179,33 +202,59 @@ public class EnemyShipScript : MonoBehaviour {
                 Destroy(gameObject);
             }
             else
-                isHit(col.gameObject.GetComponent<CollectorScript>().grinderDamage);
+            {
+                int dmg = maxHitPoints / 100;
+                isHit(dmg, true, true);
+            }
         }
     }
 
     void OnTriggerEnter2D(Collider2D col)
     {
-        if (!IsOnScreen())
-            return;
+        iscrit = false;
+
+        //if (!IsOnScreen())
+        //    return;
 
         if (col.gameObject.GetComponent<PlayerProjectileScript>() != null)
         {
-            isHit(col.gameObject.GetComponent<PlayerProjectileScript>().damage);
+            if (col.gameObject.GetComponent<PlayerProjectileScript>().Critical)
+                iscrit = true;
+            else
+                iscrit = false;
+            isHit(col.gameObject.GetComponent<PlayerProjectileScript>().damage, false, true, col.gameObject.GetComponent<PlayerProjectileScript>().armorPierce);
         }
     }
 
-    void isHit(int Damage)
+    void isHit(int incomingDamage, bool ignoreArmor, bool showDmg, float armorPierce = 0f)
     {
-        if (hitPoints <= 0)
-            return;
 
-        hitPoints -= Damage;
+
         if (hitPoints <= 0)
+            hitPoints = 0;
+
+        else
         {
-            ALIVE = false;
-            Explode();
-            destroyed_time = Time.time;
+            float newDamage = incomingDamage;
+            if (!ignoreArmor)
+            {
+                newDamage -= (armor - armor * armorPierce)  * (float)incomingDamage;
+                incomingDamage = (int)newDamage;
+                if (incomingDamage <= 1)
+                    incomingDamage = 1;
+            }
+            hitPoints -= incomingDamage;
+
+            if (hitPoints <= 0)
+            {
+                ALIVE = false;
+                Explode();
+                destroyed_time = Time.time;
+            }
         }
+
+        if (showDmg)
+            DamageText(iscrit, incomingDamage);
     }
 
     void Explode()
@@ -280,5 +329,18 @@ public class EnemyShipScript : MonoBehaviour {
         bulletInstance.GetComponent<EnemyProjectileScript>().damage = damage;
         bulletInstance.GetComponent<Rigidbody2D>().velocity = firingPositions[firepos].TransformDirection(Vector3.right * projectile_speed);
         fire_time = Time.time;
+    }
+
+    private void DamageText(bool CRITICAL, int dmg)
+    {
+        GameObject ft;
+        ft = Instantiate(floatingText, transform.position, Quaternion.identity) as GameObject;
+        ft.GetComponent<FloatingTextScript>().text = dmg.ToString();
+        ft.GetComponent<FloatingTextScript>().fttype = FloatingText.FTType.PopUp;
+        if (CRITICAL)
+        {
+            ft.GetComponent<TextMesh>().fontSize = 50;
+            ft.GetComponent<TextMesh>().color = Color.yellow;
+        }
     }
 }

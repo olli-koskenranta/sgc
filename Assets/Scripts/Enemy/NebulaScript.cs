@@ -12,8 +12,13 @@ public class NebulaScript : MonoBehaviour {
     private int dmgCounter = 0;
     private bool ALIVE = true;
     private Vector3 preferredScale;
-	// Use this for initialization
-	void Start () {
+    private GameObject floatingText;
+    private bool iscrit;
+
+    // Use this for initialization
+    void Start () {
+
+        floatingText = Resources.Load("FloatingText") as GameObject;
         mainCamera = Camera.main;
         preferredScale = transform.localScale;
         hitPoints *= GameControl.gc.currentLevel;
@@ -49,7 +54,12 @@ public class NebulaScript : MonoBehaviour {
             return;
         if (col.gameObject.GetComponent<PlayerProjectileScript>() != null)
         {
-            isHit(col.gameObject.GetComponent<PlayerProjectileScript>().damage);
+            if (col.gameObject.GetComponent<PlayerProjectileScript>().Critical)
+                iscrit = true;
+            else
+                iscrit = false;
+
+            isHit(col.gameObject.GetComponent<PlayerProjectileScript>().damage, iscrit);
         }
     }
 
@@ -97,14 +107,15 @@ public class NebulaScript : MonoBehaviour {
         
     }
 
-    void isHit(int Damage)
+    public void isHit(int incomingDamage,  bool showDmg)
     {
-
-        hitPoints -= Damage;
+        hitPoints -= incomingDamage;
         if (hitPoints <= 0)
         {
             Explode();
         }
+        if (showDmg)
+            DamageText(iscrit, incomingDamage);
     }
 
     private void Consume(GameObject gameobj, int hp)
@@ -147,5 +158,18 @@ public class NebulaScript : MonoBehaviour {
             return true;
         else
             return false;
+    }
+
+    private void DamageText(bool CRITICAL, int dmg)
+    {
+        GameObject ft;
+        ft = Instantiate(floatingText, transform.position, Quaternion.identity) as GameObject;
+        ft.GetComponent<FloatingTextScript>().text = dmg.ToString();
+        ft.GetComponent<FloatingTextScript>().fttype = FloatingText.FTType.PopUp;
+        if (CRITICAL)
+        {
+            ft.GetComponent<TextMesh>().fontSize = 50;
+            ft.GetComponent<TextMesh>().color = Color.yellow;
+        }
     }
 }

@@ -21,6 +21,7 @@ public class PlayerProjectileScript : MonoBehaviour {
     public float mass;
     public int damage;
     public float gravityDmgAmount = 0.1f;
+    public float armorPierce;
 
     private GameObject floatingText;
 
@@ -31,7 +32,7 @@ public class PlayerProjectileScript : MonoBehaviour {
         hugeMeteor = GameObject.FindWithTag("hugeMeteor");
         playerTurret = GameObject.FindWithTag("PlayerTurret");
         gameObject.GetComponent<Rigidbody2D>().mass = mass;
-        floatingText = Resources.Load("FloatingText") as GameObject;
+        armorPierce = GameControl.gc.WeaponUpgrades[GameControl.gc.SelectedWeapon, 1] * 0.2f;
 
         if (GameControl.gc.SelectedWeapon == 0)
             BOUNCE = true;
@@ -91,7 +92,7 @@ public class PlayerProjectileScript : MonoBehaviour {
 
         if (hugeMeteor != null && hugeMeteor.GetComponent<MeteorScript>().IsOnScreen())
         {
-            Vector2 forceVector = (hugeMeteor.transform.position - transform.position).normalized * GameControl.gc.currentLevel;
+            Vector2 forceVector = (hugeMeteor.transform.position - transform.position).normalized * gameObject.GetComponent<Rigidbody2D>().mass / 10;
             GetComponent<Rigidbody2D>().AddForce(new Vector2(0, forceVector.y), ForceMode2D.Impulse);
         }
     }
@@ -100,7 +101,8 @@ public class PlayerProjectileScript : MonoBehaviour {
     {
 
         HitEffect();
-        DamageText();
+        
+        //DamageText();
 
         if (GameControl.gc.SelectedWeapon == 0)
         {
@@ -144,7 +146,7 @@ public class PlayerProjectileScript : MonoBehaviour {
         }
 
         HitEffect();
-        DamageText();
+        //DamageText();
 
         /*if (col.GetComponent<NebulaScript>() != null)
         {
@@ -185,11 +187,11 @@ public class PlayerProjectileScript : MonoBehaviour {
         //hiteffect.GetComponent<ParticleSystem>().main.startColor = gameObject.GetComponent<SpriteRenderer>().color;
     }
 
-    private void DamageText()
+    private void DamageText(int newDamage)
     {
         GameObject ft;
         ft = Instantiate(floatingText, transform.position, Quaternion.identity) as GameObject;
-        ft.GetComponent<FloatingTextScript>().text = damage.ToString();
+        ft.GetComponent<FloatingTextScript>().text = newDamage.ToString();
         ft.GetComponent<FloatingTextScript>().fttype = FloatingText.FTType.PopUp;
         if (CRITICAL)
         {
