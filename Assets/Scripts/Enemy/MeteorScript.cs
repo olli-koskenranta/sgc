@@ -262,7 +262,7 @@ public class MeteorScript : MonoBehaviour {
     {
         if (damageStacks > 0)
         {
-            float nDamage = (float)incomingDamage * (damageStacks * GameControl.gc.Weapons[2].DamageAccumulation);
+            float nDamage = (float)incomingDamage * ( 1 + damageStacks * GameControl.gc.Weapons[2].DamageAccumulation);
             incomingDamage = (int)nDamage;
         }
 
@@ -288,7 +288,7 @@ public class MeteorScript : MonoBehaviour {
     public void Explode()
     {
         float randomPitch = originalPitch + Random.Range(-0.05f, 0.05f);
-        if (GameControl.gc.AUDIO_SOUNDS && !GameControl.gc.GetSceneName().Equals("MainMenu"))
+        if (GameControl.gc.AUDIO_SOUNDS && !GameControl.gc.GetSceneName().Equals("MainMenu") && IsOnScreen())
         {
             soundExplode.pitch = randomPitch;
             soundExplode.Play();

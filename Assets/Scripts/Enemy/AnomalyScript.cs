@@ -263,7 +263,7 @@ public class AnomalyScript : MonoBehaviour {
 
         if (damageStacks > 0)
         {
-            float nDamage = (float)incomingDamage * (damageStacks * GameControl.gc.Weapons[2].DamageAccumulation);
+            float nDamage = (float)incomingDamage * ( 1 + damageStacks * GameControl.gc.Weapons[2].DamageAccumulation);
             incomingDamage = (int)nDamage;
         }
 
@@ -300,6 +300,14 @@ public class AnomalyScript : MonoBehaviour {
             gameObject.GetComponent<Rigidbody2D>().mass = 1000000;
             gameObject.GetComponent<Rigidbody2D>().gravityScale = 0.1f;
 
+            if (gameObject.tag.Equals("Anomaly4"))
+            {
+                RelativeJoint2D[] joints = gameObject.GetComponentsInChildren<RelativeJoint2D>();
+                foreach (RelativeJoint2D joint in joints)
+                {
+                    //Destroy(joint);
+                }
+            }
             //Destroy(gameObject);
         }
     }

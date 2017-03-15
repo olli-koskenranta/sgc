@@ -112,7 +112,7 @@ public class NebulaScript : MonoBehaviour {
     {
         if (damageStacks > 0)
         {
-            float newDamage = (float)incomingDamage * (damageStacks * GameControl.gc.Weapons[2].DamageAccumulation);
+            float newDamage = (float)incomingDamage * ( 1 + damageStacks * GameControl.gc.Weapons[2].DamageAccumulation);
             incomingDamage = (int)newDamage;
         }
         hitPoints -= incomingDamage;

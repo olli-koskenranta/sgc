@@ -115,15 +115,10 @@ public class PlayerProjectileScript : MonoBehaviour {
 
         if (SHRAPNEL)
         {
-            ClusterBomb(1, 1, 0.1f, 0.1f);
-            ClusterBomb(1, -1, 0.1f, -0.1f);
-            ClusterBomb(-1, 1, -0.1f, 0.1f);
-            ClusterBomb(-1, -1, -0.1f, -0.1f);
-
-            //ClusterBomb(1, 0, 0.2f, 0.0f);
-            //ClusterBomb(0, 1, 0.0f, 0.2f);
-            //ClusterBomb(-1, 0, -0.2f, 0.0f);
-            //ClusterBomb(0, -1, 0.0f, -0.2f);
+            ClusterBomb(1, 1);
+            ClusterBomb(1, -1);
+            ClusterBomb(-1, 1);
+            ClusterBomb(-1, -1);
         }
 
         if (!BOUNCE)
@@ -201,7 +196,7 @@ public class PlayerProjectileScript : MonoBehaviour {
         }
     }
 
-    private void ClusterBomb(float dirX, float dirY, float posX, float posY)
+    private void ClusterBomb(float dirX, float dirY)
     {
         GameObject bulletInstance;
         Transform transform;
@@ -214,7 +209,7 @@ public class PlayerProjectileScript : MonoBehaviour {
         transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
      
 
-        bulletInstance = Instantiate(bullet_shrapnel, transform.position + new Vector3(posX, posY), this.gameObject.transform.rotation) as GameObject;
+        bulletInstance = Instantiate(bullet_shrapnel, transform.position, this.gameObject.transform.rotation) as GameObject;
 
         bulletInstance.GetComponent<Rigidbody2D>().mass = mass;
         bulletInstance.GetComponent<Rigidbody2D>().velocity = new Vector2(dirX, dirY).normalized * speed;

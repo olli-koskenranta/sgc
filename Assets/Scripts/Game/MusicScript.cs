@@ -15,22 +15,12 @@ public class MusicScript : MonoBehaviour {
         {
             DontDestroyOnLoad(gameObject);
             music = this;
-
-
-
         }
         else if (music != this)
         {
             Destroy(gameObject);
         }
     }
-
-    void Start ()
-    {
-        if (!GameControl.gc.AUDIO_MUSIC)
-            return;
-
-	}
 
     void OnEnable()
     {
@@ -47,7 +37,11 @@ public class MusicScript : MonoBehaviour {
         if (!GameControl.gc.AUDIO_MUSIC)
             return;
 
-        switch (scene.name)
+        if (PlayerPrefs.GetInt(GameControl.gc.GetMusicKey(), 1) == 0)
+            return;
+            
+
+            switch (scene.name)
         {
             case "MainMenu":
             case "Armory":
@@ -80,6 +74,10 @@ public class MusicScript : MonoBehaviour {
         if (!GameControl.gc.AUDIO_MUSIC)
             return;
 
+        if (PlayerPrefs.GetInt(GameControl.gc.GetMusicKey(), 1) == 0)
+            return;
+
+
         StopTheMusic();
 
         switch (number)
@@ -107,6 +105,9 @@ public class MusicScript : MonoBehaviour {
 
     public void PlayTheMusic()
     {
+        if (!GameControl.gc.AUDIO_MUSIC)
+            return;
+        
         PlayTrack(currentTrackNumber);
     }
 }

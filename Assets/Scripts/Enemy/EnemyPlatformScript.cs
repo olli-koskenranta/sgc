@@ -28,6 +28,10 @@ public class EnemyPlatformScript : MonoBehaviour {
 	
 	void Update ()
     {
+        //Destroy if "out of bounds"
+        if (gameObject.transform.position.x > 19 || gameObject.transform.position.x < -9 || gameObject.transform.position.y < -7 || gameObject.transform.position.y > 7)
+            Destroy(gameObject);
+
         if (Time.time - gravityHitTime >= gravityHitResetTime && ALIVE)
         {
             gameObject.GetComponent<Rigidbody2D>().gravityScale = 0;
@@ -99,7 +103,7 @@ public class EnemyPlatformScript : MonoBehaviour {
 
         if (damageStacks > 0)
         {
-            float nDamage = (float)Damage * (damageStacks * GameControl.gc.Weapons[2].DamageAccumulation);
+            float nDamage = (float)Damage * ( 1 + damageStacks * GameControl.gc.Weapons[2].DamageAccumulation);
             Damage = (int)nDamage;
         }
 

@@ -16,6 +16,7 @@ public class SpawningScript : MonoBehaviour {
     public GameObject announcer;
     public GameObject enemyFighter;
     public GameObject enemyMissileCruiser;
+    public GameObject enemyBattleShip;
 
     public GameObject anomaly1;
     public GameObject anomaly2;
@@ -30,9 +31,12 @@ public class SpawningScript : MonoBehaviour {
     private int EnemyFighterChance;
     private int EnemyMissileCruiserChance;
     private int NebulaChance;
+    private int EnemyBattleShipChance;
 
     public bool ANOMALY_SPAWNED = false;
     public bool[] ANOMALY_DESTROYED;
+
+    private bool test = true;
 
     void Start () {
 
@@ -48,6 +52,7 @@ public class SpawningScript : MonoBehaviour {
         NebulaChance = 1;
         EnemyFighterChance = 2;
         EnemyMissileCruiserChance = 1;
+        EnemyBattleShipChance = 1;
         
 
         PUSpawnTime = 0;
@@ -62,6 +67,7 @@ public class SpawningScript : MonoBehaviour {
         enemyFighter = Resources.Load("AlienShip1") as GameObject;
         enemyMissileCruiser = Resources.Load("MissileCruiser") as GameObject;
         Nebula = Resources.Load("Nebula") as GameObject;
+        enemyBattleShip = Resources.Load("BattleShip") as GameObject;
 
 	}
 	
@@ -166,14 +172,29 @@ public class SpawningScript : MonoBehaviour {
 
         //Enemy Missile Cruiser
         if (GameControl.gc.currentLevel >= 31)
-        if (RollDice(100) <= EnemyMissileCruiserChance)
         {
+            if (RollDice(100) <= EnemyMissileCruiserChance)
+            {
 
-            enemyMissileCruiser.GetComponent<EnemyShipScript>().sType = EnemyShipScript.ShipType.MissileCruiser;
-            spawnPosition.position = new Vector3(Random.Range(14f, 18f), Random.Range(0f, 4f), 0f);
-            Instantiate(enemyMissileCruiser, spawnPosition.position, spawnPosition.rotation);
+                enemyMissileCruiser.GetComponent<EnemyShipScript>().sType = EnemyShipScript.ShipType.MissileCruiser;
+                spawnPosition.position = new Vector3(Random.Range(14f, 18f), Random.Range(0f, 4f), 0f);
+                Instantiate(enemyMissileCruiser, spawnPosition.position, spawnPosition.rotation);
 
+            }
         }
+
+        //Enemy battleship
+        if (GameControl.gc.currentLevel >= 41)
+        {
+            if (RollDice(100) <= EnemyBattleShipChance)
+            {
+                enemyBattleShip.GetComponent<EnemyShipScript>().sType = EnemyShipScript.ShipType.BattleShip;
+                spawnPosition.position = new Vector3(Random.Range(14f, 18f), Random.Range(4f, 5f), 0f);
+                Instantiate(enemyBattleShip, spawnPosition.position, spawnPosition.rotation);
+            }
+        }
+        
+
 
         //Always spawn medium asteroid
         spawnPosition.position = new Vector3(Random.Range(14f, 18f), Random.Range(-3f, 4f), 0f);
