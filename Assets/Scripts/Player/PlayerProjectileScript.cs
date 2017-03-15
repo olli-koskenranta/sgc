@@ -16,6 +16,7 @@ public class PlayerProjectileScript : MonoBehaviour {
     private bool BOUNCE = false;
     private bool ROTATE = false;
     public int bounces = 0;
+    public float damageAccumulation;
 
     public float critMultiplier;
     public float mass;
@@ -219,6 +220,7 @@ public class PlayerProjectileScript : MonoBehaviour {
         bulletInstance.GetComponent<Rigidbody2D>().velocity = new Vector2(dirX, dirY).normalized * speed;
         bulletInstance.GetComponent<SpriteRenderer>().color = GetComponent<SpriteRenderer>().color;
         //bulletInstance.GetComponent<Transform>().localScale /= 2;
+        bulletInstance.GetComponent<PlayerProjectileScript>().damageAccumulation = damageAccumulation;
         bulletInstance.GetComponent<PlayerProjectileScript>().damage = damage / 4;
     }
 

@@ -218,7 +218,8 @@ public class TurretScript : MonoBehaviour {
         bulletScript.mass = turret.Mass;
         bulletScript.damage = turret.Damage;
         bulletScript.critMultiplier = turret.CriticalMultiplier;
-        bulletScript.bounces = turret.Bounces; 
+        bulletScript.bounces = turret.Bounces;
+        bulletScript.damageAccumulation = turret.DamageAccumulation;
         //Debug.Log("Bounces: " + bulletScript.bounces.ToString());
         if (GameControl.gc.SelectedWeapon == 1 && special2)
         {
@@ -272,7 +273,7 @@ public class TurretScript : MonoBehaviour {
     {
         GameObject ftInstance = Instantiate(ft, transform.position, Quaternion.identity) as GameObject;
         ftInstance.GetComponent<Transform>().position += new Vector3(1f, 0f, 0f);
-        ftInstance.GetComponent<FloatingTextScript>().text = "Power +1";
+        ftInstance.GetComponent<FloatingTextScript>().text = "Skill +1";
         ftInstance.GetComponent<FloatingTextScript>().fttype = FloatingText.FTType.Normal;
         ftInstance.GetComponent<FloatingTextScript>().durationBeforeFading = 2;
         ftInstance.GetComponent<TextMesh>().fontSize = 15;

@@ -37,6 +37,7 @@ public class MeteorScript : MonoBehaviour {
     private int bigMeteorDamage = 6;
     private int hugeMeteorDamage = 18;
     private int collisionCounter = 0;
+    private int damageStacks = 0;
 
     public float armor = 0;
     public bool iscrit = false;
@@ -176,6 +177,10 @@ public class MeteorScript : MonoBehaviour {
                 gameObject.GetComponent<SpriteRenderer>().color = Color.green;
                 gameObject.GetComponent<Rigidbody2D>().gravityScale += col.gameObject.GetComponent<PlayerProjectileScript>().gravityDmgAmount;
             }
+            if (col.gameObject.GetComponent<PlayerProjectileScript>().damageAccumulation > 0)
+            {
+                damageStacks += 1;
+            }
 
             isHit(col.gameObject.GetComponent<PlayerProjectileScript>().damage, false, true, col.gameObject.GetComponent<PlayerProjectileScript>().armorPierce);
         }
@@ -255,7 +260,14 @@ public class MeteorScript : MonoBehaviour {
 
     public void isHit(int incomingDamage, bool ignoreArmor, bool showDmg, float armorPierce = 0f)
     {
+        if (damageStacks > 0)
+        {
+            float nDamage = (float)incomingDamage * (damageStacks * GameControl.gc.Weapons[2].DamageAccumulation);
+            incomingDamage = (int)nDamage;
+        }
+
         float newDamage = incomingDamage;
+
         if (!ignoreArmor)
         {
             newDamage -= (armor - armor * armorPierce) * (float)incomingDamage;

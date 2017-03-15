@@ -17,7 +17,7 @@ public class GameControl : MonoBehaviour {
     public int scrapCount = 0;
     public int researchMaterialCount = 0;
     public int currentLevel;
-    public int scrapRequiredForNextLevel;
+    //public int scrapRequiredForNextLevel;
 
     public int[] Experience;
     public int[] WeaponSkill;
@@ -37,6 +37,8 @@ public class GameControl : MonoBehaviour {
     public bool GAME_PAUSED;
 
     public int highestLevelAchieved;
+
+    
     
     
 
@@ -47,10 +49,7 @@ public class GameControl : MonoBehaviour {
 
     //Player attributes
     public int shipArmor;
-    public bool[] StartZoneUnlocked;
-    public int[] startZones;
-    
-
+    public System.Collections.Generic.List<int> StartZoneUnlocked;
 
     //Weapon types
     //0 = Basic Cannon
@@ -139,6 +138,8 @@ public class GameControl : MonoBehaviour {
         //Debug.Log("GameControl START()!");
         GAME_PAUSED = false;
 
+        
+
         WeaponUpgradeCosts = new int[] { 1000, 10000, 100000, 1000000 };
         WeaponUpgradeRMCosts = new int[] { 0, 1, 5, 10 };
 
@@ -157,15 +158,13 @@ public class GameControl : MonoBehaviour {
         Experience = new int[numberOfWeapons];
         PowerUps = new bool[numberOfPowerUps];
         PowerUpNames = new string[numberOfPowerUps] { "Kinetic Bomb", "Shield", "Gravity Bomb", "Max Weapon Skill" }; //, "Slow Meteors", "Cluster Projectile", "Repel Shield", "Attack Speed" };
-        startZones = new int[] { 1, 5, 11, 21, 31, 41, 51, 61, 71, 81, 91 };
-        WeaponSkill = new int[numberOfWeapons];
+        WeaponSkill = new int[numberOfWeapons] { 0, 0, 0, 0 };
         WeaponUnlocked = new bool[numberOfWeapons] { true, false, false, false };
         ResearchStarted = new bool[numberOfResearches] { false, false, false, false, false };
         
         AttackSpeedReductions = new float[] { 0.15f, 0.05f, 0.025f, 0 };
         ExpForSkillUp = 10;
         currentLevel = 1;
-        scrapRequiredForNextLevel = 200;
         DateDailyResearchTime = new DateTime(2001, 1, 1, 6, 0, 0);
         DateDailyScrapBoostTime = new DateTime(2001, 1, 1, 6, 0, 0);
         ResearchStartTimes = new DateTime[numberOfResearches];
@@ -190,10 +189,12 @@ public class GameControl : MonoBehaviour {
         WeaponUpgradePointsTotal = new int[numberOfWeapons];
         WeaponUpgradePointsAvailable = new int[numberOfWeapons];
 
-        StartZoneUnlocked = new bool[numberOfStartZones] { true, false, false, false, false, false, false, false, false, false, false };
+        StartZoneUnlocked = new System.Collections.Generic.List<int>();
         
 
         ClearArrays();
+        
+
 
         Weapons = new Turret[numberOfWeapons];
 
@@ -201,10 +202,10 @@ public class GameControl : MonoBehaviour {
         BlasterTurret = new Turret(10f, 2, 1, 1, 5, 2f, 0, SpecialType.GravityDamage, "Gravity Blast", "Bounces");
         BlasterTurret.SetUpgradeValuesPerSkillPoint(2, 1, 0.2f);
 
-        PulseLaserTurret = new Turret(20f, 100, 0.0001f, 0.4f, 5, 2f, 1, SpecialType.Piercing, "Piercing", "Beam Split");
+        PulseLaserTurret = new Turret(20f, 100, 0f, 0.4f, 5, 2f, 1, SpecialType.Piercing, "Piercing", "Beam Split");
         PulseLaserTurret.SetUpgradeValuesPerSkillPoint(3, 0, 0.2f);
 
-        MassDriverTurret = new Turret(30f, 50, 0.1f, 0.2f, 5f, 2f, 2, SpecialType.Shrapnel, "Shrapnel", "Armor Piercing");
+        MassDriverTurret = new Turret(30f, 50, 0.1f, 0.2f, 5f, 2f, 2, SpecialType.Shrapnel, "Shrapnel", "Damage Accumulation");
         MassDriverTurret.SetUpgradeValuesPerSkillPoint(4, 0.1f, 0.2f);
 
         PlasmaTurret = new Turret(10f, 10, 3, 1, 5, 5, 3, SpecialType.Shrapnel);
@@ -295,7 +296,6 @@ public class GameControl : MonoBehaviour {
         //WeaponUpgrades = new int[4, 7];
         ClearArrays();
         WeaponUnlocked = new bool[numberOfWeapons] { true, false, false, false };
-        StartZoneUnlocked = new bool[numberOfStartZones] { true, false, false, false, false, false, false, false, false, false, false };
         ResearchStarted = new bool[numberOfResearches] { false, false, false, false, false };
 
         PlayerData playerData = GetPlayerData(true);
@@ -315,12 +315,15 @@ public class GameControl : MonoBehaviour {
 
     public void ClearArrays()
     {
+        
         Array.Clear(WeaponUpgrades, 0, WeaponUpgrades.Length);
         Array.Clear(WeaponSkill, 0, WeaponSkill.Length);
         Array.Clear(Experience, 0, Experience.Length);
         Array.Clear(WeaponUpgradePointsTotal, 0, WeaponUpgradePointsTotal.Length);
         Array.Clear(WeaponUpgradePointsAvailable, 0, WeaponUpgradePointsAvailable.Length);
         Array.Clear(ResearchStartTimes, 0, ResearchStartTimes.Length);
+        StartZoneUnlocked.Clear();
+        StartZoneUnlocked.Add(1);
     }
 
     public int UpgradePointCost(int type)
@@ -400,34 +403,40 @@ public class GameControl : MonoBehaviour {
         if (data.highestLevelAchieved != 0)
             highestLevelAchieved = data.highestLevelAchieved;
 
-        if (data.WeaponSkill != null)
+        if (data.WeaponSkill.Length != 0)
             WeaponSkill = data.WeaponSkill;
         else
-            Debug.Log("WeaponSkill[] is null");
-        if (data.Experience != null)
+            Debug.Log("WeaponSkill[] length is 0");
+
+        if (data.Experience.Length != 0)
             Experience = data.Experience;
         else
-            Debug.Log("Experience[] is null");
+            Debug.Log("Experience[] length is 0");
+
         if (data.WeaponUnlocked != null)
             WeaponUnlocked = data.WeaponUnlocked;
         else
             Debug.Log("WeaponUnlocked[] is null");
+
         if (data.StartZoneUnlocked != null)
             StartZoneUnlocked = data.StartZoneUnlocked;
         else
             Debug.Log("StartZoneUnlocked[] is null");
+
         if (data.WeaponUpgrades != null)
             WeaponUpgrades = data.WeaponUpgrades;
         else
             Debug.Log("WeaponUpgrades[] is null");
-        if (data.WeaponUpgradePointsTotal != null)
+
+        if (data.WeaponUpgradePointsTotal.Length != 0)
             WeaponUpgradePointsTotal = data.WeaponUpgradePointsTotal;
         else
-            Debug.Log("WeaponUpgradePointsTotal[] is null");
-        if (data.WeaponUpgradePointsAvailable != null)
+            Debug.Log("WeaponUpgradePointsTotal[] length is 0");
+
+        if (data.WeaponUpgradePointsAvailable.Length != 0)
             WeaponUpgradePointsAvailable = data.WeaponUpgradePointsAvailable;
         else
-            Debug.Log("WeaponUpgradePointsAvailable[] is null");
+            Debug.Log("WeaponUpgradePointsAvailable[] length is 0");
         if (data.DateDailyResearchTime != null)
             DateDailyResearchTime = data.DateDailyResearchTime;
         else
@@ -436,10 +445,12 @@ public class GameControl : MonoBehaviour {
             DateDailyScrapBoostTime = data.DateDailyScrapBoostTime;
         else
             Debug.Log("DateDailyScrapBoostTime is null");
+
         if (data.ResearchStartTimes != null)
             ResearchStartTimes = data.ResearchStartTimes;
         else
             Debug.Log("ResearchStartTimes[] is null");
+
         if (data.ResearchStarted != null)
             ResearchStarted = data.ResearchStarted;
         else
@@ -548,7 +559,7 @@ class PlayerData
 
     public bool[] WeaponUnlocked = new bool[GameControl.gc.GetNumberOfWeapons()];
 
-    public bool[] StartZoneUnlocked = new bool[GameControl.gc.GetNumberOfStartZones()];
+    public System.Collections.Generic.List<int> StartZoneUnlocked = new System.Collections.Generic.List<int>();
 
     public bool[] ResearchStarted = new bool[GameControl.gc.GetNumberOfResearches()];
 

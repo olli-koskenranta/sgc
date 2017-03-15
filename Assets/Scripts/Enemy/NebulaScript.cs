@@ -14,6 +14,7 @@ public class NebulaScript : MonoBehaviour {
     private Vector3 preferredScale;
     private GameObject floatingText;
     private bool iscrit;
+    private float damageStacks;
 
     // Use this for initialization
     void Start () {
@@ -59,7 +60,12 @@ public class NebulaScript : MonoBehaviour {
             else
                 iscrit = false;
 
-            isHit(col.gameObject.GetComponent<PlayerProjectileScript>().damage, iscrit);
+            if (col.gameObject.GetComponent<PlayerProjectileScript>().damageAccumulation > 0)
+            {
+                damageStacks += 1;
+            }
+
+            isHit(col.gameObject.GetComponent<PlayerProjectileScript>().damage, true);
         }
     }
 
@@ -102,13 +108,13 @@ public class NebulaScript : MonoBehaviour {
 
     }
 
-    void OnCollisionStay2D(Collision2D col)
-    {
-        
-    }
-
     public void isHit(int incomingDamage,  bool showDmg)
     {
+        if (damageStacks > 0)
+        {
+            float newDamage = (float)incomingDamage * (damageStacks * GameControl.gc.Weapons[2].DamageAccumulation);
+            incomingDamage = (int)newDamage;
+        }
         hitPoints -= incomingDamage;
         if (hitPoints <= 0)
         {

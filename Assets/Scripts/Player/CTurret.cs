@@ -20,6 +20,7 @@ namespace ShipWeapons
         private int WeaponType;
         private float fireTime;
         private int bounces;
+        private float damageAccumulation;
         private int skillCap;
 
         //Special names
@@ -57,6 +58,7 @@ namespace ShipWeapons
             bounces = 0;
             skillCap = 100;
             fireTime = Time.time;
+            damageAccumulation = 0;
         }
 
         public void SetUpgradeValuesPerSkillPoint(int damage, float mass, float crit)
@@ -68,14 +70,16 @@ namespace ShipWeapons
 
         public void UpdateValues(int weaponNumber)
         {
-            //Debug.Log("Updating weapon number " + weaponNumber.ToString());
             int skillLevel = GameControl.gc.WeaponSkill[weaponNumber];
             totalDamage = baseDamage + skillLevel * uDamage;
-            totalMass = baseMass + skillLevel * uMass;
+
+            if (weaponNumber == 1) //Pulse Laser has no mass
+                totalMass = 0;
+            else
+                totalMass = baseMass + skillLevel * uMass;
+
             totalCritChance = baseCritChance + skillLevel * uCritChance;
             UpdateUpgrades();
-
-
         }
 
         private void UpdateUpgrades()
@@ -104,6 +108,9 @@ namespace ShipWeapons
                     break;
                 case 1:
                     totalSpecial2Chance = baseSpecialChance * GameControl.gc.WeaponUpgrades[WeaponType, 4];
+                    break;
+                case 2:
+                    damageAccumulation = 0.01f * GameControl.gc.WeaponUpgrades[WeaponType, 4];
                     break;
                 default:
                     break;
@@ -179,6 +186,11 @@ namespace ShipWeapons
         {
             get { return fireTime; }
             set { fireTime = value; }
+        }
+
+        public float DamageAccumulation
+        {
+            get { return damageAccumulation; }
         }
 
         public string[] SpecialNames

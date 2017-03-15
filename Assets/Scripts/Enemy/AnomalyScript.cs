@@ -20,6 +20,7 @@ public class AnomalyScript : MonoBehaviour {
     private GameObject floatingText;
     private float destroyed_time;
     private float destroyed_interval = 0.1f;
+    private float damageStacks;
 
 
     //Boss spesific variables
@@ -62,7 +63,7 @@ public class AnomalyScript : MonoBehaviour {
         XP = 100 * GameControl.gc.currentLevel;
         armor = 0.01f * GameControl.gc.currentLevel;
 
-        GameObject.Find("Music").GetComponent<MusicScript>().PlayTrack(2);
+        MusicScript.music.PlayTrack(3);
         shipHull = GameObject.FindWithTag("ShipHull");
         mainCamera = Camera.main;
         spawnTime = Time.time;
@@ -204,6 +205,12 @@ public class AnomalyScript : MonoBehaviour {
                 iscrit = true;
             else
                 iscrit = false;
+
+            if (col.gameObject.GetComponent<PlayerProjectileScript>().damageAccumulation > 0)
+            {
+                damageStacks += 1;
+            }
+
             isHit(col.gameObject.GetComponent<PlayerProjectileScript>().damage, false, true, col.gameObject.GetComponent<PlayerProjectileScript>().armorPierce);
         }
 
@@ -238,7 +245,7 @@ public class AnomalyScript : MonoBehaviour {
             {
                 generatorHitPoints -= 1;
                 HitEffect();
-                Debug.Log(generatorHitPoints.ToString());
+                //Debug.Log(generatorHitPoints.ToString());
             }
             else
             {
@@ -253,6 +260,12 @@ public class AnomalyScript : MonoBehaviour {
     {
         if (!ALIVE)
             return;
+
+        if (damageStacks > 0)
+        {
+            float nDamage = (float)incomingDamage * (damageStacks * GameControl.gc.Weapons[2].DamageAccumulation);
+            incomingDamage = (int)nDamage;
+        }
 
         float newDamage = incomingDamage;
         if (!ignoreArmor)
@@ -277,7 +290,7 @@ public class AnomalyScript : MonoBehaviour {
 
         if (hitPoints <= 0)
         {
-            GameObject.Find("Music").GetComponent<MusicScript>().PlayTrack(1);
+            MusicScript.music.PlayTrack(2);
             GameControl.gc.ExperienceGained(XP);
             ALIVE = false;
             GameObject.Find("MeteorSpawning").GetComponent<SpawningScript>().ANOMALY_DESTROYED[anomalyNumber - 1] = true;

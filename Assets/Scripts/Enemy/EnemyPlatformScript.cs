@@ -13,9 +13,13 @@ public class EnemyPlatformScript : MonoBehaviour {
     public bool ALIVE;
     public int XP = 0;
     private GameObject hit_effect;
+    private GameObject floatingText;
+    private bool iscrit = false;
+    private int damageStacks;
 
     void Start ()
     {
+        floatingText = Resources.Load("FloatingText") as GameObject;
         ALIVE = true;
         hitPoints = 100000;
         gravityHitTime = Time.time;
@@ -51,6 +55,17 @@ public class EnemyPlatformScript : MonoBehaviour {
                 gameObject.GetComponentInChildren<SpriteRenderer>().color = Color.green;
                 gravityHitTime = Time.time;
             }
+
+            if (col.gameObject.GetComponent<PlayerProjectileScript>().Critical)
+                iscrit = true;
+            else
+                iscrit = false;
+
+            if (col.gameObject.GetComponent<PlayerProjectileScript>().damageAccumulation > 0)
+            {
+                damageStacks += 1;
+            }
+
             isHit(col.gameObject.GetComponent<PlayerProjectileScript>().damage);
         }
 
@@ -63,10 +78,30 @@ public class EnemyPlatformScript : MonoBehaviour {
         }
     }
 
+    void OnTriggerEnter2D(Collider2D col)
+    {
+        if (col.gameObject.GetComponent<PlayerProjectileScript>() != null)
+        {
+            if (col.gameObject.GetComponent<PlayerProjectileScript>().Critical)
+                iscrit = true;
+            else
+                iscrit = false;
+
+
+            isHit(col.gameObject.GetComponent<PlayerProjectileScript>().damage);
+        }
+    }
+
     void isHit(int Damage)
     {
         if (hitPoints <= 0)
             return;
+
+        if (damageStacks > 0)
+        {
+            float nDamage = (float)Damage * (damageStacks * GameControl.gc.Weapons[2].DamageAccumulation);
+            Damage = (int)nDamage;
+        }
 
         hitPoints -= Damage;
         if (hitPoints <= 0)
@@ -75,6 +110,7 @@ public class EnemyPlatformScript : MonoBehaviour {
             Explode();
             destroyed_time = Time.time;
         }
+        DamageText(iscrit, Damage);
     }
 
     void Explode()
@@ -101,5 +137,18 @@ public class EnemyPlatformScript : MonoBehaviour {
         hiteffect = Instantiate(hit_effect, transform.position, Quaternion.identity) as GameObject;
         mm = hiteffect.GetComponent<ParticleSystem>().main;
         mm.startColor = gameObject.GetComponent<SpriteRenderer>().color;
+    }
+
+    private void DamageText(bool CRITICAL, int dmg)
+    {
+        GameObject ft;
+        ft = Instantiate(floatingText, transform.position, Quaternion.identity) as GameObject;
+        ft.GetComponent<FloatingTextScript>().text = dmg.ToString();
+        ft.GetComponent<FloatingTextScript>().fttype = FloatingText.FTType.PopUp;
+        if (CRITICAL)
+        {
+            ft.GetComponent<TextMesh>().fontSize = 50;
+            ft.GetComponent<TextMesh>().color = Color.yellow;
+        }
     }
 }

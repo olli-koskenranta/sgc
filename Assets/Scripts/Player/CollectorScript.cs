@@ -153,18 +153,18 @@ public class CollectorScript : MonoBehaviour
         if (GameControl.gc.highestLevelAchieved < GameControl.gc.currentLevel)
             GameControl.gc.highestLevelAchieved = GameControl.gc.currentLevel;
         UpdateInfoText();
-        for (int i = 0; i < GameControl.gc.startZones.Length; i++)
+        if (GameControl.gc.currentLevel == 5 || (GameControl.gc.currentLevel - 1) % 10 == 0)
         {
-            if (GameControl.gc.startZones[i] == GameControl.gc.currentLevel && !GameControl.gc.StartZoneUnlocked[i])
+            if (GameControl.gc.StartZoneUnlocked.Find(i => i == GameControl.gc.currentLevel) == 0)
             {
-                GameControl.gc.StartZoneUnlocked[i] = true;
+                GameControl.gc.StartZoneUnlocked.Add(GameControl.gc.currentLevel);
                 announcer.GetComponent<AnnouncerScript>().Announce("Zone " + GameControl.gc.currentLevel.ToString() + "!"
                     + "\nNew Start Zone Unlocked!", FloatingText.FTType.Announcement);
                 levelStartTime = Time.time;
-                //GameControl.gc.SaveData();
                 return;
             }
         }
+
         announcer.GetComponent<AnnouncerScript>().Announce("Zone " + GameControl.gc.currentLevel.ToString() + "!", FloatingText.FTType.Announcement);
         levelStartTime = Time.time;
     }

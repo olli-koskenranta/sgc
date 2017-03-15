@@ -20,7 +20,6 @@ public class ArmoryScript : MonoBehaviour {
     public Button btnDailyResearch;
     public Button btnDailyScrapBoost;
     public Button btnDailyBoosts;
-    public Button btnClosePanel;
     public Button btnSU0;
     public Button btnSU1;
     public Button btnSU2;
@@ -65,8 +64,6 @@ public class ArmoryScript : MonoBehaviour {
         buttonShipUpgrades.transform.FindChild("ButtonSU2").gameObject.SetActive(false);
         GameObject.Find("Canvas").transform.FindChild("PanelResearch").gameObject.SetActive(false);
         textNotEnoughResources.gameObject.SetActive(false);
-        btnClosePanel.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, Screen.width + 500);
-        btnClosePanel.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, Screen.height + 500);
 
         UpdateSliders();
         UpdateStartingZones();
@@ -107,6 +104,11 @@ public class ArmoryScript : MonoBehaviour {
             specialText2 = GameControl.gc.Weapons[GameControl.gc.SelectedWeapon].SpecialNames[1] + ": "
                 + GameControl.gc.Weapons[GameControl.gc.SelectedWeapon].Bounces;
         }
+        else if (GameControl.gc.SelectedWeapon == 2)
+        {
+            specialText2 = GameControl.gc.Weapons[GameControl.gc.SelectedWeapon].SpecialNames[1] + ": "
+                + GameControl.gc.Weapons[GameControl.gc.SelectedWeapon].DamageAccumulation * 100 + "%";
+        }
         else
         {
             specialText2 = GameControl.gc.Weapons[GameControl.gc.SelectedWeapon].SpecialNames[1] + " Chance: "
@@ -131,6 +133,7 @@ public class ArmoryScript : MonoBehaviour {
             + "\nWeapon Damage: " + GameControl.gc.Weapons[GameControl.gc.SelectedWeapon].Damage.ToString()
                 + "(+" + (GameControl.gc.WeaponUpgrades[GameControl.gc.SelectedWeapon, 2] * 25).ToString() + "%)"
             + "\nCritical Multiplier: " + GameControl.gc.Weapons[GameControl.gc.SelectedWeapon].CriticalMultiplier.ToString()
+            + "\nProjectile Mass: " + GameControl.gc.Weapons[GameControl.gc.SelectedWeapon].Mass.ToString()
             + "\n" + GameControl.gc.Weapons[GameControl.gc.SelectedWeapon].SpecialNames[0] + " Chance: " + GameControl.gc.Weapons[GameControl.gc.SelectedWeapon].SpecialChance.ToString() + "%"
             + "\n" + specialText2
             + "\n\nHighest Zone Reached: " + GameControl.gc.highestLevelAchieved.ToString();
@@ -141,18 +144,51 @@ public class ArmoryScript : MonoBehaviour {
         UpdateShipSystemsTexts();
         UpdateWeaponTexts();
         UpdateDailyBoostTexts();
+        HighlightSelectedWeapon();
         
 
 
         textUpgPoints.text = "Allocate " + GameControl.gc.WeaponNames[GameControl.gc.SelectedWeapon] + " Weapon Power: " + UpgPointsAvailable().ToString();
         if (GameControl.gc.WeaponUpgradePointsTotal[GameControl.gc.SelectedWeapon] < 24)
         {
+            btnBuyPoints.transform.FindChild("Text").transform.FindChild("TextScrapp").gameObject.SetActive(true);
+            btnBuyPoints.transform.FindChild("Text").FindChild("TextRMM").gameObject.SetActive(true);
             int scrapCost = GameControl.gc.UpgradePointCost(0) / 1000;
-            btnBuyPoints.GetComponentInChildren<Text>().text = "Add W. Power\n" + scrapCost.ToString() + "K S/" + GetRMCost().ToString() + " RM";
+            Text[] children = btnBuyPoints.GetComponentsInChildren<Text>();
+            foreach (Text child in children)
+            {
+                switch (child.gameObject.name)
+                {
+                    case "Text":
+                        child.text = "Add W. Power";
+                        break;
+                    case "TextScrapp":
+                        child.text = scrapCost.ToString() + "K";
+                        break;
+                    case "TextRMM":
+                        child.text = GetRMCost().ToString();
+                        break;
+                    default:
+                        break;
+                }
+            }
         }
         else
         {
-            btnBuyPoints.GetComponentInChildren<Text>().text = "Weapon Power Maxed";
+            btnBuyPoints.transform.FindChild("Text").transform.FindChild("TextScrapp").gameObject.SetActive(false);
+            btnBuyPoints.transform.FindChild("Text").FindChild("TextRMM").gameObject.SetActive(false);
+            Text[] children = btnBuyPoints.GetComponentsInChildren<Text>();
+            foreach (Text child in children)
+            {
+                switch (child.gameObject.name)
+                {
+                    case "Text":
+                        child.text = "Weapon Power Maxed";
+                        break;
+                    default:
+                        break;
+                }
+            }
         }
 
         
@@ -198,7 +234,7 @@ public class ArmoryScript : MonoBehaviour {
         if (GameControl.gc.ShipRepairBots)
         {
             btnSU0.interactable = false;
-            btnSU0.GetComponentInChildren<Text>().text = "Repair Bots Active";
+            btnSU0.GetComponentInChildren<Text>().text = "Repair Bots ACTIVE";
         }
         else if (!GameControl.gc.ShipRepairBots && GameControl.gc.ResearchStarted[0])
         {
@@ -212,7 +248,7 @@ public class ArmoryScript : MonoBehaviour {
         if (GameControl.gc.ShipShieldGenerator)
         {
             btnSU1.interactable = false;
-            btnSU1.GetComponentInChildren<Text>().text = "Shield Generator Active";
+            btnSU1.GetComponentInChildren<Text>().text = "Shield Generator ACTIVE";
         }
         else if (!GameControl.gc.ShipShieldGenerator && GameControl.gc.ResearchStarted[1])
         {
@@ -226,7 +262,7 @@ public class ArmoryScript : MonoBehaviour {
         if (GameControl.gc.ShipReactiveArmor)
         {
             btnSU2.interactable = false;
-            btnSU2.GetComponentInChildren<Text>().text = "Reactive Armor Active";
+            btnSU2.GetComponentInChildren<Text>().text = "Reactive Armor ACTIVE";
         }
         else if (!GameControl.gc.ShipReactiveArmor && GameControl.gc.ResearchStarted[2])
         {
@@ -384,6 +420,38 @@ public class ArmoryScript : MonoBehaviour {
 
     }
 
+    public void HighlightSelectedWeapon()
+    {
+        Image imgButton;
+
+        imgButton = GameObject.Find("ButtonWeapon0").GetComponent<Image>();
+        imgButton.color = new Color(0.59f, 0.59f, 1f);
+
+        imgButton = GameObject.Find("ButtonWeapon1").GetComponent<Image>();
+        imgButton.color = new Color(0.59f, 0.59f, 1f);
+
+        imgButton = GameObject.Find("ButtonWeapon2").GetComponent<Image>();
+        imgButton.color = new Color(0.59f, 0.59f, 1f);
+
+        switch (GameControl.gc.SelectedWeapon)
+        {
+            case 0:
+                imgButton = GameObject.Find("ButtonWeapon0").GetComponent<Image>();
+                imgButton.color = new Color(0.59f, 1f, 1f);
+                break;
+            case 1:
+                imgButton = GameObject.Find("ButtonWeapon1").GetComponent<Image>();
+                imgButton.color = new Color(0.59f, 1f, 1f);
+                break;
+            case 2:
+                imgButton = GameObject.Find("ButtonWeapon2").GetComponent<Image>();
+                imgButton.color = new Color(0.59f, 1f, 1f);
+                break;
+            default:
+                break;
+        }
+    }
+
     public void DailyBoostsClicked()
     {
         GameObject temp = btnDailyBoosts.transform.FindChild("ButtonDailyResearch").gameObject;
@@ -435,21 +503,18 @@ public class ArmoryScript : MonoBehaviour {
     public void UpdateStartingZones()
     {
         ddSelectZone.ClearOptions();
+        
         RectTransform rect = ddSelectZone.transform.FindChild("Template").GetComponent<RectTransform>();
         float size = 0;
-        for (int i = 0; i < GameControl.gc.startZones.Length; i++)
+        for (int i = 0; i < GameControl.gc.StartZoneUnlocked.Count; i++)
         {
-            if (GameControl.gc.StartZoneUnlocked[i])
-            {
-                size += 120;
-                if (size > 560)
-                    size = 560;
+            size += 120;
+            if (size > 560)
+                size = 560;
 
-                rect.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, size);
-                string newText = "Start Zone " + GameControl.gc.startZones[i].ToString();
-                ddSelectZone.options.Add(new Dropdown.OptionData() { text = newText });
-            }
-            else continue;
+            rect.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, size);
+            string newText = "Start Zone " + GameControl.gc.StartZoneUnlocked[i].ToString();
+            ddSelectZone.options.Add(new Dropdown.OptionData() { text = newText });
         }
         ddSelectZone.value = 0;
         ddSelectZone.RefreshShownValue();
@@ -457,7 +522,7 @@ public class ArmoryScript : MonoBehaviour {
 
     public void DropDownZoneSelected()
     {
-        GameControl.gc.currentLevel = GameControl.gc.startZones[ddSelectZone.value];
+        GameControl.gc.currentLevel = GameControl.gc.StartZoneUnlocked[ddSelectZone.value];
         UpdateArmoryUI();
     }
 

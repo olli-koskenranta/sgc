@@ -45,6 +45,7 @@ public class EnemyShipScript : MonoBehaviour {
 
     public float armor = 0f;
     public bool iscrit = false;
+    private float damageStacks;
 
     private GameObject floatingText;
 
@@ -174,6 +175,12 @@ public class EnemyShipScript : MonoBehaviour {
                 iscrit = true;
             else
                 iscrit = false;
+
+            if (col.gameObject.GetComponent<PlayerProjectileScript>().damageAccumulation > 0)
+            {
+                damageStacks += 1;
+            }
+
             isHit(col.gameObject.GetComponent<PlayerProjectileScript>().damage, false, true, col.gameObject.GetComponent<PlayerProjectileScript>().armorPierce);
         }
 
@@ -181,15 +188,28 @@ public class EnemyShipScript : MonoBehaviour {
         {
             if (!IsOnScreen())
                 return;
-
-            int dmg = maxHitPoints / 10;
+            int divider;
+            if (sType == ShipType.Fighter)
+                divider = 20;
+            else
+                divider = 100;
+            int dmg = maxHitPoints / divider;
             isHit(dmg, true, true);
         }
 
         if (col.gameObject.GetComponent<CollectorScript>() != null)
         {
             if (!ALIVE)
+            {
+                GameObject asteroidFragment = Resources.Load("ScrapPiece") as GameObject;
+                GameObject fragmentInstance = Instantiate(asteroidFragment, this.transform.position, this.transform.rotation) as GameObject;
+                fragmentInstance.GetComponent<ScrapPieceScript>().type = Scrap.ScrapType.Normal;
+                if (Random.Range(1, 1001) >= 1000 - GameControl.gc.currentLevel / 10)
+                {
+                    fragmentInstance.GetComponent<ScrapPieceScript>().type = Scrap.ScrapType.ResearchMaterial;
+                }
                 Destroy(gameObject);
+            }
         }
     }
 
@@ -235,6 +255,12 @@ public class EnemyShipScript : MonoBehaviour {
 
         else
         {
+            if (damageStacks > 0)
+            {
+                float nDamage = (float)incomingDamage * (damageStacks * GameControl.gc.Weapons[2].DamageAccumulation);
+                incomingDamage = (int)nDamage;
+            }
+
             float newDamage = incomingDamage;
             if (!ignoreArmor)
             {
@@ -268,6 +294,8 @@ public class EnemyShipScript : MonoBehaviour {
         //Destroy(this.gameObject, 1);
         gameObject.GetComponent<Rigidbody2D>().gravityScale = 0.1f;
         gameObject.GetComponent<SpriteRenderer>().color = Color.gray;
+        gameObject.GetComponent<Rigidbody2D>().mass = 1000000;
+        gameObject.GetComponent<Rigidbody2D>().velocity = new Vector2(0, 0);
         HitEffect();
         HitEffect();
         HitEffect();

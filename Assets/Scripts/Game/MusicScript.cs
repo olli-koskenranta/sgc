@@ -1,46 +1,112 @@
 ﻿using UnityEngine;
-using UnityEngine.UI;
-using System.Collections;
+using UnityEngine.SceneManagement;
 
 public class MusicScript : MonoBehaviour {
 
-    public AudioSource track1;
-    public AudioSource track2;
+    public static MusicScript music;
+    public AudioSource trackMenuArmory;
+    public AudioSource trackGame;
+    public AudioSource trackBoss;
+    private int currentTrackNumber;
+
+    void Awake()
+    {
+        if (music == null)
+        {
+            DontDestroyOnLoad(gameObject);
+            music = this;
+
+
+
+        }
+        else if (music != this)
+        {
+            Destroy(gameObject);
+        }
+    }
 
     void Start ()
-    {
-        if (GameControl.gc.AUDIO_MUSIC)
-            track1.Play();
-
-	}
-
-    public void PlayTrack(int number)
     {
         if (!GameControl.gc.AUDIO_MUSIC)
             return;
 
-        if (number == 1)
+	}
+
+    void OnEnable()
+    {
+        SceneManager.sceneLoaded += OnLevelFinishedLoading;
+    }
+
+    void OnDisable()
+    {
+        SceneManager.sceneLoaded -= OnLevelFinishedLoading;
+    }
+
+    void OnLevelFinishedLoading(Scene scene, LoadSceneMode mode)
+    {
+        if (!GameControl.gc.AUDIO_MUSIC)
+            return;
+
+        switch (scene.name)
         {
-            track2.Stop();
-            track1.Play();
+            case "MainMenu":
+            case "Armory":
+                if (trackMenuArmory.isPlaying)
+                    return;
+                else
+                {
+                    if (trackGame.isPlaying || trackBoss.isPlaying)
+                    {
+                        StopTheMusic();
+                        PlayTrack(1);
+                    }
+                    else
+                        PlayTrack(1);
+                }
+                break;
+            case "GameWorld1":
+                StopTheMusic();
+                PlayTrack(2);
+                break;
+            default:
+                break;
         }
-        else if (number == 2)
+    }
+
+    public void PlayTrack(int number)
+    {
+        currentTrackNumber = number;
+
+        if (!GameControl.gc.AUDIO_MUSIC)
+            return;
+
+        StopTheMusic();
+
+        switch (number)
         {
-            track1.Stop();
-            track2.Play();
+            case 1:
+                trackMenuArmory.Play();
+                break;
+            case 2:
+                trackGame.Play();
+                break;
+            case 3:
+                trackBoss.Play();
+                break;
+            default:
+                break;
         }
     }
 
     public void StopTheMusic()
     {
-        track1.Stop();
-        track2.Stop();
+        trackMenuArmory.Stop();
+        trackGame.Stop();
+        trackBoss.Stop();
     }
 
     public void PlayTheMusic()
     {
-        track1.Play();
+        PlayTrack(currentTrackNumber);
     }
-    
-
 }

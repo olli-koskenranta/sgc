@@ -16,10 +16,19 @@ public class UIControlScript : MonoBehaviour {
         LoadingText = canvas.transform.FindChild("LoadingText").gameObject;
         LoadingText.GetComponent<Text>().enabled = false;
 
+        GameObject btnCloseOptions = GameObject.Find("ButtonCloseOptions");
+        if (btnCloseOptions != null)
+        {
+            btnCloseOptions.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, Screen.width + 500);
+            btnCloseOptions.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, Screen.height + 500);
+        }
+
         if (SceneManager.GetActiveScene().name.Equals("GameWorld1"))
             CloseOptions();
         else if (SceneManager.GetActiveScene().name.Equals("MainMenu"))
             CloseOptions();
+
+        
     }
 
     void Update()
@@ -45,6 +54,11 @@ public class UIControlScript : MonoBehaviour {
                     ExitClicked();
             }
         
+        }
+
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            ResetClicked();
         }
     }
 

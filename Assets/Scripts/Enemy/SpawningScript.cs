@@ -119,10 +119,6 @@ public class SpawningScript : MonoBehaviour {
         Transform spawnPosition = transform;
         float randomScaleFactor;
 
-        
-
-        
-
         //Huge Asteroid
         if (GameControl.gc.currentLevel >= 5)
         {
@@ -142,9 +138,6 @@ public class SpawningScript : MonoBehaviour {
             bigMeteorInstance.GetComponent<MeteorScript>().asteroidType = AsteroidType.Big;
             randomScaleFactor = Random.Range(0, 0.5f);
             bigMeteorInstance.GetComponent<Transform>().localScale += new Vector3(randomScaleFactor, randomScaleFactor, 0);
-            
-            
-            
         }
 
         //Nebula
