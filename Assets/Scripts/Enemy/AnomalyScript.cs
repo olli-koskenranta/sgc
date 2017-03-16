@@ -130,6 +130,12 @@ public class AnomalyScript : MonoBehaviour {
                 preferredScale = transform.localScale;
                 break;
         }
+
+        if (GameControl.gc.currentLevel > 50)
+        {
+            hitPoints += GameControl.gc.currentLevel / 10 * 500000;
+        }
+
         maxHitPoints = hitPoints;
 
         BossHPBar = GameObject.Find("Canvas/SliderBossHP").GetComponent<Slider>(); 
@@ -395,8 +401,7 @@ public class AnomalyScript : MonoBehaviour {
             MusicScript.music.PlayTrack(2);
             GameControl.gc.ExperienceGained(XP);
             ALIVE = false;
-            GameObject.Find("MeteorSpawning").GetComponent<SpawningScript>().ANOMALY_DESTROYED[anomalyNumber - 1] = true;
-            GameObject.Find("MeteorSpawning").GetComponent<SpawningScript>().ANOMALY_SPAWNED = false;
+            //GameObject.Find("MeteorSpawning").GetComponent<SpawningScript>().ANOMALY_SPAWNED = false;
             GameObject.Find("UIControl").GetComponent<UIControlScript>().SetBossBarsActive(false);
             if (anomalyNumber != 5)
             {

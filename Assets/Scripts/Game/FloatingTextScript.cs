@@ -113,7 +113,6 @@ public class FloatingTextScript : MonoBehaviour {
         //Debug.Log("Triggered");
         if (col.gameObject.GetComponent<FloatingTextScript>().fttype == FTType.PowerUp && fttype == FTType.PowerUp && col.gameObject.GetComponent<FloatingTextScript>().spawnTime > spawnTime)
         {
-            Debug.Log("Pushing");
             col.gameObject.transform.position += new Vector3(0, 0.1f, 0);
         }
     }

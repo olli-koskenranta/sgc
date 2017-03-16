@@ -42,18 +42,12 @@ public class SpawningScript : MonoBehaviour {
     private float EnemyBattleShipSpawnTime;
 
     public bool ANOMALY_SPAWNED = false;
-    public bool[] ANOMALY_DESTROYED;
-
-    private bool test = true;
 
     public enum EnemyType { medMeteor, bigMeteor, hugeMeteor, Nebula, Fighter, MissileCruiser, BattleShip }
 
     void Start () {
 
         GameObject.Find("UIControl").GetComponent<UIControlScript>().SetBossBarsActive(false);
-        ANOMALY_DESTROYED = new bool[5];
-        for (int i = 0; i < ANOMALY_DESTROYED.Length; i++)
-            ANOMALY_DESTROYED[i] = false;
 
         bigAsteroidChance = 30;
         //Define spawn chances here (%), maybe some increase per level? Ok, lets change these to times
@@ -102,37 +96,36 @@ public class SpawningScript : MonoBehaviour {
             SpawnPowerUp();
         }
 
-        if (GameControl.gc.currentLevel == 10 && !ANOMALY_SPAWNED && !ANOMALY_DESTROYED[0])
+        if ((GameControl.gc.currentLevel == 10 || (GameControl.gc.currentLevel - 10) % 50 == 0) && !ANOMALY_SPAWNED)
         {
             GameObject.Find("UIControl").GetComponent<UIControlScript>().SetBossBarsActive(true);
             SpawnAnomaly(1);
             announcer.GetComponent<AnnouncerScript>().Announce("!ANOMALY DETECTED!", FloatingText.FTType.Danger);
         }
 
-        if (GameControl.gc.currentLevel == 20 && !ANOMALY_SPAWNED && !ANOMALY_DESTROYED[1])
+        if ((GameControl.gc.currentLevel == 20 || (GameControl.gc.currentLevel - 20) % 50 == 0) && !ANOMALY_SPAWNED)
         {
             GameObject.Find("UIControl").GetComponent<UIControlScript>().SetBossBarsActive(true);
             SpawnAnomaly(2);
             announcer.GetComponent<AnnouncerScript>().Announce("!ANOMALY DETECTED!", FloatingText.FTType.Danger);
         }
 
-        if (GameControl.gc.currentLevel == 30 && !ANOMALY_SPAWNED && !ANOMALY_DESTROYED[2])
+        if ((GameControl.gc.currentLevel == 30 || (GameControl.gc.currentLevel - 30) % 50 == 0) && !ANOMALY_SPAWNED)
         {
             GameObject.Find("UIControl").GetComponent<UIControlScript>().SetBossBarsActive(true);
             SpawnAnomaly(3);
             announcer.GetComponent<AnnouncerScript>().Announce("!ANOMALY DETECTED!", FloatingText.FTType.Danger);
         }
 
-        if (GameControl.gc.currentLevel == 40 && !ANOMALY_SPAWNED && !ANOMALY_DESTROYED[3])
+        if ((GameControl.gc.currentLevel == 40 || (GameControl.gc.currentLevel - 40) % 50 == 0) && !ANOMALY_SPAWNED)
         {
             GameObject.Find("UIControl").GetComponent<UIControlScript>().SetBossBarsActive(true);
             SpawnAnomaly(4);
             announcer.GetComponent<AnnouncerScript>().Announce("!ANOMALY DETECTED!", FloatingText.FTType.Danger);
         }
 
-        if (GameControl.gc.currentLevel == 50 && !ANOMALY_SPAWNED && !ANOMALY_DESTROYED[4])
+        if ((GameControl.gc.currentLevel == 50 || (GameControl.gc.currentLevel - 50) % 50 == 0) && !ANOMALY_SPAWNED)
         {
-            //test = false;
             GameObject.Find("UIControl").GetComponent<UIControlScript>().SetBossBarsActive(true);
             SpawnAnomaly(5);
             announcer.GetComponent<AnnouncerScript>().Announce("!ANOMALY DETECTED!", FloatingText.FTType.Danger);

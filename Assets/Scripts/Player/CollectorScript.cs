@@ -57,7 +57,7 @@ public class CollectorScript : MonoBehaviour
         }
     }
 
-    private void UpdateInfoText()
+    public void UpdateInfoText()
     {
         textScrap.text = GameControl.gc.scrapCount.ToString();
         textRM.text = GameControl.gc.researchMaterialCount.ToString();
@@ -149,7 +149,9 @@ public class CollectorScript : MonoBehaviour
 
     public void LevelUp()
     {
+
         GameControl.gc.currentLevel += 1;
+        GameObject.Find("MeteorSpawning").GetComponent<SpawningScript>().ANOMALY_SPAWNED = false;
         if (GameControl.gc.highestLevelAchieved < GameControl.gc.currentLevel)
             GameControl.gc.highestLevelAchieved = GameControl.gc.currentLevel;
         UpdateInfoText();
@@ -183,7 +185,7 @@ public class CollectorScript : MonoBehaviour
 
         int PowerUpNumber = Random.Range(0, GameControl.gc.GetNumberOfPowerUps());
 
-        if (GameControl.gc.WeaponUpgrades[GameControl.gc.SelectedWeapon, 6] == 20)
+        if (GameControl.gc.WeaponUpgrades[GameControl.gc.SelectedWeapon, 6] == 90)
         {
             while (PowerUpNumber == 3)
             {
@@ -210,7 +212,8 @@ public class CollectorScript : MonoBehaviour
 
         else if (PowerUpNumber == 3)
         {
-            GameControl.gc.WeaponUpgrades[GameControl.gc.SelectedWeapon, 6] += 1;
+            if (GameControl.gc.WeaponUpgrades[GameControl.gc.SelectedWeapon, 6] < 90)
+                GameControl.gc.WeaponUpgrades[GameControl.gc.SelectedWeapon, 6] += 1;
             GameObject.FindWithTag("PlayerTurret").GetComponent<TurretScript>().GetTurret().UpdateValues(GameControl.gc.SelectedWeapon);
             UpdateInfoText();
             announcer.GetComponent<AnnouncerScript>().Announce(GameControl.gc.PowerUpNames[PowerUpNumber] + " increased!", FloatingText.FTType.PowerUp);

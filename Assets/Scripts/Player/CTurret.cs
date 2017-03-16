@@ -78,11 +78,18 @@ namespace ShipWeapons
             else
                 totalMass = baseMass + skillLevel * uMass;
 
+
             totalCritChance = baseCritChance + skillLevel * uCritChance;
-            UpdateUpgrades();
+            float overflow = 0;
+            if (totalCritChance > 100)
+            {
+                overflow = totalCritChance - 100;
+                totalCritChance = 100;
+            }
+            UpdateUpgrades(overflow);
         }
 
-        private void UpdateUpgrades()
+        private void UpdateUpgrades(float critOverflow)
         {
             //0 = attack speed
             //1 = mass
@@ -94,7 +101,7 @@ namespace ShipWeapons
             totalROF = baseROF - GameControl.gc.AttackSpeedReductions[WeaponType] * GameControl.gc.WeaponUpgrades[WeaponType, 0];
             totalMass += totalMass * GameControl.gc.WeaponUpgrades[WeaponType, 1];
             totalDamage += (int)((float)totalDamage * (float)GameControl.gc.WeaponUpgrades[WeaponType, 2] * 0.25f);
-            totalCritMultiplier = baseCritMultiplier + GameControl.gc.WeaponUpgrades[WeaponType, 3] * 0.5f;
+            totalCritMultiplier = baseCritMultiplier + GameControl.gc.WeaponUpgrades[WeaponType, 3] * 0.5f + critOverflow / 100;
             totalSpecialChance = baseSpecialChance * GameControl.gc.WeaponUpgrades[WeaponType, 5];
 
             skillCap = 100 + 10 * GameControl.gc.WeaponUpgrades[WeaponType, 6];

@@ -33,7 +33,7 @@ public class PlayerProjectileScript : MonoBehaviour {
         hugeMeteor = GameObject.FindWithTag("hugeMeteor");
         playerTurret = GameObject.FindWithTag("PlayerTurret");
         gameObject.GetComponent<Rigidbody2D>().mass = mass;
-        armorPierce = GameControl.gc.WeaponUpgrades[GameControl.gc.SelectedWeapon, 1] * 0.2f;
+        armorPierce = GameControl.gc.WeaponUpgrades[GameControl.gc.SelectedWeapon, 1] * 0.15f;
 
         if (GameControl.gc.SelectedWeapon == 0)
             BOUNCE = true;
@@ -142,6 +142,15 @@ public class PlayerProjectileScript : MonoBehaviour {
         }
 
         HitEffect();
+
+        if (SHRAPNEL)
+        {
+            ClusterBomb(1, 1);
+            ClusterBomb(1, -1);
+            ClusterBomb(-1, 1);
+            ClusterBomb(-1, -1);
+        }
+
         //DamageText();
 
         /*if (col.GetComponent<NebulaScript>() != null)

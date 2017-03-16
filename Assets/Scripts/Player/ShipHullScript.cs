@@ -27,7 +27,42 @@ public class ShipHullScript : MonoBehaviour {
         GameControl.gc.PLAYER_ALIVE = true;
         UpdateHullBar();
         repairBotsTime = Time.time;
-	}
+
+        GameObject selectWeapon;
+        if (GameControl.gc.WeaponUnlocked[0])
+        {
+            selectWeapon = GameObject.Find("ButtonWeapon1");
+            selectWeapon.GetComponent<Button>().interactable = true;
+        }
+        else
+        {
+            selectWeapon = GameObject.Find("ButtonWeapon1");
+            selectWeapon.GetComponent<Button>().interactable = false;
+        }
+
+        if (GameControl.gc.WeaponUnlocked[1])
+        {
+            selectWeapon = GameObject.Find("ButtonWeapon2");
+            selectWeapon.GetComponent<Button>().interactable = true;
+        }
+        else
+        {
+            selectWeapon = GameObject.Find("ButtonWeapon2");
+            selectWeapon.GetComponent<Button>().interactable = false;
+        }
+
+        if (GameControl.gc.WeaponUnlocked[2])
+        {
+            selectWeapon = GameObject.Find("ButtonWeapon3");
+            selectWeapon.GetComponent<Button>().interactable = true;
+        }
+        else
+        {
+            selectWeapon = GameObject.Find("ButtonWeapon3");
+            selectWeapon.GetComponent<Button>().interactable = false;
+        }
+
+    }
 	
 	void Update () {
 	    if (!GameControl.gc.PLAYER_ALIVE)

@@ -22,7 +22,7 @@ public class GameControl : MonoBehaviour {
     public int[] Experience;
     public int[] WeaponSkill;
     public int ExpForSkillUp;
-    public string GameVersion = "0.8";
+    public string GameVersion = "0.9a";
     
 
     public int[] ResearchScrapCost;
@@ -138,7 +138,7 @@ public class GameControl : MonoBehaviour {
         
 
         WeaponUpgradeCosts = new int[] { 1000, 10000, 100000, 1000000 };
-        WeaponUpgradeRMCosts = new int[] { 0, 1, 5, 10 };
+        WeaponUpgradeRMCosts = new int[] { 0, 2, 6, 10 };
 
         highestLevelAchieved = 1;
 
@@ -167,8 +167,6 @@ public class GameControl : MonoBehaviour {
         ResearchStartTimes = new DateTime[numberOfResearches];
         
         ScrapBoostActive = false;
-
-        //if (PlayerPrefs.GetInt(playerSound, 1) == 1)
 
         ShipRepairBots = false;
         ShipShieldGenerator = false;
@@ -249,6 +247,13 @@ public class GameControl : MonoBehaviour {
             file.Close();
 
             SetPlayerData(playerData);
+
+            if (!playerData.GameVersion.Equals(GameVersion))
+            {
+                Debug.Log("New game version found, resetting data!");
+                ResetData();
+                return;
+            }
 
             Debug.Log("Player data loaded!");
             /*if (playerData.GameVersion == null || playerData.GameVersion.Equals(""))

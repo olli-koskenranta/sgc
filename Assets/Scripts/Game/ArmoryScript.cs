@@ -129,7 +129,7 @@ public class ArmoryScript : MonoBehaviour {
                 + "(+" + (GameControl.gc.WeaponUpgrades[GameControl.gc.SelectedWeapon, 6] * 10).ToString() + ")"
             + "\nCritical Chance: " + GameControl.gc.Weapons[GameControl.gc.SelectedWeapon].CriticalChance.ToString() + "%"
             + "\nRate of Fire: " + GameControl.gc.Weapons[GameControl.gc.SelectedWeapon].RateOfFire.ToString()
-            + "\nArmor Pierce: " + (GameControl.gc.WeaponUpgrades[GameControl.gc.SelectedWeapon, 1] * 20).ToString() + "%"
+            + "\nArmor Pierce: " + (GameControl.gc.WeaponUpgrades[GameControl.gc.SelectedWeapon, 1] * 15).ToString() + "%"
             + "\nWeapon Damage: " + GameControl.gc.Weapons[GameControl.gc.SelectedWeapon].Damage.ToString()
                 + "(+" + (GameControl.gc.WeaponUpgrades[GameControl.gc.SelectedWeapon, 2] * 25).ToString() + "%)"
             + "\nCritical Multiplier: " + GameControl.gc.Weapons[GameControl.gc.SelectedWeapon].CriticalMultiplier.ToString()

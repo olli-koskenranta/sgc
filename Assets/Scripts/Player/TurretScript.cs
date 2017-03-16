@@ -85,14 +85,14 @@ public class TurretScript : MonoBehaviour {
                 }
         }
 
-        if (Input.GetKeyDown(KeyCode.Keypad0))
+        /*if (Input.GetKeyDown(KeyCode.Keypad0))
             ChangeWeapon(0);
         if (Input.GetKeyDown(KeyCode.Keypad1))
             ChangeWeapon(1);
         if (Input.GetKeyDown(KeyCode.Keypad2))
             ChangeWeapon(2);
         if (Input.GetKeyDown(KeyCode.R))
-            GameControl.gc.ResetData();
+            GameControl.gc.ResetData();*/
 
     }
 
@@ -282,6 +282,7 @@ public class TurretScript : MonoBehaviour {
     public void ChangeWeapon(int weaponNumber)
     {
         GameControl.gc.SelectedWeapon = weaponNumber;
+        GameObject.Find("Collector").GetComponent<CollectorScript>().UpdateInfoText();
         Start();
     }
 

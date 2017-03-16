@@ -43,8 +43,8 @@ public class EnemyShipScript : MonoBehaviour {
     private int enemyBattleShipMass = 1000000;
 
     private int enemyFighterHitPoints = 250;
-    private int enemyMissileCruiserHitPoints = 500;
-    private int enemyBattleShipHitPoints = 5000;
+    private int enemyMissileCruiserHitPoints = 1000;
+    private int enemyBattleShipHitPoints = 3000;
 
     private int enemyFighterDamage = 6;
     private int enemyMissileCruiserDamage = 18;
@@ -229,6 +229,10 @@ public class EnemyShipScript : MonoBehaviour {
 
         if (col.gameObject.GetComponent<CollectorScript>() != null)
         {
+            if (sType == ShipType.Fighter)
+            {
+                GetComponent<Rigidbody2D>().gravityScale = 1f;
+            }
             if (!ALIVE)
             {
                 GameObject asteroidFragment = Resources.Load("ScrapPiece") as GameObject;
