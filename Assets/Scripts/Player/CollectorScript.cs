@@ -117,7 +117,7 @@ public class CollectorScript : MonoBehaviour
 
     private void ScrapCollected(int amount, bool isResearchMaterial = false)
     {
-        if (GameControl.gc.AUDIO_SOUNDS)
+        if (PlayerPrefs.GetInt(GameControl.gc.GetSoundKey(), 1) == 1)
         {
             float randomPitch = 1f + Random.Range(-0.05f, 0.05f);
             if (isResearchMaterial)
@@ -171,7 +171,7 @@ public class CollectorScript : MonoBehaviour
 
     public bool IsBossPresent()
     {
-        if (FindAnomaly(1) || FindAnomaly(2) || FindAnomaly(3) || FindAnomaly(4))
+        if (FindAnomaly(1) || FindAnomaly(2) || FindAnomaly(3) || FindAnomaly(4) || FindAnomaly(5))
             return true;
         else
             return false;
@@ -229,9 +229,7 @@ public class CollectorScript : MonoBehaviour
 
     public GameObject FindAnomaly(int anomalyNumber)
     {
-        GameObject anomaly;
         string name = "Anomaly" + anomalyNumber.ToString();
-        anomaly = GameObject.FindWithTag(name);
-        return anomaly;
+        return GameObject.FindWithTag(name);
     }
 }

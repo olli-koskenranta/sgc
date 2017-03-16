@@ -92,7 +92,7 @@ public class PowerUpScript : MonoBehaviour {
 
     void Explode()
     {
-        if (GameControl.gc.AUDIO_SOUNDS)
+        if (PlayerPrefs.GetInt(GameControl.gc.GetSoundKey(), 1) == 1)
             soundBoom.Play();
 
         GetComponent<SpriteRenderer>().enabled = false;

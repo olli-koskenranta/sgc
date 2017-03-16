@@ -21,7 +21,7 @@ public class MainMenuScript : MonoBehaviour {
     {
         //#if UNITY_ANDROID
         //Application.OpenURL("market://details?id=YOUR_ID");
-        Application.OpenURL("http://www.google.com");
+        Application.OpenURL("https://play.google.com/store/apps/details?id=com.ookoointeractive.sgc");
     }
 
     public void CreditsClicked()

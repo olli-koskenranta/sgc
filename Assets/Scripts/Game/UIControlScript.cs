@@ -152,13 +152,11 @@ public class UIControlScript : MonoBehaviour {
         if (PlayerPrefs.GetInt(GameControl.gc.GetSoundKey(), 1) == 1)
         {
             PlayerPrefs.SetInt(GameControl.gc.GetSoundKey(), 0);
-            GameControl.gc.AUDIO_SOUNDS = false;
             textSounds.text = "Sound OFF";
         }
         else
         {
             PlayerPrefs.SetInt(GameControl.gc.GetSoundKey(), 1);
-            GameControl.gc.AUDIO_SOUNDS = true;
             textSounds.text = "Sound ON";
         }
 
@@ -171,7 +169,6 @@ public class UIControlScript : MonoBehaviour {
         if (PlayerPrefs.GetInt(GameControl.gc.GetMusicKey(), 1) == 1)
         {
             PlayerPrefs.SetInt(GameControl.gc.GetMusicKey(), 0);
-            GameControl.gc.AUDIO_MUSIC = false;
             textMusic.text = "Music OFF";
             GameObject.Find("Music").GetComponent<MusicScript>().StopTheMusic();
 
@@ -179,7 +176,6 @@ public class UIControlScript : MonoBehaviour {
         else
         {
             PlayerPrefs.SetInt(GameControl.gc.GetMusicKey(), 1);
-            GameControl.gc.AUDIO_MUSIC = true;
             textMusic.text = "Music ON";
             GameObject.Find("Music").GetComponent<MusicScript>().PlayTheMusic();
         }

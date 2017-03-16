@@ -34,14 +34,7 @@ public class MusicScript : MonoBehaviour {
 
     void OnLevelFinishedLoading(Scene scene, LoadSceneMode mode)
     {
-        if (!GameControl.gc.AUDIO_MUSIC)
-            return;
-
-        if (PlayerPrefs.GetInt(GameControl.gc.GetMusicKey(), 1) == 0)
-            return;
-            
-
-            switch (scene.name)
+        switch (scene.name)
         {
             case "MainMenu":
             case "Armory":
@@ -70,9 +63,6 @@ public class MusicScript : MonoBehaviour {
     public void PlayTrack(int number)
     {
         currentTrackNumber = number;
-
-        if (!GameControl.gc.AUDIO_MUSIC)
-            return;
 
         if (PlayerPrefs.GetInt(GameControl.gc.GetMusicKey(), 1) == 0)
             return;
@@ -105,7 +95,7 @@ public class MusicScript : MonoBehaviour {
 
     public void PlayTheMusic()
     {
-        if (!GameControl.gc.AUDIO_MUSIC)
+        if (PlayerPrefs.GetInt(GameControl.gc.GetMusicKey(), 1) == 0)
             return;
         
         PlayTrack(currentTrackNumber);

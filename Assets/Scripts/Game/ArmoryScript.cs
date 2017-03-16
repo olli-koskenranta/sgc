@@ -161,6 +161,7 @@ public class ArmoryScript : MonoBehaviour {
                 {
                     case "Text":
                         child.text = "Add W. Power";
+                        child.gameObject.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, 20);
                         break;
                     case "TextScrapp":
                         child.text = scrapCost.ToString() + "K";
@@ -184,6 +185,7 @@ public class ArmoryScript : MonoBehaviour {
                 {
                     case "Text":
                         child.text = "Weapon Power Maxed";
+                        child.gameObject.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, 0);
                         break;
                     default:
                         break;

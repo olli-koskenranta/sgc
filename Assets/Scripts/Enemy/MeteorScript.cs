@@ -19,7 +19,7 @@ public class MeteorScript : MonoBehaviour {
     private Camera mainCamera;
     private bool HIT_BY_GRAVITY_DMG = false;
     private bool HIT_BY_KINECTIC_DMG = false;
-    public GameObject anomaly1, anomaly2;
+    public GameObject anomaly1, anomaly2, anomaly5;
     private GameObject shipHull;
     private int XP = 0;
     public AsteroidType asteroidType = AsteroidType.NONE;
@@ -40,11 +40,13 @@ public class MeteorScript : MonoBehaviour {
     private int damageStacks = 0;
 
     public float armor = 0;
+    public float baseArmor;
     public bool iscrit = false;
 
     private GameObject floatingText;
 
     private float originalPitch;
+    public bool tagged = false;
 
     void Start()
     {
@@ -63,13 +65,20 @@ public class MeteorScript : MonoBehaviour {
         mainCamera = Camera.main;
         if (asteroidType != AsteroidType.Anomaly1)
         {
-            FindAnomaly(1);
+            anomaly1 = FindAnomaly(1);
             if (anomaly1 != null)
                 gameObject.GetComponent<SpriteRenderer>().color = Color.cyan;
 
-            FindAnomaly(2);
+            anomaly2 = FindAnomaly(2);
             if (anomaly2 != null)
                 gameObject.GetComponent<SpriteRenderer>().color = Color.red;
+
+            anomaly5 = FindAnomaly(5);
+            if (anomaly5 != null)
+            {
+                gameObject.GetComponent<SpriteRenderer>().color = anomaly5.GetComponent<SpriteRenderer>().color;
+            }
+            
         }
 
         shipHull = GameObject.FindWithTag("ShipHull");
@@ -110,6 +119,7 @@ public class MeteorScript : MonoBehaviour {
             hitPoints = 1;
 
         armor = 0.01f * GameControl.gc.currentLevel;
+        baseArmor = armor;
 
         //if (armor > 0.9f)
         //    armor = 0.9f;
@@ -148,6 +158,44 @@ public class MeteorScript : MonoBehaviour {
                 
                 Vector2 forceVector = (shipHull.transform.position - transform.position).normalized * gameObject.GetComponent<Rigidbody2D>().mass / 100; // * GameControlScript.gameControl.currentLevel;
                 GetComponent<Rigidbody2D>().AddForce(forceVector, ForceMode2D.Impulse);
+            }
+        }
+
+        if (anomaly5 != null)
+        {
+            if (anomaly5.GetComponent<AnomalyScript>().ALIVE)
+            {
+                
+
+                if (anomaly5.GetComponent<AnomalyScript>().phase == 0)
+                {
+                    armor = baseArmor + 5f;
+                    gameObject.GetComponent<SpriteRenderer>().color = Color.cyan;
+                    //GetComponent<Rigidbody2D>().velocity = new Vector2(0, 0);
+                    //transform.position += (anomaly5.transform.position - transform.position) * Time.deltaTime;
+                    Vector2 forceVector = (anomaly5.transform.position - transform.position).normalized * gameObject.GetComponent<Rigidbody2D>().mass / 10; // * GameControlScript.gameControl.currentLevel;
+                    GetComponent<Rigidbody2D>().AddForce(forceVector, ForceMode2D.Impulse);
+                }
+                else if (anomaly5.GetComponent<AnomalyScript>().phase == 1)
+                {
+                    armor = baseArmor;
+                    if (tagged)
+                    {
+                        
+                        gameObject.GetComponent<SpriteRenderer>().color = Color.red;
+                        //GetComponent<Rigidbody2D>().velocity = new Vector2(0, 0);
+                        //transform.position += (shipHull.transform.position - transform.position) * Time.deltaTime;
+                        Vector2 forceVector = (shipHull.transform.position - transform.position).normalized * gameObject.GetComponent<Rigidbody2D>().mass / 10; // * GameControlScript.gameControl.currentLevel;
+                        GetComponent<Rigidbody2D>().AddForce(forceVector, ForceMode2D.Impulse);
+                    }
+                }
+                else
+                {
+                    //GetComponent<Rigidbody2D>().velocity = new Vector2(0, 0);
+                    //transform.position += (anomaly5.transform.position - transform.position) * Time.deltaTime;
+                    Vector2 forceVector = (anomaly5.transform.position - transform.position).normalized * gameObject.GetComponent<Rigidbody2D>().mass / 10; // * GameControlScript.gameControl.currentLevel;
+                    GetComponent<Rigidbody2D>().AddForce(forceVector, ForceMode2D.Impulse);
+                }
             }
         }
 
@@ -190,7 +238,7 @@ public class MeteorScript : MonoBehaviour {
             if (!IsOnScreen())
                 return;
 
-            if (anomaly1 != null)
+            if (anomaly1 != null || anomaly5 != null)
             {
                 return;
 
@@ -288,7 +336,7 @@ public class MeteorScript : MonoBehaviour {
     public void Explode()
     {
         float randomPitch = originalPitch + Random.Range(-0.05f, 0.05f);
-        if (GameControl.gc.AUDIO_SOUNDS && !GameControl.gc.GetSceneName().Equals("MainMenu") && IsOnScreen())
+        if (PlayerPrefs.GetInt(GameControl.gc.GetSoundKey(), 1) == 1 && !GameControl.gc.GetSceneName().Equals("MainMenu") && IsOnScreen())
         {
             soundExplode.pitch = randomPitch;
             soundExplode.Play();
@@ -344,19 +392,10 @@ public class MeteorScript : MonoBehaviour {
             return false;
     }
 
-    public void FindAnomaly(int anomalyNumber)
+    public GameObject FindAnomaly(int anomalyNumber)
     {
-        switch (anomalyNumber)
-        {
-            case 1:
-                anomaly1 = GameObject.FindWithTag("Anomaly1");
-                break;
-            case 2:
-                anomaly2 = GameObject.FindWithTag("Anomaly2");
-                break;
-            default:
-                break;
-        }
+        string aname = "Anomaly" + anomalyNumber.ToString();
+        return GameObject.FindWithTag(aname);
     }
 
     private void DamageText(bool CRITICAL, int dmg)

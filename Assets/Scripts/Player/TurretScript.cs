@@ -119,7 +119,7 @@ public class TurretScript : MonoBehaviour {
         {
             case 0:
 
-                if (GameControl.gc.AUDIO_SOUNDS)
+                if (PlayerPrefs.GetInt(GameControl.gc.GetSoundKey(), 1) == 1)
                 {
                     BlasterSound.pitch = randomPitch;
                     BlasterSound.Play();
@@ -134,7 +134,7 @@ public class TurretScript : MonoBehaviour {
                 break;
 
             case 1:
-                if (GameControl.gc.AUDIO_SOUNDS)
+                if (PlayerPrefs.GetInt(GameControl.gc.GetSoundKey(), 1) == 1)
                 {
 
                     LaserSound.pitch = randomPitch;
@@ -160,7 +160,7 @@ public class TurretScript : MonoBehaviour {
                 break;
 
             case 2:
-                if (GameControl.gc.AUDIO_SOUNDS)
+                if (PlayerPrefs.GetInt(GameControl.gc.GetSoundKey(), 1) == 1)
                 {
                     MassDriverSound.pitch = randomPitch;
                     MassDriverSound.Play();
@@ -175,7 +175,7 @@ public class TurretScript : MonoBehaviour {
                 break;
 
             case 3:
-                if (GameControl.gc.AUDIO_SOUNDS)
+                if (PlayerPrefs.GetInt(GameControl.gc.GetSoundKey(), 1) == 1)
                 {
                     LaserSound.pitch = randomPitch;
                     LaserSound.Play();

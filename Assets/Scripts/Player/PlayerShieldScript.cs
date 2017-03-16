@@ -66,7 +66,7 @@ public class PlayerShieldScript : MonoBehaviour {
 
         if (hitPoints < 100)
         {
-            if (GameControl.gc.AUDIO_SOUNDS)
+            if (PlayerPrefs.GetInt(GameControl.gc.GetSoundKey(), 1) == 1)
             {
                 shieldSound.Play();
             }

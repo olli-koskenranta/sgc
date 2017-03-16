@@ -106,10 +106,15 @@ public class FloatingTextScript : MonoBehaviour {
             default:
                 break;
         }
-            
-
-
-
-	
 	}
+
+    void OnTriggerStay2D(Collider2D col)
+    {
+        //Debug.Log("Triggered");
+        if (col.gameObject.GetComponent<FloatingTextScript>().fttype == FTType.PowerUp && fttype == FTType.PowerUp && col.gameObject.GetComponent<FloatingTextScript>().spawnTime > spawnTime)
+        {
+            Debug.Log("Pushing");
+            col.gameObject.transform.position += new Vector3(0, 0.1f, 0);
+        }
+    }
 }

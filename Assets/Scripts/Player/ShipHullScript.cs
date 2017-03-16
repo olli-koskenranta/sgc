@@ -83,7 +83,7 @@ public class ShipHullScript : MonoBehaviour {
 
     public void isHit(int Damage)
     {
-        if (GameControl.gc.AUDIO_SOUNDS)
+        if (PlayerPrefs.GetInt(GameControl.gc.GetSoundKey(), 1) == 1)
             soundHullHit.Play();
 
         if (hitPoints - Damage > 0)

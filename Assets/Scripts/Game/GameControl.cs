@@ -89,9 +89,6 @@ public class GameControl : MonoBehaviour {
     public int[] WeaponUpgradeRMCosts;
 
     //Preferences
-    public bool AUDIO_SOUNDS;
-    public bool AUDIO_MUSIC;
-
     public const string playerSound = "playerSound";
     public const string playerMusic  = "playerMusic";
 
@@ -171,15 +168,7 @@ public class GameControl : MonoBehaviour {
         
         ScrapBoostActive = false;
 
-        if (PlayerPrefs.GetInt(playerSound, 1) == 1)
-            AUDIO_SOUNDS = true;
-        else
-            AUDIO_SOUNDS = false;
-
-        if (PlayerPrefs.GetInt(playerMusic, 1) == 1)
-            AUDIO_MUSIC = true;
-        else
-            AUDIO_MUSIC = false;
+        //if (PlayerPrefs.GetInt(playerSound, 1) == 1)
 
         ShipRepairBots = false;
         ShipShieldGenerator = false;
