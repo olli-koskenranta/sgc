@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
 
 public class BGSwitchScript : MonoBehaviour
 {
@@ -77,7 +76,8 @@ public class BGSwitchScript : MonoBehaviour
         int index = GameControl.gc.currentLevel;
         if (index >= 50)
         {
-            index -= 50 * index / 50;
+            int howmany50 = index / 50;
+            index -= howmany50 * 50;
         }
         index /= 10;
         return index;

@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using FloatingText;
-using System.Collections;
 
 public class FloatingTextScript : MonoBehaviour {
 
@@ -13,9 +12,10 @@ public class FloatingTextScript : MonoBehaviour {
     private bool finished = false;
     public float spawnTime;
     public float durationBeforeFading = 4f;
-    //Default font size is 30
+    private Transform trans;
 
 	void Start () {
+        trans = transform;
         GetComponent<TextMesh>().text = text;
         newColor = GetComponent<TextMesh>().color;
         spawnTime = Time.time;
@@ -27,7 +27,9 @@ public class FloatingTextScript : MonoBehaviour {
             case FTType.Announcement:
                 newColor.a = 0f;
                 GetComponent<TextMesh>().color = newColor;
-                transform.position += new Vector3(0f, -2f, 0);
+                Vector3 posVector = trans.position;
+                posVector.y -= 2;
+                trans.position = posVector;
                 break;
             case FTType.PowerUp:
                 newColor.a = 1f;
@@ -45,14 +47,16 @@ public class FloatingTextScript : MonoBehaviour {
         GetComponent<MeshRenderer>().sortingOrder = SortingOrder;
 
     }
-	
-	void Update ()
+
+    void Update()
     {
         switch (fttype)
 
         {
             case FTType.Normal:
-                transform.position += new Vector3(0f, 0.01f, 0);
+                Vector3 moveVector = trans.position;
+                moveVector.y += 0.01f;
+                trans.position = moveVector;
                 if (Time.time - spawnTime > durationBeforeFading)
                 {
                     Destroy(gameObject);
@@ -68,7 +72,9 @@ public class FloatingTextScript : MonoBehaviour {
                 break;
 
             case FTType.Announcement:
-                transform.position += new Vector3(0f, 0.01f, 0);
+                Vector3 moveVector2 = trans.position;
+                moveVector2.y += 0.01f;
+                trans.position = moveVector2;
                 if (!finished)
                 {
                     newColor.a += 0.005f;
@@ -105,15 +111,6 @@ public class FloatingTextScript : MonoBehaviour {
 
             default:
                 break;
-        }
-	}
-
-    void OnTriggerStay2D(Collider2D col)
-    {
-        //Debug.Log("Triggered");
-        if (col.gameObject.GetComponent<FloatingTextScript>().fttype == FTType.PowerUp && fttype == FTType.PowerUp && col.gameObject.GetComponent<FloatingTextScript>().spawnTime > spawnTime)
-        {
-            col.gameObject.transform.position += new Vector3(0, 0.1f, 0);
         }
     }
 }

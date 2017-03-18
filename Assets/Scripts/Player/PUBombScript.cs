@@ -12,7 +12,7 @@ public class PUBombScript : MonoBehaviour {
 
     void Start () {
 
-        hit_effect = Resources.Load("Explosion") as GameObject;
+        hit_effect = GameControl.gc.hit_effect;
         if (type == PUBombType.Gravity)
             GetComponent<SpriteRenderer>().color = Color.green;
         else if (type == PUBombType.Kinetic)

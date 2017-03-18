@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class EnemyTurretScript : MonoBehaviour {
 
@@ -19,7 +17,7 @@ public class EnemyTurretScript : MonoBehaviour {
     {
         Bullet = Resources.Load("EnemyBullet1") as GameObject;
         playerShip = GameObject.FindWithTag("ShipHull");
-        hit_effect = Resources.Load("Explosion") as GameObject;
+        hit_effect = GameControl.gc.hit_effect;
         fire_time = Time.time;
         
     }

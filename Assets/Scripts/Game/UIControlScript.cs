@@ -19,8 +19,8 @@ public class UIControlScript : MonoBehaviour {
         GameObject btnCloseOptions = GameObject.Find("ButtonCloseOptions");
         if (btnCloseOptions != null)
         {
-            btnCloseOptions.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, Screen.width + 500);
-            btnCloseOptions.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, Screen.height + 500);
+            btnCloseOptions.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 1920);
+            btnCloseOptions.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 1080);
         }
 
         if (SceneManager.GetActiveScene().name.Equals("GameWorld1"))
@@ -107,13 +107,18 @@ public class UIControlScript : MonoBehaviour {
         GameControl.gc.ResetData();
     }
 
-    public void SetBossBarsActive(bool value)
+    public void SetBossBarsActive(bool value, bool shield = false)
     {
         if (SceneManager.GetActiveScene().name.Equals("GameWorld1"))
         {
             GameObject canvas;
             canvas = GameObject.Find("Canvas");
             canvas.transform.FindChild("SliderBossHP").gameObject.SetActive(value);
+            if (shield || value == false)
+            {
+                canvas.transform.FindChild("SliderBossShield").gameObject.SetActive(value);
+            }
+
         }
     }
 

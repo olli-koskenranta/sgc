@@ -20,7 +20,7 @@ public class ShipHullScript : MonoBehaviour {
 
 
     void Start () {
-        floatingText = Resources.Load("FloatingText") as GameObject;
+        floatingText = GameControl.gc.floatingText;
         hitPoints = 100;
         maxHitPoints = hitPoints;
         hullBar.maxValue = maxHitPoints;

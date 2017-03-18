@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
 
 public class NebulaScript : MonoBehaviour {
 
@@ -15,11 +14,12 @@ public class NebulaScript : MonoBehaviour {
     private GameObject floatingText;
     private bool iscrit;
     private float damageStacks;
+    public Transform trans;
 
     // Use this for initialization
     void Start () {
-
-        floatingText = Resources.Load("FloatingText") as GameObject;
+        trans = transform;
+        floatingText = GameControl.gc.floatingText;
         mainCamera = Camera.main;
         preferredScale = transform.localScale;
         hitPoints *= GameControl.gc.currentLevel;
@@ -28,22 +28,31 @@ public class NebulaScript : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
         //Destroy if "out of bounds"
-        if (gameObject.transform.position.x > 19 || gameObject.transform.position.x < -19 || gameObject.transform.position.y < -7 || gameObject.transform.position.y > 7)
+        if (trans.position.x > 19 || trans.position.x < -19 || trans.position.y < -7 || trans.position.y > 7)
             Destroy(gameObject);
 
-        transform.position += new Vector3(movementSpeed, 0, 0);
+        Vector3 newVector;
+        newVector = trans.position;
+        newVector.x += movementSpeed;
+        trans.position = newVector;
         GetComponent<SpriteRenderer>().transform.Rotate(Vector3.forward * 0.2f);
         //counter++;
         if (!ALIVE)
         {
-            transform.localScale -= new Vector3(0.005f, 0.005f, 0);
-            if (transform.localScale.x < 0.05)
+            Vector3 newScale = trans.localScale;
+            newScale.x -= 0.005f;
+            newScale.y -= 0.005f;
+            trans.localScale = newScale;
+            if (trans.localScale.x < 0.05)
                 Destroy(gameObject);
             return;
         }
-        else if (transform.localScale.x < preferredScale.x)
+        else if (trans.localScale.x < preferredScale.x)
         {
-            transform.localScale += new Vector3(0.005f, 0.005f, 0);
+            Vector3 newScale = trans.localScale;
+            newScale.x += 0.005f;
+            newScale.y += 0.005f;
+            trans.localScale = newScale;
         }
 
 
@@ -93,10 +102,14 @@ public class NebulaScript : MonoBehaviour {
             {
                 //if (counter % 10 == 0)
                 //{
-                col.attachedRigidbody.velocity = (transform.position - col.transform.position).normalized;
-                col.GetComponent<Transform>().localScale -= new Vector3(0.02f, 0.02f, 0f);
+                col.attachedRigidbody.velocity = (trans.position - col.transform.position).normalized;
+                Vector3 newScale = col.transform.localScale;
+                newScale.x -= 0.02f;
+                newScale.y -= 0.02f;
+
+                col.transform.localScale -= newScale;
                 //}
-                if (col.GetComponent<Transform>().localScale.x < 0.1)
+                if (col.transform.localScale.x < 0.1)
                 {
                     Consume(col.gameObject, col.GetComponent<MeteorScript>().hitPoints);
                 }
@@ -126,11 +139,12 @@ public class NebulaScript : MonoBehaviour {
 
     private void Consume(GameObject gameobj, int hp)
     {
-        hitPoints += 2 * hp;
+        hitPoints += 3 * hp;
         Destroy(gameobj);
-        if (preferredScale.x < 0.5f)
+        if (preferredScale.x < 1f)
         {
-            preferredScale += new Vector3(0.05f, 0.05f, 0);
+            preferredScale.x += 0.05f;
+            preferredScale.y += 0.05f;
         }
         consumedObjects++;
     }
@@ -143,8 +157,10 @@ public class NebulaScript : MonoBehaviour {
         asteroidFragment = Resources.Load("ScrapPiece") as GameObject;
         for (int i = 0; i <= consumedObjects; i++)
         {
-            Vector3 rngpos = new Vector3(Random.Range(-1f, 1f), Random.Range(-1f, 1f), 0f);
-            GameObject fragmentInstance = Instantiate(asteroidFragment, this.transform.position + rngpos, this.transform.rotation) as GameObject;
+            Vector3 rngpos = trans.position;
+            rngpos.x += Random.Range(-1f, 1f);
+            rngpos.y += Random.Range(-1f, 1f);
+            GameObject fragmentInstance = Instantiate(asteroidFragment, rngpos, trans.rotation) as GameObject;
             fragmentInstance.GetComponent<ScrapPieceScript>().type = Scrap.ScrapType.Normal;
             if (Random.Range(1, 1001) >= 1000 - GameControl.gc.currentLevel / 10)
             {
@@ -159,7 +175,7 @@ public class NebulaScript : MonoBehaviour {
 
     private bool IsOnScreen()
     {
-        Vector3 screenPoint = mainCamera.WorldToViewportPoint(gameObject.transform.position);
+        Vector3 screenPoint = mainCamera.WorldToViewportPoint(trans.position);
         if (screenPoint.x > 0 && screenPoint.y > 0 && screenPoint.x < 1 && screenPoint.y < 1)
             return true;
         else
@@ -169,7 +185,7 @@ public class NebulaScript : MonoBehaviour {
     private void DamageText(bool CRITICAL, int dmg)
     {
         GameObject ft;
-        ft = Instantiate(floatingText, transform.position, Quaternion.identity) as GameObject;
+        ft = Instantiate(floatingText, trans.position, Quaternion.identity) as GameObject;
         ft.GetComponent<FloatingTextScript>().text = dmg.ToString();
         ft.GetComponent<FloatingTextScript>().fttype = FloatingText.FTType.PopUp;
         if (CRITICAL)

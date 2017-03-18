@@ -31,7 +31,7 @@ public class ScrapPieceScript : MonoBehaviour {
         if (col.gameObject.tag.Equals("Collector"))
         {
             GameObject ft;
-            GameObject floatingText = Resources.Load("FloatingText") as GameObject;
+            GameObject floatingText = GameControl.gc.floatingText;
             ft = Instantiate(floatingText, transform.position, Quaternion.identity) as GameObject;
             if (type == ScrapType.ResearchMaterial)
             {

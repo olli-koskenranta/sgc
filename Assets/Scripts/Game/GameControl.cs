@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 using ShipWeapons;
-using System.Collections;
 using System;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
@@ -22,8 +21,8 @@ public class GameControl : MonoBehaviour {
     public int[] Experience;
     public int[] WeaponSkill;
     public int ExpForSkillUp;
-    public string GameVersion = "0.9a";
-    
+    public string GameVersion = "0.9d";
+
 
     public int[] ResearchScrapCost;
     public int[] ResearchRMCost;
@@ -37,10 +36,6 @@ public class GameControl : MonoBehaviour {
     public bool GAME_PAUSED;
 
     public int highestLevelAchieved;
-
-    
-    
-    
 
 
 
@@ -57,6 +52,7 @@ public class GameControl : MonoBehaviour {
     //2 = Mass Driver
     //3 = Plasma Cannon
     public int SelectedWeapon = 0;
+    public int SelectedZone = 0;
 
     //Player upgrades
     public int ArmorUpgrades;
@@ -82,7 +78,7 @@ public class GameControl : MonoBehaviour {
     public Turret PulseLaserTurret;
     public Turret MassDriverTurret;
     public Turret PlasmaTurret;
-    
+
     public string[] WeaponNames = new string[] { "Blaster", "Pulse Laser", "Mass Driver", "Plasma" };
     public float[] AttackSpeedReductions;
     public int[] WeaponUpgradeCosts;
@@ -90,7 +86,8 @@ public class GameControl : MonoBehaviour {
 
     //Preferences
     public const string playerSound = "playerSound";
-    public const string playerMusic  = "playerMusic";
+    public const string playerMusic = "playerMusic";
+    public const string tutorialKey = "Tutorial";
 
     //Power Ups
     //0 = Gravity Gun
@@ -103,6 +100,12 @@ public class GameControl : MonoBehaviour {
 
     public bool[] PowerUps;
     public string[] PowerUpNames;
+
+    //Preloaded gameobjects
+    public GameObject floatingText;
+    public GameObject scrapPiece;
+    public GameObject[] meteors;
+    public GameObject hit_effect;
 
     void Awake()
     {
@@ -132,6 +135,11 @@ public class GameControl : MonoBehaviour {
     
     void Start()
     {
+        floatingText = Resources.Load("FloatingText") as GameObject;
+        scrapPiece = Resources.Load("ScrapPiece") as GameObject;
+        meteors = new GameObject[2] { Resources.Load("medMeteor1") as GameObject, Resources.Load("bigMeteor1") as GameObject };
+        hit_effect =  Resources.Load("Explosion") as GameObject;
+
         //Debug.Log("GameControl START()!");
         GAME_PAUSED = false;
 
@@ -247,13 +255,6 @@ public class GameControl : MonoBehaviour {
             file.Close();
 
             SetPlayerData(playerData);
-
-            if (!playerData.GameVersion.Equals(GameVersion))
-            {
-                Debug.Log("New game version found, resetting data!");
-                ResetData();
-                return;
-            }
 
             Debug.Log("Player data loaded!");
             /*if (playerData.GameVersion == null || playerData.GameVersion.Equals(""))
@@ -393,6 +394,9 @@ public class GameControl : MonoBehaviour {
         ShipRepairBots = data.ShipRepairBots;
         ShipShieldGenerator = data.ShipShieldGenerator;
         researchMaterialCount = data.researchMaterialCount;
+        
+        if (!data.GameVersion.Equals(GameVersion))
+           
 
         if (data.highestLevelAchieved != 0)
             highestLevelAchieved = data.highestLevelAchieved;
@@ -488,6 +492,11 @@ public class GameControl : MonoBehaviour {
     public string GetMusicKey()
     {
         return playerMusic;
+    }
+
+    public string GetTutorialKey()
+    {
+        return tutorialKey;
     }
 
     public string GetSceneName()
@@ -586,7 +595,7 @@ class PlayerData
 
 namespace Asteroids
 {
-    public enum AsteroidType { NONE, Scrap, Medium, Big, Huge, Anomaly1 }
+    public enum AsteroidType { NONE, Medium, Big, Huge }
 }
 
 namespace FloatingText

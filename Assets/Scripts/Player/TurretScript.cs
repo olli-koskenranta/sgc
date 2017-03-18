@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using ShipWeapons;
-using System.Collections;
 
 public class TurretScript : MonoBehaviour {
 

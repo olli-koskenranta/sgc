@@ -1,6 +1,4 @@
 ﻿using UnityEngine;
-using ShipWeapons;
-using System.Collections;
 
 public class EnemyShipScript : MonoBehaviour {
 
@@ -54,10 +52,12 @@ public class EnemyShipScript : MonoBehaviour {
     private float damageStacks;
 
     private GameObject floatingText;
+    public Transform trans;
 
     void Start () {
 
-        floatingText = Resources.Load("FloatingText") as GameObject;
+        floatingText = GameControl.gc.floatingText;
+        trans = transform;
         rotateSpeed = 1f;
         ALIVE = true;
 
@@ -116,7 +116,7 @@ public class EnemyShipScript : MonoBehaviour {
         mainCamera = Camera.main;
         booster_time = Time.time;
         fire_time = Time.time;
-        hit_effect = Resources.Load("Explosion") as GameObject;
+        hit_effect = GameControl.gc.hit_effect;
 
         armor = 0.01f * GameControl.gc.currentLevel;
 
@@ -131,33 +131,41 @@ public class EnemyShipScript : MonoBehaviour {
 
         maxHitPoints = hitPoints;
     }
-	
-	void Update () {
 
+    void FixedUpdate()
+    {
         //Destroy if "out of bounds"
-        if (gameObject.transform.position.x > 19 || gameObject.transform.position.x < -10 || gameObject.transform.position.y < -7 || gameObject.transform.position.y > 7)
+        if (trans.position.x > 19 || trans.position.x < -10 || trans.position.y < -7 || trans.position.y > 7)
             Destroy(gameObject);
 
         if (playerShip != null && sType == ShipType.Fighter)
         {
             if (Time.time - booster_time >= booster_interval && hitPoints > 0)
             {
-                if (Vector3.Distance(playerShip.transform.position, transform.position) > 5)
-                    GetComponent<Rigidbody2D>().velocity = (playerShip.transform.position - transform.position).normalized * speed;
+                if (Vector3.Distance(playerShip.transform.position, trans.position) > 5)
+                    GetComponent<Rigidbody2D>().velocity = (playerShip.transform.position - trans.position).normalized * speed;
                 else
-                    GetComponent<Rigidbody2D>().velocity = -1 * (playerShip.transform.position - transform.position).normalized * speed;
+                    GetComponent<Rigidbody2D>().velocity = -1 * (playerShip.transform.position - trans.position).normalized * speed;
                 booster_time = Time.time;
             }
         }
 
+        if (trans.position.y > 5)
+        {
+            Vector3 newpos = trans.position;
+            newpos.y -= 0.01f;
+            trans.position = newpos;
+        }
+            
+
         if (sType == ShipType.MissileCruiser && hitPoints > 0)
         {
-            GetComponent<Rigidbody2D>().velocity = transform.TransformDirection(Vector3.right * 0.5f);
+            GetComponent<Rigidbody2D>().velocity = trans.TransformDirection(Vector3.right * 0.5f);
         }
 
         if (sType == ShipType.BattleShip && hitPoints > 0)
         {
-            GetComponent<Rigidbody2D>().velocity = transform.TransformDirection(Vector3.right * 0.2f);
+            GetComponent<Rigidbody2D>().velocity = trans.TransformDirection(Vector3.right * 0.2f);
         }
 
         //Rotate towards target
@@ -169,7 +177,7 @@ public class EnemyShipScript : MonoBehaviour {
             }
             else if (sType == ShipType.MissileCruiser)
             {
-                Vector3 target = transform.position;
+                Vector3 target = trans.position;
                 target.x -= 1;
                 RotateTowards(target);
             }
@@ -181,14 +189,17 @@ public class EnemyShipScript : MonoBehaviour {
 
         //if (!IsOnScreen())
         //    return;
+    }
+
+    void Update () {
+
+        
 
         if (Time.time - fire_time >= fire_interval && hitPoints > 0)
             Shoot();
 
         if (Time.time - destroyed_time >= destroyed_interval && hitPoints <= 0)
         {
-            Vector3 rngpos = new Vector3(Random.Range(-0.5f, 0.5f), Random.Range(-0.5f, 0.5f), 0f);
-
             HitEffect();
             destroyed_time = Time.time;
         }
@@ -235,13 +246,7 @@ public class EnemyShipScript : MonoBehaviour {
             }
             if (!ALIVE)
             {
-                GameObject asteroidFragment = Resources.Load("ScrapPiece") as GameObject;
-                GameObject fragmentInstance = Instantiate(asteroidFragment, this.transform.position, this.transform.rotation) as GameObject;
-                fragmentInstance.GetComponent<ScrapPieceScript>().type = Scrap.ScrapType.Normal;
-                if (Random.Range(1, 1001) >= 1000 - GameControl.gc.currentLevel / 10)
-                {
-                    fragmentInstance.GetComponent<ScrapPieceScript>().type = Scrap.ScrapType.ResearchMaterial;
-                }
+                
                 Destroy(gameObject);
             }
         }
@@ -251,15 +256,8 @@ public class EnemyShipScript : MonoBehaviour {
     {
         if (col.gameObject.GetComponent<CollectorScript>() != null)
         {
-            if (!ALIVE)
-            {
-                Destroy(gameObject);
-            }
-            else
-            {
-                int dmg = maxHitPoints / 100;
-                isHit(dmg, true, true);
-            }
+            int dmg = maxHitPoints / 100;
+            isHit(dmg, true, true);
         }
     }
 
@@ -326,36 +324,45 @@ public class EnemyShipScript : MonoBehaviour {
         //GetComponent<SpriteRenderer>().enabled = false;
         //GetComponent<PolygonCollider2D>().enabled = false;
         //Destroy(this.gameObject, 1);
+        Destroy(GetComponent<Collider2D>());
         gameObject.GetComponent<Rigidbody2D>().gravityScale = 0.1f;
         gameObject.GetComponent<SpriteRenderer>().color = Color.gray;
-        gameObject.GetComponent<Rigidbody2D>().mass = 1000000;
+
         gameObject.GetComponent<Rigidbody2D>().velocity = new Vector2(0, 0);
         HitEffect();
         HitEffect();
         HitEffect();
 
+        GameObject asteroidFragment = GameControl.gc.scrapPiece;
+        GameObject fragmentInstance = Instantiate(asteroidFragment, trans.position, trans.rotation) as GameObject;
+        fragmentInstance.GetComponent<ScrapPieceScript>().type = Scrap.ScrapType.Normal;
+        if (Random.Range(1, 1001) >= 1000 - GameControl.gc.currentLevel / 10)
+        {
+            fragmentInstance.GetComponent<ScrapPieceScript>().type = Scrap.ScrapType.ResearchMaterial;
+        }
+
     }
 
     private void RotateTowards(Vector3 target)
     {
-        Vector3 dir = target - transform.position;
+        Vector3 dir = target - trans.position;
         float targetAngle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
         Quaternion q = Quaternion.AngleAxis(targetAngle, Vector3.forward);
-        transform.rotation = Quaternion.Lerp(transform.rotation, q, rotateSpeed * Time.deltaTime);
+        trans.rotation = Quaternion.Lerp(trans.rotation, q, rotateSpeed * Time.deltaTime);
     }
 
     private void HitEffect()
     {
         ParticleSystem.MainModule mm;
         GameObject hiteffect;
-        hiteffect = Instantiate(hit_effect, transform.position, Quaternion.identity) as GameObject;
+        hiteffect = Instantiate(hit_effect, trans.position, Quaternion.identity) as GameObject;
         mm = hiteffect.GetComponent<ParticleSystem>().main;
         mm.startColor = gameObject.GetComponent<SpriteRenderer>().color;
     }
 
     private bool IsOnScreen()
     {
-        Vector3 screenPoint = mainCamera.WorldToViewportPoint(gameObject.transform.position);
+        Vector3 screenPoint = mainCamera.WorldToViewportPoint(trans.position);
         if (screenPoint.x > 0 && screenPoint.y > 0 && screenPoint.x < 1 && screenPoint.y < 1)
             return true;
         else
@@ -415,7 +422,7 @@ public class EnemyShipScript : MonoBehaviour {
     private void DamageText(bool CRITICAL, int dmg)
     {
         GameObject ft;
-        ft = Instantiate(floatingText, transform.position, Quaternion.identity) as GameObject;
+        ft = Instantiate(floatingText, trans.position, Quaternion.identity) as GameObject;
         ft.GetComponent<FloatingTextScript>().text = dmg.ToString();
         ft.GetComponent<FloatingTextScript>().fttype = FloatingText.FTType.PopUp;
         if (CRITICAL)

@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using FloatingText;
-using System.Collections;
 
 public class AnnouncerScript : MonoBehaviour {
 

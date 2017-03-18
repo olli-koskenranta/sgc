@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
 
 public class PlayerProjectileScript : MonoBehaviour {
 
@@ -94,7 +93,8 @@ public class PlayerProjectileScript : MonoBehaviour {
         if (hugeMeteor != null && hugeMeteor.GetComponent<MeteorScript>().IsOnScreen())
         {
             Vector2 forceVector = (hugeMeteor.transform.position - transform.position).normalized * gameObject.GetComponent<Rigidbody2D>().mass / 10;
-            GetComponent<Rigidbody2D>().AddForce(new Vector2(0, forceVector.y), ForceMode2D.Impulse);
+            forceVector.x = 0;
+            GetComponent<Rigidbody2D>().AddForce(forceVector, ForceMode2D.Impulse);
         }
     }
 
@@ -216,12 +216,16 @@ public class PlayerProjectileScript : MonoBehaviour {
 
         float angle = Mathf.Atan2(dirY, dirX) * Mathf.Rad2Deg;
         transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
-     
 
-        bulletInstance = Instantiate(bullet_shrapnel, transform.position, this.gameObject.transform.rotation) as GameObject;
+        Vector3 newPos = transform.position;
+        newPos.x -= 0.1f;
+        bulletInstance = Instantiate(bullet_shrapnel, newPos, gameObject.transform.rotation) as GameObject;
 
         bulletInstance.GetComponent<Rigidbody2D>().mass = mass;
-        bulletInstance.GetComponent<Rigidbody2D>().velocity = new Vector2(dirX, dirY).normalized * speed;
+        Vector2 newVelocity;
+        newVelocity.x = dirX;
+        newVelocity.y = dirY;
+        bulletInstance.GetComponent<Rigidbody2D>().velocity = newVelocity.normalized * speed;
         bulletInstance.GetComponent<SpriteRenderer>().color = GetComponent<SpriteRenderer>().color;
         //bulletInstance.GetComponent<Transform>().localScale /= 2;
         bulletInstance.GetComponent<PlayerProjectileScript>().damageAccumulation = damageAccumulation;

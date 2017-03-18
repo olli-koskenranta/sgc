@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using Asteroids;
-using System.Collections;
 
 public class SpawningScript : MonoBehaviour {
 
@@ -43,6 +42,10 @@ public class SpawningScript : MonoBehaviour {
 
     public bool ANOMALY_SPAWNED = false;
 
+    private Vector2 topLeft;
+    private Vector2 bottomRight;
+    Vector2[] spawnAreaCoordinates;
+
     public enum EnemyType { medMeteor, bigMeteor, hugeMeteor, Nebula, Fighter, MissileCruiser, BattleShip }
 
     void Start () {
@@ -64,7 +67,9 @@ public class SpawningScript : MonoBehaviour {
         EnemyMissileCruiserInterval = 45;
         EnemyBattleShipInterval = 90;
 
-
+        topLeft = new Vector2();
+        bottomRight = new Vector2();
+        spawnAreaCoordinates = new Vector2[2];
 
         PUSpawnTime = 0;
         medMeteor1 = Resources.Load("medMeteor1") as GameObject;
@@ -85,16 +90,7 @@ public class SpawningScript : MonoBehaviour {
 	
 	void Update () {
 
-        if (Time.time - spawnTime >= spawnInterval)
-        {
-            SpawnMeteor();
-            spawnTime = Time.time;
-        }
-
-        if (Time.time - PUSpawnTime >= 30)
-        {
-            SpawnPowerUp();
-        }
+        
 
         if ((GameControl.gc.currentLevel == 10 || (GameControl.gc.currentLevel - 10) % 50 == 0) && !ANOMALY_SPAWNED)
         {
@@ -103,41 +99,55 @@ public class SpawningScript : MonoBehaviour {
             announcer.GetComponent<AnnouncerScript>().Announce("!ANOMALY DETECTED!", FloatingText.FTType.Danger);
         }
 
-        if ((GameControl.gc.currentLevel == 20 || (GameControl.gc.currentLevel - 20) % 50 == 0) && !ANOMALY_SPAWNED)
+        else if ((GameControl.gc.currentLevel == 20 || (GameControl.gc.currentLevel - 20) % 50 == 0) && !ANOMALY_SPAWNED)
         {
             GameObject.Find("UIControl").GetComponent<UIControlScript>().SetBossBarsActive(true);
             SpawnAnomaly(2);
             announcer.GetComponent<AnnouncerScript>().Announce("!ANOMALY DETECTED!", FloatingText.FTType.Danger);
         }
 
-        if ((GameControl.gc.currentLevel == 30 || (GameControl.gc.currentLevel - 30) % 50 == 0) && !ANOMALY_SPAWNED)
+        else if ((GameControl.gc.currentLevel == 30 || (GameControl.gc.currentLevel - 30) % 50 == 0) && !ANOMALY_SPAWNED)
         {
             GameObject.Find("UIControl").GetComponent<UIControlScript>().SetBossBarsActive(true);
             SpawnAnomaly(3);
             announcer.GetComponent<AnnouncerScript>().Announce("!ANOMALY DETECTED!", FloatingText.FTType.Danger);
         }
 
-        if ((GameControl.gc.currentLevel == 40 || (GameControl.gc.currentLevel - 40) % 50 == 0) && !ANOMALY_SPAWNED)
+        else if ((GameControl.gc.currentLevel == 40 || (GameControl.gc.currentLevel - 40) % 50 == 0) && !ANOMALY_SPAWNED)
         {
-            GameObject.Find("UIControl").GetComponent<UIControlScript>().SetBossBarsActive(true);
+            GameObject.Find("UIControl").GetComponent<UIControlScript>().SetBossBarsActive(true, true);
             SpawnAnomaly(4);
             announcer.GetComponent<AnnouncerScript>().Announce("!ANOMALY DETECTED!", FloatingText.FTType.Danger);
         }
 
-        if ((GameControl.gc.currentLevel == 50 || (GameControl.gc.currentLevel - 50) % 50 == 0) && !ANOMALY_SPAWNED)
+        else if ((GameControl.gc.currentLevel == 50 || (GameControl.gc.currentLevel - 50) % 50 == 0) && !ANOMALY_SPAWNED)
         {
             GameObject.Find("UIControl").GetComponent<UIControlScript>().SetBossBarsActive(true);
             SpawnAnomaly(5);
             announcer.GetComponent<AnnouncerScript>().Announce("!ANOMALY DETECTED!", FloatingText.FTType.Danger);
         }
 
-        if (!FindAnomaly(5))
+        if (Time.time - spawnTime >= spawnInterval && !FindAnomaly(4))
+        {
+            SpawnMeteor();
+            spawnTime = Time.time;
+            return;
+        }
+
+        if (Time.time - PUSpawnTime >= 30)
+        {
+            SpawnPowerUp();
+            return;
+        }
+
+        if (!FindAnomaly(5) && !FindAnomaly(3) && !FindAnomaly(4))
         {
             if (GameControl.gc.currentLevel >= 5)
             {
                 if (Time.time - HugeAsteroidSpawnTime >= HugeAsteroidInterval)
                 {
                     SpawnEnemy(EnemyType.hugeMeteor);
+                    return;
                 }
             }
 
@@ -146,6 +156,7 @@ public class SpawningScript : MonoBehaviour {
                 if (Time.time - NebulaSpawnTime >= NebulaInterval)
                 {
                     SpawnEnemy(EnemyType.Nebula);
+                    return;
                 }
             }
 
@@ -154,6 +165,7 @@ public class SpawningScript : MonoBehaviour {
                 if (Time.time - EnemyFighterSpawnTime >= EnemyFighterInterval)
                 {
                     SpawnEnemy(EnemyType.Fighter);
+                    return;
                 }
             }
 
@@ -162,6 +174,7 @@ public class SpawningScript : MonoBehaviour {
                 if (Time.time - EnemyMissileCruiserSpawnTime >= EnemyMissileCruiserInterval)
                 {
                     SpawnEnemy(EnemyType.MissileCruiser);
+                    return;
                 }
             }
 
@@ -170,6 +183,7 @@ public class SpawningScript : MonoBehaviour {
                 if (Time.time - EnemyBattleShipSpawnTime >= EnemyBattleShipInterval)
                 {
                     SpawnEnemy(EnemyType.BattleShip);
+                    return;
                 }
             }
         }
@@ -179,35 +193,53 @@ public class SpawningScript : MonoBehaviour {
     public void SpawnEnemy(EnemyType type)
     {
         Transform spawnPosition = transform;
+        Vector3 rngpos;
 
         switch (type)
         {
             case EnemyType.hugeMeteor:
-                spawnPosition.position = new Vector3(Random.Range(14f, 18f), Random.Range(-3f, 4f), 0f);
+                rngpos = spawnPosition.position;
+                rngpos.x = Random.Range(14f, 18f);
+                rngpos.y = Random.Range(-3f, 4f);
+
+
+                spawnPosition.position = rngpos;
                 hugeMeteor1.GetComponent<MeteorScript>().asteroidType = AsteroidType.Huge;
                 Instantiate(hugeMeteor1, spawnPosition.position, spawnPosition.rotation);
                 HugeAsteroidSpawnTime = Time.time;
                 break;
             case EnemyType.Nebula:
-                spawnPosition.position = new Vector3(Random.Range(14f, 18f), Random.Range(-3f, 2f), 0f);
+                rngpos = spawnPosition.position;
+                rngpos.x = Random.Range(14f, 18f);
+                rngpos.y = Random.Range(-3f, 1f);
+                spawnPosition.position = rngpos;
                 GameObject nebulaInstance = Instantiate(Nebula, spawnPosition.position, spawnPosition.rotation) as GameObject;
                 NebulaSpawnTime = Time.time;
                 break;
             case EnemyType.Fighter:
+                rngpos = spawnPosition.position;
+                rngpos.x = Random.Range(14f, 18f);
+                rngpos.y = Random.Range(0f, 4f);
                 enemyFighter.GetComponent<EnemyShipScript>().sType = EnemyShipScript.ShipType.Fighter;
-                spawnPosition.position = new Vector3(Random.Range(14f, 18f), Random.Range(0f, 4f), 0f);
+                spawnPosition.position = rngpos;
                 Instantiate(enemyFighter, spawnPosition.position, spawnPosition.rotation);
                 EnemyFighterSpawnTime = Time.time;
                 break;
             case EnemyType.MissileCruiser:
+                rngpos = spawnPosition.position;
+                rngpos.x = Random.Range(14f, 18f);
+                rngpos.y = Random.Range(0f, 4f);
                 enemyMissileCruiser.GetComponent<EnemyShipScript>().sType = EnemyShipScript.ShipType.MissileCruiser;
-                spawnPosition.position = new Vector3(Random.Range(14f, 18f), Random.Range(0f, 4f), 0f);
+                spawnPosition.position = rngpos;
                 Instantiate(enemyMissileCruiser, spawnPosition.position, spawnPosition.rotation);
                 EnemyMissileCruiserSpawnTime = Time.time;
                 break;
             case EnemyType.BattleShip:
+                rngpos = spawnPosition.position;
+                rngpos.x = Random.Range(14f, 18f);
+                rngpos.y = Random.Range(4f, 5f);
                 enemyBattleShip.GetComponent<EnemyShipScript>().sType = EnemyShipScript.ShipType.BattleShip;
-                spawnPosition.position = new Vector3(Random.Range(14f, 18f), Random.Range(4f, 5f), 0f);
+                spawnPosition.position = rngpos;
                 Instantiate(enemyBattleShip, spawnPosition.position, spawnPosition.rotation);
                 EnemyBattleShipSpawnTime = Time.time;
                 break;
@@ -218,17 +250,18 @@ public class SpawningScript : MonoBehaviour {
 
     void SpawnMeteor()
     {
-
-        //if (FindAnomaly(3) || FindAnomaly(4))
-        //    return;
-
         Transform spawnPosition = transform;
+        Vector3 rngpos;
         float randomScaleFactor;
 
         //Big Asteroid
         if (RollDice(100) <= bigAsteroidChance)
         {
-            spawnPosition.position = new Vector3(Random.Range(14f, 18f), Random.Range(-3f, 4f), 0f);
+            rngpos = spawnPosition.position;
+            rngpos.x = Random.Range(14f, 18f);
+            rngpos.y = Random.Range(-3f, 4f);
+
+            spawnPosition.position = rngpos;
             GameObject bigMeteorInstance = Instantiate(bigMeteor1, spawnPosition.position, spawnPosition.rotation) as GameObject;
             bigMeteorInstance.GetComponent<MeteorScript>().asteroidType = AsteroidType.Big;
             randomScaleFactor = Random.Range(0, 0.5f);
@@ -238,7 +271,11 @@ public class SpawningScript : MonoBehaviour {
         //Medium asteroid
         else
         {
-            spawnPosition.position = new Vector3(Random.Range(14f, 18f), Random.Range(-3f, 4f), 0f);
+            rngpos = spawnPosition.position;
+            rngpos.x = Random.Range(14f, 18f);
+            rngpos.y = Random.Range(-3f, 4f);
+
+            spawnPosition.position = rngpos;
             GameObject medMeteorInstance = Instantiate(medMeteor1, spawnPosition.position, spawnPosition.rotation) as GameObject;
             medMeteorInstance.GetComponent<MeteorScript>().asteroidType = AsteroidType.Medium;
             randomScaleFactor = Random.Range(0, 0.5f);
@@ -246,17 +283,39 @@ public class SpawningScript : MonoBehaviour {
         }
 
 
-        
+
 
         spawnInterval = 1.1f - (GameControl.gc.currentLevel % 10) / 10f;
         if (spawnInterval < 0.3f || GameControl.gc.currentLevel % 10 == 0)
             spawnInterval = 0.3f;
     }
 
+    /*
+    private Vector2[] GetSpawnArea(GameObject gObject, Vector3 spawnPos)
+    {
+        topLeft.x = gObject.GetComponent<Collider2D>().bounds.center.x - gObject.GetComponent<Collider2D>().bounds.extents.x;
+        topLeft.y = gObject.GetComponent<Collider2D>().bounds.center.y + gObject.GetComponent<Collider2D>().bounds.extents.y;
+        bottomRight.x = gObject.GetComponent<Collider2D>().bounds.center.x + gObject.GetComponent<Collider2D>().bounds.extents.x;
+        bottomRight.y = gObject.GetComponent<Collider2D>().bounds.center.y - gObject.GetComponent<Collider2D>().bounds.extents.y;
+
+        topLeft.x += spawnPos.x;
+        topLeft.y += spawnPos.y;
+        bottomRight.x += spawnPos.x;
+        bottomRight.y += spawnPos.y;
+        spawnAreaCoordinates[0] = topLeft;
+        spawnAreaCoordinates[1] = bottomRight;
+        return spawnAreaCoordinates;
+    }
+    */
+
     void SpawnPowerUp()
     {
         Transform spawnPosition = transform;
-        spawnPosition.position = new Vector3(Random.Range(14f, 18f), Random.Range(0f, 4f), 0f);
+        Vector3 rngpos;
+        rngpos = spawnPosition.position;
+        rngpos.x = Random.Range(14f, 18f);
+        rngpos.y = Random.Range(0f, 4f);
+        spawnPosition.position = rngpos;
         Instantiate(powerUpContainer, spawnPosition.position, spawnPosition.rotation);
         PUSpawnTime = Time.time;
     }
@@ -264,12 +323,16 @@ public class SpawningScript : MonoBehaviour {
     void SpawnAnomaly(int anomalyNumber)
     {
         Transform spawnPosition = transform;
-        spawnPosition.position = new Vector3(15f, 3f, 0f);
+        Vector3 pos;
+        pos = spawnPosition.position;
+        pos.x = 15f;
+        pos.y = 3f;
+        spawnPosition.position = pos;
         GameObject anomaly;
         switch (anomalyNumber)
         {
             case 1:
-                
+
                 anomaly = Instantiate(anomaly1, spawnPosition.position, spawnPosition.rotation);
                 anomaly.GetComponent<AnomalyScript>().anomalyNumber = anomalyNumber;
                 break;

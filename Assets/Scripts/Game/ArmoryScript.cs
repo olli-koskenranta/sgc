@@ -161,7 +161,10 @@ public class ArmoryScript : MonoBehaviour {
                 {
                     case "Text":
                         child.text = "Add W. Power";
-                        child.gameObject.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, 20);
+                        Vector2 pos = child.gameObject.GetComponent<RectTransform>().anchoredPosition;
+                        pos.x = 0;
+                        pos.y = 20;
+                        child.gameObject.GetComponent<RectTransform>().anchoredPosition = pos;
                         break;
                     case "TextScrapp":
                         child.text = scrapCost.ToString() + "K";
@@ -185,7 +188,10 @@ public class ArmoryScript : MonoBehaviour {
                 {
                     case "Text":
                         child.text = "Weapon Power Maxed";
-                        child.gameObject.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, 0);
+                        Vector2 pos = child.gameObject.GetComponent<RectTransform>().anchoredPosition;
+                        pos.x = 0;
+                        pos.y = 0;
+                        child.gameObject.GetComponent<RectTransform>().anchoredPosition = pos;
                         break;
                     default:
                         break;
@@ -508,7 +514,7 @@ public class ArmoryScript : MonoBehaviour {
         
         RectTransform rect = ddSelectZone.transform.FindChild("Template").GetComponent<RectTransform>();
         float size = 0;
-        for (int i = 0; i < GameControl.gc.StartZoneUnlocked.Count; i++)
+        for (int i = GameControl.gc.StartZoneUnlocked.Count - 1; i >= 0; i--)
         {
             size += 120;
             if (size > 560)
@@ -518,13 +524,14 @@ public class ArmoryScript : MonoBehaviour {
             string newText = "Start Zone " + GameControl.gc.StartZoneUnlocked[i].ToString();
             ddSelectZone.options.Add(new Dropdown.OptionData() { text = newText });
         }
-        ddSelectZone.value = 0;
+        ddSelectZone.value = GameControl.gc.SelectedZone;
         ddSelectZone.RefreshShownValue();
     }
 
     public void DropDownZoneSelected()
     {
-        GameControl.gc.currentLevel = GameControl.gc.StartZoneUnlocked[ddSelectZone.value];
+        GameControl.gc.currentLevel = GameControl.gc.StartZoneUnlocked[GameControl.gc.StartZoneUnlocked.Count - 1 - ddSelectZone.value];
+        GameControl.gc.SelectedZone = ddSelectZone.value;
         UpdateArmoryUI();
     }
 
@@ -642,14 +649,14 @@ public class ArmoryScript : MonoBehaviour {
                     DAILY_RESEARCH = false;
                     GameControl.gc.researchMaterialCount += 10;
                     GameControl.gc.DateDailyResearchTime = System.DateTime.Now;
-                    //GameControl.gc.SaveData();
+                    GameControl.gc.SaveData();
                 }
                 else if (DAILY_SCRAPBOOST)
                 {
                     DAILY_SCRAPBOOST = false;
                     GameControl.gc.ScrapBoostActive = true;
                     GameControl.gc.DateDailyScrapBoostTime = System.DateTime.Now;
-                    //GameControl.gc.SaveData();
+                    GameControl.gc.SaveData();
                 }
                 else
                 {

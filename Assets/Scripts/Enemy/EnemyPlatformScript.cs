@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class EnemyPlatformScript : MonoBehaviour {
 
@@ -16,20 +14,25 @@ public class EnemyPlatformScript : MonoBehaviour {
     private GameObject floatingText;
     private bool iscrit = false;
     private int damageStacks;
+    public Transform trans;
+
+    GameObject battlestation;
 
     void Start ()
     {
-        floatingText = Resources.Load("FloatingText") as GameObject;
+        battlestation = GameObject.FindWithTag("Anomaly4");
+        floatingText = GameControl.gc.floatingText;
+        trans = transform;
         ALIVE = true;
         hitPoints = 100000;
         gravityHitTime = Time.time;
-        hit_effect = Resources.Load("Explosion") as GameObject;
+        hit_effect = GameControl.gc.hit_effect;
     }
 	
-	void Update ()
+    void FixedUpdate()
     {
         //Destroy if "out of bounds"
-        if (gameObject.transform.position.x > 19 || gameObject.transform.position.x < -9 || gameObject.transform.position.y < -7 || gameObject.transform.position.y > 7)
+        if (trans.position.x > 19 || trans.position.x < -9 || trans.position.y < -7 || trans.position.y > 7)
             Destroy(gameObject);
 
         if (Time.time - gravityHitTime >= gravityHitResetTime && ALIVE)
@@ -38,11 +41,12 @@ public class EnemyPlatformScript : MonoBehaviour {
             gameObject.GetComponent<SpriteRenderer>().color = Color.white;
             gameObject.GetComponentInChildren<SpriteRenderer>().color = Color.white;
         }
+    }
 
+	void Update ()
+    {
         if (Time.time - destroyed_time >= destroyed_interval && hitPoints <= 0)
         {
-            Vector3 rngpos = new Vector3(Random.Range(-0.5f, 0.5f), Random.Range(-0.5f, 0.5f), 0f);
-
             HitEffect();
             destroyed_time = Time.time;
         }
@@ -110,6 +114,7 @@ public class EnemyPlatformScript : MonoBehaviour {
         hitPoints -= Damage;
         if (hitPoints <= 0)
         {
+            battlestation.GetComponent<AnomalyScript>().GeneratorHit(3);
             ALIVE = false;
             Explode();
             destroyed_time = Time.time;
@@ -125,7 +130,7 @@ public class EnemyPlatformScript : MonoBehaviour {
         GameControl.gc.ExperienceGained(XP);
         //GetComponent<SpriteRenderer>().enabled = false;
         //GetComponent<PolygonCollider2D>().enabled = false;
-        //Destroy(this.gameObject, 1);
+        Destroy(GetComponent<Collider2D>());
         gameObject.GetComponent<Rigidbody2D>().gravityScale += 1.5f;
         gameObject.GetComponent<SpriteRenderer>().color = Color.gray;
         HitEffect();
@@ -138,7 +143,7 @@ public class EnemyPlatformScript : MonoBehaviour {
     {
         ParticleSystem.MainModule mm;
         GameObject hiteffect;
-        hiteffect = Instantiate(hit_effect, transform.position, Quaternion.identity) as GameObject;
+        hiteffect = Instantiate(hit_effect, trans.position, Quaternion.identity) as GameObject;
         mm = hiteffect.GetComponent<ParticleSystem>().main;
         mm.startColor = gameObject.GetComponent<SpriteRenderer>().color;
     }
@@ -146,7 +151,7 @@ public class EnemyPlatformScript : MonoBehaviour {
     private void DamageText(bool CRITICAL, int dmg)
     {
         GameObject ft;
-        ft = Instantiate(floatingText, transform.position, Quaternion.identity) as GameObject;
+        ft = Instantiate(floatingText, trans.position, Quaternion.identity) as GameObject;
         ft.GetComponent<FloatingTextScript>().text = dmg.ToString();
         ft.GetComponent<FloatingTextScript>().fttype = FloatingText.FTType.PopUp;
         if (CRITICAL)
