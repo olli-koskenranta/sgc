@@ -3,7 +3,6 @@
 public class PlayerProjectileScript : MonoBehaviour {
 
     private Camera mainCamera;
-    public GameObject hit_effect;
     private GameObject bullet_shrapnel;
     private GameObject hugeMeteor;
     private GameObject playerTurret;
@@ -23,7 +22,7 @@ public class PlayerProjectileScript : MonoBehaviour {
     public float gravityDmgAmount = 0.1f;
     public float armorPierce;
 
-    private GameObject floatingText;
+
 
         
 
@@ -77,9 +76,9 @@ public class PlayerProjectileScript : MonoBehaviour {
 
 
     }
-	
-	void Update () {
 
+    void FixedUpdate()
+    {
         //Destroy if "out of bounds"
         if (gameObject.transform.position.x > 9 || gameObject.transform.position.x < -9 || gameObject.transform.position.y < -5 || gameObject.transform.position.y > 20)
             Destroy(gameObject);
@@ -97,6 +96,7 @@ public class PlayerProjectileScript : MonoBehaviour {
             GetComponent<Rigidbody2D>().AddForce(forceVector, ForceMode2D.Impulse);
         }
     }
+	
 
     void OnCollisionEnter2D(Collision2D col)
     {
@@ -160,7 +160,7 @@ public class PlayerProjectileScript : MonoBehaviour {
 
         if (PIERCE)
         {
-            float damageReduction = (float)damage / 5f;
+            float damageReduction = (float)damage / 3f;
             damage -= (int)damageReduction;
             //Debug.Log(damage.ToString());
         }
@@ -184,25 +184,16 @@ public class PlayerProjectileScript : MonoBehaviour {
 
     private void HitEffect()
     {
-        ParticleSystem.MainModule mm;
         GameObject hiteffect;
-        hiteffect = Instantiate(hit_effect, transform.position, Quaternion.identity) as GameObject;
+        hiteffect = ObjectPool.pool.GetPooledObject(GameControl.gc.hit_effect, 1);
+        if (hiteffect == null)
+            return;
+
+        ParticleSystem.MainModule mm;
+        hiteffect.transform.position = transform.position;
         mm = hiteffect.GetComponent<ParticleSystem>().main;
         mm.startColor = gameObject.GetComponent<SpriteRenderer>().color;
-        //hiteffect.GetComponent<ParticleSystem>().main.startColor = gameObject.GetComponent<SpriteRenderer>().color;
-    }
-
-    private void DamageText(int newDamage)
-    {
-        GameObject ft;
-        ft = Instantiate(floatingText, transform.position, Quaternion.identity) as GameObject;
-        ft.GetComponent<FloatingTextScript>().text = newDamage.ToString();
-        ft.GetComponent<FloatingTextScript>().fttype = FloatingText.FTType.PopUp;
-        if (CRITICAL)
-        {
-            ft.GetComponent<TextMesh>().fontSize = 50;
-            ft.GetComponent<TextMesh>().color = Color.yellow;
-        }
+        hiteffect.SetActive(true);
     }
 
     private void ClusterBomb(float dirX, float dirY)

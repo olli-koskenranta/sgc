@@ -17,9 +17,8 @@ public class PowerUpScript : MonoBehaviour {
         mainCamera = Camera.main;
     }
 
-    void Update()
+    void FixedUpdate()
     {
-
         //Destroy if "out of bounds"
         if (gameObject.transform.position.x > 19 || gameObject.transform.position.x < -19 || gameObject.transform.position.y < -7 || gameObject.transform.position.y > 7)
             Destroy(this.gameObject);

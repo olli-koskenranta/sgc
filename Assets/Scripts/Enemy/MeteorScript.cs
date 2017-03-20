@@ -3,7 +3,6 @@ using Asteroids;
 
 public class MeteorScript : MonoBehaviour {
 
-    private bool spawnProtection;
     private float spawnTime;
     float speed = 1.5f;
     public int hitPoints;
@@ -40,17 +39,16 @@ public class MeteorScript : MonoBehaviour {
     public float baseArmor;
     public bool iscrit = false;
 
-    private GameObject floatingText;
-
     private float originalPitch;
     public bool tagged = false;
     public Transform trans;
 
+    private float hitTime;
+    private float critTime;
+
     void Start()
     {
         trans = transform;
-        floatingText = GameControl.gc.floatingText;
-        spawnProtection = true;
         spawnTime = Time.time;
         originalPitch = soundExplode.pitch;
 
@@ -112,7 +110,10 @@ public class MeteorScript : MonoBehaviour {
         GetComponent<Rigidbody2D>().AddTorque(GetComponent<Rigidbody2D>().mass / 10, ForceMode2D.Impulse);
 
         if (HIT_BY_KINECTIC_DMG)
+        {
             hitPoints = 1;
+            GetComponent<Rigidbody2D>().mass = 1;
+        }
 
         armor = 0.01f * GameControl.gc.currentLevel;
         baseArmor = armor;
@@ -189,20 +190,6 @@ public class MeteorScript : MonoBehaviour {
         }
     }
 
-    void Update()
-    {
-
-        
-
-        
-
-        if (Time.time - spawnTime > 1)
-        {
-            spawnProtection = false;
-        }
-
-    }
-
     void OnCollisionEnter2D(Collision2D col)
     {
         iscrit = false;
@@ -240,21 +227,9 @@ public class MeteorScript : MonoBehaviour {
             }
             else
             {
-                if (!spawnProtection)
-                    isHit(col.gameObject.GetComponent<MeteorScript>().damage, true, false);
+                isHit(col.gameObject.GetComponent<MeteorScript>().damage, true, false);
             }
         }
-        
-        else if (col.gameObject.GetComponent<EnemyProjectileScript>() != null)
-        {
-            Explode();
-        }
-    }
-
-    void OnCollisionStay2D(Collision2D col)
-    {
-        if (!IsOnScreen())
-            return;
     }
 
     void OnTriggerEnter2D(Collider2D col)
@@ -294,6 +269,7 @@ public class MeteorScript : MonoBehaviour {
             {
                 HIT_BY_KINECTIC_DMG = true;
                 gameObject.GetComponent<Rigidbody2D>().velocity *= 0;
+                gameObject.GetComponent<Rigidbody2D>().mass = 1;
                 gameObject.GetComponent<MeteorScript>().hitPoints = 1;
                 col.gameObject.GetComponent<PUBombScript>().HitEffect(trans.position);
                 gameObject.GetComponent<SpriteRenderer>().color = Color.gray;
@@ -340,7 +316,7 @@ public class MeteorScript : MonoBehaviour {
         GameControl.gc.ExperienceGained(XP);
         GetComponent<SpriteRenderer>().enabled = false;
         Destroy(GetComponent<Collider2D>());
-        Destroy(this.gameObject, 1);
+        Destroy(gameObject, 1);
 
         if (asteroidType == AsteroidType.Big || asteroidType == AsteroidType.Huge)
         {
@@ -385,19 +361,51 @@ public class MeteorScript : MonoBehaviour {
     public GameObject FindAnomaly(int anomalyNumber)
     {
         string aname = "Anomaly" + anomalyNumber.ToString();
+        if (anomalyNumber == 1)
+        {
+            if (GameObject.FindWithTag(aname) != null)
+                anomaly1 = GameObject.FindWithTag(aname);
+        }
+
         return GameObject.FindWithTag(aname);
     }
 
     private void DamageText(bool CRITICAL, int dmg)
     {
-        GameObject ft;
-        ft = Instantiate(floatingText, trans.position, Quaternion.identity) as GameObject;
-        ft.GetComponent<FloatingTextScript>().text = dmg.ToString();
-        ft.GetComponent<FloatingTextScript>().fttype = FloatingText.FTType.PopUp;
-        if (CRITICAL)
+        if (!CRITICAL)
         {
-            ft.GetComponent<TextMesh>().fontSize = 50;
-            ft.GetComponent<TextMesh>().color = Color.yellow;
+            if (Time.time - hitTime < 0.5f)
+                return;
+            GameObject normalDamageTextInstance;
+            normalDamageTextInstance = ObjectPool.pool.GetPooledObject(GameControl.gc.floatingText, 1);
+
+            if (normalDamageTextInstance == null)
+                return;
+
+            normalDamageTextInstance.transform.position = trans.position;
+            normalDamageTextInstance.GetComponent<FloatingTextScript>().fttype = FloatingText.FTType.PopUp;
+            normalDamageTextInstance.GetComponent<FloatingTextScript>().text = dmg.ToString();
+            normalDamageTextInstance.SetActive(true);
+            hitTime = Time.time;
+        }
+
+        else 
+        {
+            if (Time.time - critTime < 0.5f)
+                return;
+            GameObject criticalDamageTextInstance;
+            criticalDamageTextInstance = ObjectPool.pool.GetPooledObject(GameControl.gc.floatingText, 1);
+
+            if (criticalDamageTextInstance == null)
+                return;
+
+            criticalDamageTextInstance.transform.position = trans.position;
+            criticalDamageTextInstance.GetComponent<FloatingTextScript>().fttype = FloatingText.FTType.PopUp;
+            criticalDamageTextInstance.GetComponent<FloatingTextScript>().text = dmg.ToString();
+            criticalDamageTextInstance.GetComponent<FloatingTextScript>().isCrit = true;
+            criticalDamageTextInstance.GetComponent<TextMesh>().color = Color.yellow;
+            criticalDamageTextInstance.SetActive(true);
+            critTime = Time.time;
         }
     }
 }

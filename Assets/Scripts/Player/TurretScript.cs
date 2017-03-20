@@ -22,7 +22,7 @@ public class TurretScript : MonoBehaviour {
     void Start()
     {
         firingPosition = transform.FindChild("FiringPosition");
-        ft = Resources.Load("FloatingText") as GameObject;
+        ft = GameControl.gc.floatingText;
         //Set up weapon here
         //Weapon types
         //0 = Basic Cannon
@@ -83,16 +83,6 @@ public class TurretScript : MonoBehaviour {
                     Shoot();
                 }
         }
-
-        /*if (Input.GetKeyDown(KeyCode.Keypad0))
-            ChangeWeapon(0);
-        if (Input.GetKeyDown(KeyCode.Keypad1))
-            ChangeWeapon(1);
-        if (Input.GetKeyDown(KeyCode.Keypad2))
-            ChangeWeapon(2);
-        if (Input.GetKeyDown(KeyCode.R))
-            GameControl.gc.ResetData();*/
-
     }
 
     private void Shoot()
@@ -219,17 +209,9 @@ public class TurretScript : MonoBehaviour {
         bulletScript.critMultiplier = turret.CriticalMultiplier;
         bulletScript.bounces = turret.Bounces;
         bulletScript.damageAccumulation = turret.DamageAccumulation;
-        //Debug.Log("Bounces: " + bulletScript.bounces.ToString());
         if (GameControl.gc.SelectedWeapon == 1 && special2)
         {
-            
-            //float distance = 1 - Input.mousePosition.x / (Screen.width - Screen.width / 10);
             float distance = 0.05f;
-            /*if (distance > 0.5f)
-                distance = 0.5f;
-            else if (distance < 0.05f)
-                distance = 0.05f;*/
-            //Debug.Log(distance.ToString());
             BeamSplit(1, distance, 0f, 0f, bulletInstance, crit, special);
             BeamSplit(1, -distance, 0f, 0f, bulletInstance, crit, special);
         }
@@ -252,13 +234,11 @@ public class TurretScript : MonoBehaviour {
 
         bulletInstance = Instantiate(splitBeam, trans.position + new Vector3(posX, posY), trans.rotation) as GameObject;
         PlayerProjectileScript bulletScript = bulletInstance.GetComponent<PlayerProjectileScript>();
+        bulletScript.damage /= 2;
         bulletScript.Critical = isCrit;
         bulletScript.Special = isSpecial;
 
-        //bulletInstance.GetComponent<Rigidbody2D>().mass = turret.Mass;
         bulletInstance.GetComponent<Rigidbody2D>().velocity = bulletInstance.transform.TransformDirection(Vector3.right * turret.Speed);
-        //bulletInstance.GetComponent<SpriteRenderer>().color = GetComponent<SpriteRenderer>().color;
-        //bulletInstance.GetComponent<PlayerProjectileScript>().damage = turret.Damage;
     }
 
 
@@ -275,6 +255,7 @@ public class TurretScript : MonoBehaviour {
         ftInstance.GetComponent<FloatingTextScript>().text = "Skill +1";
         ftInstance.GetComponent<FloatingTextScript>().fttype = FloatingText.FTType.Normal;
         ftInstance.GetComponent<FloatingTextScript>().durationBeforeFading = 2;
+        ftInstance.GetComponent<FloatingTextScript>().KILL_ME = true;
         ftInstance.GetComponent<TextMesh>().fontSize = 15;
     }
 

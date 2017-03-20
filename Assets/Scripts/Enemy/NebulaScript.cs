@@ -11,22 +11,22 @@ public class NebulaScript : MonoBehaviour {
     private int dmgCounter = 0;
     private bool ALIVE = true;
     private Vector3 preferredScale;
-    private GameObject floatingText;
     private bool iscrit;
     private float damageStacks;
     public Transform trans;
 
-    // Use this for initialization
+    private float hitTime;
+    private float critTime;
+
     void Start () {
         trans = transform;
-        floatingText = GameControl.gc.floatingText;
         mainCamera = Camera.main;
         preferredScale = transform.localScale;
         hitPoints *= GameControl.gc.currentLevel;
     }
 	
-	// Update is called once per frame
-	void Update () {
+    void FixedUpdate()
+    {
         //Destroy if "out of bounds"
         if (trans.position.x > 19 || trans.position.x < -19 || trans.position.y < -7 || trans.position.y > 7)
             Destroy(gameObject);
@@ -54,8 +54,6 @@ public class NebulaScript : MonoBehaviour {
             newScale.y += 0.005f;
             trans.localScale = newScale;
         }
-
-
     }
 
     void OnTriggerEnter2D(Collider2D col)
@@ -107,7 +105,7 @@ public class NebulaScript : MonoBehaviour {
                 newScale.x -= 0.02f;
                 newScale.y -= 0.02f;
 
-                col.transform.localScale -= newScale;
+                col.transform.localScale = newScale;
                 //}
                 if (col.transform.localScale.x < 0.1)
                 {
@@ -123,6 +121,9 @@ public class NebulaScript : MonoBehaviour {
 
     public void isHit(int incomingDamage,  bool showDmg)
     {
+        if (!IsOnScreen())
+            return;
+
         if (damageStacks > 0)
         {
             float newDamage = (float)incomingDamage * ( 1 + damageStacks * GameControl.gc.Weapons[2].DamageAccumulation);
@@ -184,14 +185,40 @@ public class NebulaScript : MonoBehaviour {
 
     private void DamageText(bool CRITICAL, int dmg)
     {
-        GameObject ft;
-        ft = Instantiate(floatingText, trans.position, Quaternion.identity) as GameObject;
-        ft.GetComponent<FloatingTextScript>().text = dmg.ToString();
-        ft.GetComponent<FloatingTextScript>().fttype = FloatingText.FTType.PopUp;
-        if (CRITICAL)
+        if (!CRITICAL)
         {
-            ft.GetComponent<TextMesh>().fontSize = 50;
-            ft.GetComponent<TextMesh>().color = Color.yellow;
+            if (Time.time - hitTime < 0.5f)
+                return;
+            GameObject normalDamageTextInstance;
+            normalDamageTextInstance = ObjectPool.pool.GetPooledObject(GameControl.gc.floatingText, 1);
+
+            if (normalDamageTextInstance == null)
+                return;
+
+            normalDamageTextInstance.transform.position = trans.position;
+            normalDamageTextInstance.GetComponent<FloatingTextScript>().fttype = FloatingText.FTType.PopUp;
+            normalDamageTextInstance.GetComponent<FloatingTextScript>().text = dmg.ToString();
+            normalDamageTextInstance.SetActive(true);
+            hitTime = Time.time;
+        }
+
+        else
+        {
+            if (Time.time - critTime < 0.5f)
+                return;
+            GameObject criticalDamageTextInstance;
+            criticalDamageTextInstance = ObjectPool.pool.GetPooledObject(GameControl.gc.floatingText, 1);
+
+            if (criticalDamageTextInstance == null)
+                return;
+
+            criticalDamageTextInstance.transform.position = trans.position;
+            criticalDamageTextInstance.GetComponent<FloatingTextScript>().fttype = FloatingText.FTType.PopUp;
+            criticalDamageTextInstance.GetComponent<FloatingTextScript>().text = dmg.ToString();
+            criticalDamageTextInstance.GetComponent<FloatingTextScript>().isCrit = true;
+            criticalDamageTextInstance.GetComponent<TextMesh>().color = Color.yellow;
+            criticalDamageTextInstance.SetActive(true);
+            critTime = Time.time;
         }
     }
 }

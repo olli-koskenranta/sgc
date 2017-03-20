@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using FloatingText;
 
 public class FloatingTextScript : MonoBehaviour {
@@ -13,8 +14,16 @@ public class FloatingTextScript : MonoBehaviour {
     public float spawnTime;
     public float durationBeforeFading = 4f;
     private Transform trans;
+    public bool isCrit = false;
+    public bool KILL_ME = false;
 
-	void Start () {
+    void Start()
+    {
+        OnEnable();
+    }
+	void OnEnable ()
+    {
+        //Invoke("EndLife", 2);
         trans = transform;
         GetComponent<TextMesh>().text = text;
         newColor = GetComponent<TextMesh>().color;
@@ -26,7 +35,7 @@ public class FloatingTextScript : MonoBehaviour {
                 break;
             case FTType.Announcement:
                 newColor.a = 0f;
-                GetComponent<TextMesh>().color = newColor;
+                GetComponent <TextMesh>().color = newColor;
                 Vector3 posVector = trans.position;
                 posVector.y -= 2;
                 trans.position = posVector;
@@ -37,19 +46,27 @@ public class FloatingTextScript : MonoBehaviour {
             case FTType.Danger:
                 newColor = Color.red;
                 GetComponent<TextMesh>().color = newColor;
-                GetComponent<TextMesh>().fontSize = 50;
+                GetComponent<TextMesh>().fontSize = 30;
                 GetComponent<TextMesh>().text = GetComponent<TextMesh>().text;
+                Vector3 newScale = trans.localScale;
+                newScale.x += 0.1f;
+                newScale.y += 0.1f;
+                trans.localScale = newScale;
                 break;
             default:
                 break;
         }
+        if (isCrit)
+            GetComponent<TextMesh>().fontSize = 50;
+
         GetComponent<MeshRenderer>().sortingLayerName = SortingLayerName;
         GetComponent<MeshRenderer>().sortingOrder = SortingOrder;
 
     }
 
-    void Update()
+    void FixedUpdate()
     {
+        //return;
         switch (fttype)
 
         {
@@ -59,16 +76,19 @@ public class FloatingTextScript : MonoBehaviour {
                 trans.position = moveVector;
                 if (Time.time - spawnTime > durationBeforeFading)
                 {
-                    Destroy(gameObject);
+                    EndLife();
                 }
                 break;
             case FTType.PopUp:
-                newColor.a -= 0.0075f;
-                if (GetComponent<TextMesh>().fontSize > 1)
-                    GetComponent<TextMesh>().fontSize--;
-                if (newColor.a <= 0 || GetComponent<TextMesh>().fontSize == 1)
-                    Destroy(gameObject);
-                GetComponent<TextMesh>().color = newColor;
+                if (trans.localScale.x > 0.05f)
+                {
+                    Vector3 newScale = trans.localScale;
+                    newScale.x -= 0.005f;
+                    newScale.y -= 0.005f;
+                    trans.localScale = newScale;
+                }
+                else
+                    EndLife();
                 break;
 
             case FTType.Announcement:
@@ -85,7 +105,7 @@ public class FloatingTextScript : MonoBehaviour {
                 {
                     newColor.a -= 0.005f;
                     if (newColor.a <= 0 && finished)
-                        Destroy(gameObject);
+                        EndLife();
                 }
                 GetComponent<TextMesh>().color = newColor;
                 break;
@@ -93,18 +113,21 @@ public class FloatingTextScript : MonoBehaviour {
             case FTType.PowerUp:
                 if (Time.time - spawnTime > durationBeforeFading)
                 {
-                    Destroy(gameObject);
+                    EndLife();
                 }
                 break;
 
             case FTType.Danger:
-                if (GetComponent<TextMesh>().fontSize > 30)
+                if (trans.localScale.x > 0.2f)
                 {
-                    GetComponent<TextMesh>().fontSize--;
+                    Vector3 newScale = trans.localScale;
+                    newScale.x -= 0.005f;
+                    newScale.y -= 0.005f;
+                    trans.localScale = newScale;
                 }
                 if (Time.time - spawnTime > durationBeforeFading)
                 {
-                    Destroy(gameObject);
+                    EndLife();
                 }
                 break;
 
@@ -112,5 +135,20 @@ public class FloatingTextScript : MonoBehaviour {
             default:
                 break;
         }
+    }
+
+    private void EndLife()
+    {
+        if (KILL_ME)
+            Destroy(gameObject);
+        GetComponent<TextMesh>().color = Color.white;
+        GetComponent<TextMesh>().fontSize = 30;
+        newColor = GetComponent<TextMesh>().color;
+        Vector3 newScale = trans.localScale;
+        newScale.x = 0.2f;
+        newScale.y = 0.2f;
+        trans.localScale = newScale;
+        isCrit = false;
+        gameObject.SetActive(false);
     }
 }

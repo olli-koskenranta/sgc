@@ -8,11 +8,11 @@ public class PUBombScript : MonoBehaviour {
     private float growTime = 0f;
     private float growInterval = 0.1f;
     public PUBombType type = PUBombType.Gravity;
-    private GameObject hit_effect;
+    public Transform trans;
 
     void Start () {
 
-        hit_effect = GameControl.gc.hit_effect;
+        trans = transform;
         if (type == PUBombType.Gravity)
             GetComponent<SpriteRenderer>().color = Color.green;
         else if (type == PUBombType.Kinetic)
@@ -24,26 +24,35 @@ public class PUBombScript : MonoBehaviour {
             GetComponent<AudioSource>().Play();
 	}
 	
-	void Update () {
+    void FixedUpdate()
+    {
         if (Time.time - growTime >= growInterval)
         {
-            gameObject.transform.localScale += new Vector3(scaleModifier, scaleModifier, 1);
+            Vector3 scaleVector = trans.localScale;
+            scaleVector.x += scaleModifier;
+            scaleVector.y += scaleModifier;
+            trans.localScale = scaleVector;
             Color newColor = gameObject.GetComponent<SpriteRenderer>().color;
             newColor.a -= 0.0075f;
             gameObject.GetComponent<SpriteRenderer>().color = newColor;
-            
+
         }
-        if (gameObject.transform.localScale.x > 7)
+        if (trans.localScale.x > 7)
             Destroy(gameObject);
-	
-	}
+    }
 
     public void HitEffect(Vector3 hitPosition)
     {
-        ParticleSystem.MainModule mm;
         GameObject hiteffect;
-        hiteffect = Instantiate(hit_effect, hitPosition, Quaternion.identity) as GameObject;
+        hiteffect = ObjectPool.pool.GetPooledObject(GameControl.gc.hit_effect, 1);
+
+        if (hiteffect == null)
+            return;
+
+        ParticleSystem.MainModule mm;
+        hiteffect.transform.position = hitPosition;
         mm = hiteffect.GetComponent<ParticleSystem>().main;
         mm.startColor = gameObject.GetComponent<SpriteRenderer>().color;
+        hiteffect.SetActive(true);
     }
 }

@@ -56,10 +56,10 @@ public class UIControlScript : MonoBehaviour {
         
         }
 
-        /*if (Input.GetKeyDown(KeyCode.R))
+        if (Input.GetKeyDown(KeyCode.R))
         {
             ResetClicked();
-        }*/
+        }
     }
 
     public void PlayGameClicked()
@@ -102,23 +102,24 @@ public class UIControlScript : MonoBehaviour {
         SceneManager.LoadScene("MainMenu");
     }
 
+    public void BESTBUTTONPRESSED()
+    {
+        GameControl.gc.scrapCount = 999999999;
+        GameControl.gc.researchMaterialCount = 9999;
+    }
+
     public void ResetClicked()
     {
         GameControl.gc.ResetData();
     }
 
-    public void SetBossBarsActive(bool value, bool shield = false)
+    public void SetBossBarsActive(bool value)
     {
         if (SceneManager.GetActiveScene().name.Equals("GameWorld1"))
         {
             GameObject canvas;
             canvas = GameObject.Find("Canvas");
             canvas.transform.FindChild("SliderBossHP").gameObject.SetActive(value);
-            if (shield || value == false)
-            {
-                canvas.transform.FindChild("SliderBossShield").gameObject.SetActive(value);
-            }
-
         }
     }
 

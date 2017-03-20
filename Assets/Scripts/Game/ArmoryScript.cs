@@ -19,6 +19,7 @@ public class ArmoryScript : MonoBehaviour {
     public Button btnBuyPoints;
     public Button btnDailyResearch;
     public Button btnDailyScrapBoost;
+    public Button btnDailyTraining;
     public Button btnDailyBoosts;
     public Button btnSU0;
     public Button btnSU1;
@@ -39,12 +40,14 @@ public class ArmoryScript : MonoBehaviour {
     private Text textResearchScrapCost;
     private Text textResearchRMCost;
     private Text textResearchDescription;
+    private int researchCooldown = 1;
 
     public Slider[] upgradeSliders = new Slider[6];
 
     private AdManagerScript adManager;
     private bool DAILY_RESEARCH = false;
     private bool DAILY_SCRAPBOOST = false;
+    private bool DAILY_TRAINING = false;
 
     private int[] StartingZones;
 
@@ -59,6 +62,7 @@ public class ArmoryScript : MonoBehaviour {
 
         btnDailyBoosts.transform.FindChild("ButtonDailyResearch").gameObject.SetActive(false);
         btnDailyBoosts.transform.FindChild("ButtonDailyScrap").gameObject.SetActive(false);
+        btnDailyBoosts.transform.FindChild("ButtonDailyTraining").gameObject.SetActive(false);
         buttonShipUpgrades.transform.FindChild("ButtonSU0").gameObject.SetActive(false);
         buttonShipUpgrades.transform.FindChild("ButtonSU1").gameObject.SetActive(false);
         buttonShipUpgrades.transform.FindChild("ButtonSU2").gameObject.SetActive(false);
@@ -318,17 +322,19 @@ public class ArmoryScript : MonoBehaviour {
     {
         if (IsDailyResearchAvailable())
         {
+            GameObject.Find("TextBoost").GetComponent<Text>().text = "Boost\nAvailable!";
             btnDailyResearch.interactable = true;
-            btnDailyResearch.GetComponentInChildren<Text>().text = "Research\n+10 R. Material!\nWatch Ad";
+            btnDailyResearch.GetComponentInChildren<Text>().text = "+5 Research Material!\nWatch Ad";
         }
         else
         {
             btnDailyResearch.interactable = false;
-            btnDailyResearch.GetComponentInChildren<Text>().text = "Research\nCompleted";
+            btnDailyResearch.GetComponentInChildren<Text>().text = "Research\nCompleted\nCooldown " + researchCooldown.ToString() + " Hour";
         }
 
         if (IsDailyScrapBoostAvailable())
         {
+            GameObject.Find("TextBoost").GetComponent<Text>().text = "Boost\nAvailable!";
             btnDailyScrapBoost.interactable = true;
             btnDailyScrapBoost.GetComponentInChildren<Text>().text = "Scrap Boost\n+100% Scrap!\nWatch Ad";
         }
@@ -336,6 +342,24 @@ public class ArmoryScript : MonoBehaviour {
         {
             btnDailyScrapBoost.interactable = false;
             btnDailyScrapBoost.GetComponentInChildren<Text>().text = "Scrap Boost\nActive";
+        }
+
+        if (IsDailyTrainingAvailable())
+        {
+            GameObject.Find("TextBoost").GetComponent<Text>().text = "Boost\nAvailable!";
+            btnDailyTraining.interactable = true;
+            btnDailyTraining.GetComponentInChildren<Text>().text = "Daily Training!\n+100 Max Skill for Selected Weapon";
+
+        }
+        else
+        {
+            btnDailyTraining.interactable = false;
+            btnDailyTraining.GetComponentInChildren<Text>().text = "Daily Training Complete";
+        }
+
+        if (!IsDailyResearchAvailable() && !IsDailyScrapBoostAvailable() && !IsDailyTrainingAvailable())
+        {
+            GameObject.Find("TextBoost").GetComponent<Text>().text = "Boosts";
         }
     }
 
@@ -468,11 +492,15 @@ public class ArmoryScript : MonoBehaviour {
             temp.SetActive(false);
             temp = btnDailyBoosts.transform.FindChild("ButtonDailyScrap").gameObject;
             temp.SetActive(false);
+            temp = btnDailyBoosts.transform.FindChild("ButtonDailyTraining").gameObject;
+            temp.SetActive(false);
         }
         else
         {
             temp.SetActive(true);
             temp = btnDailyBoosts.transform.FindChild("ButtonDailyScrap").gameObject;
+            temp.SetActive(true);
+            temp = btnDailyBoosts.transform.FindChild("ButtonDailyTraining").gameObject;
             temp.SetActive(true);
         }
         UpdateArmoryUI();
@@ -525,12 +553,14 @@ public class ArmoryScript : MonoBehaviour {
             ddSelectZone.options.Add(new Dropdown.OptionData() { text = newText });
         }
         ddSelectZone.value = GameControl.gc.SelectedZone;
+        DropDownZoneSelected();
         ddSelectZone.RefreshShownValue();
     }
 
     public void DropDownZoneSelected()
     {
         GameControl.gc.currentLevel = GameControl.gc.StartZoneUnlocked[GameControl.gc.StartZoneUnlocked.Count - 1 - ddSelectZone.value];
+        //Debug.Log((GameControl.gc.StartZoneUnlocked.Count - 1 - ddSelectZone.value).ToString());
         GameControl.gc.SelectedZone = ddSelectZone.value;
         UpdateArmoryUI();
     }
@@ -647,9 +677,10 @@ public class ArmoryScript : MonoBehaviour {
                 if (DAILY_RESEARCH)
                 {
                     DAILY_RESEARCH = false;
-                    GameControl.gc.researchMaterialCount += 10;
+                    GameControl.gc.researchMaterialCount += 5;
                     GameControl.gc.DateDailyResearchTime = System.DateTime.Now;
                     GameControl.gc.SaveData();
+                    Debug.Log("Research Complete");
                 }
                 else if (DAILY_SCRAPBOOST)
                 {
@@ -657,6 +688,16 @@ public class ArmoryScript : MonoBehaviour {
                     GameControl.gc.ScrapBoostActive = true;
                     GameControl.gc.DateDailyScrapBoostTime = System.DateTime.Now;
                     GameControl.gc.SaveData();
+                    Debug.Log("ScrapBoost Complete");
+                }
+                else if (DAILY_TRAINING)
+                {
+                    DAILY_TRAINING = false;
+                    GameControl.gc.WeaponUpgrades[GameControl.gc.SelectedWeapon, 6] += 10;
+                    GameControl.gc.DateDailyTrainingTime = System.DateTime.Now;
+                    GameControl.gc.Weapons[GameControl.gc.SelectedWeapon].UpdateValues(GameControl.gc.SelectedWeapon);
+                    GameControl.gc.SaveData();
+                    Debug.Log("Training Complete");
                 }
                 else
                 {
@@ -669,6 +710,7 @@ public class ArmoryScript : MonoBehaviour {
                 Debug.Log("This should never happen");
                 DAILY_RESEARCH = false;
                 DAILY_SCRAPBOOST = false;
+                DAILY_TRAINING = false;
                 UpdateArmoryUI();
                 break;
             case "FAILED":
@@ -676,6 +718,7 @@ public class ArmoryScript : MonoBehaviour {
                 announcer.Announce("Ad failed to show!", FloatingText.FTType.Danger);
                 DAILY_RESEARCH = false;
                 DAILY_SCRAPBOOST = false;
+                DAILY_TRAINING = false;
                 UpdateArmoryUI();
                 break;
             default:
@@ -707,10 +750,22 @@ public class ArmoryScript : MonoBehaviour {
         }
     }
 
+    public void DailyTrainingClicked()
+    {
+        if (DAILY_TRAINING)
+            return;
+        if (IsDailyTrainingAvailable())
+        {
+            DAILY_TRAINING = true;
+            StartCoroutine(adManager.ShowAd());
+            DailyBoostsClicked();
+        }
+    }
+
     private bool IsDailyResearchAvailable()
     {
-        System.DateTime dateTime = System.DateTime.Now;
-        if (dateTime.Day != GameControl.gc.DateDailyResearchTime.Day)
+        System.TimeSpan timeSpan = System.DateTime.Now - GameControl.gc.DateDailyResearchTime;
+        if (timeSpan.Hours >= researchCooldown)
             return true;
         else
             return false;
@@ -727,6 +782,19 @@ public class ArmoryScript : MonoBehaviour {
         else
         {
             GameControl.gc.ScrapBoostActive = true;
+            return false;
+        }
+    }
+
+    private bool IsDailyTrainingAvailable()
+    {
+        System.DateTime dateTime = System.DateTime.Now;
+        if (dateTime.Day != GameControl.gc.DateDailyTrainingTime.Day)
+        {
+            return true;
+        }
+        else
+        {
             return false;
         }
     }

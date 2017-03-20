@@ -18,7 +18,6 @@ public class EnemyShipScript : MonoBehaviour {
     private float speed;
     private Transform[] firingPositions;
     private float rotateSpeed;
-    public GameObject hit_effect;
 
     public GameObject Bullet;
     public GameObject Missile;
@@ -28,7 +27,6 @@ public class EnemyShipScript : MonoBehaviour {
     private float projectileMass = 1;
 
     private bool HIT_BY_GRAVITY_DMG = false;
-    private bool spawnProtection = false;
 
     public int XP = 0;
 
@@ -51,13 +49,17 @@ public class EnemyShipScript : MonoBehaviour {
     public bool iscrit = false;
     private float damageStacks;
 
-    private GameObject floatingText;
     public Transform trans;
 
+    private float hitTime;
+    private float critTime;
+
+    void Awake()
+    {
+        trans = transform;
+    }
     void Start () {
 
-        floatingText = GameControl.gc.floatingText;
-        trans = transform;
         rotateSpeed = 1f;
         ALIVE = true;
 
@@ -96,6 +98,7 @@ public class EnemyShipScript : MonoBehaviour {
                 Bullet = Resources.Load("EnemyBullet1") as GameObject;
                 Missile = Resources.Load("Missile") as GameObject;
                 hitPoints = enemyBattleShipHitPoints * GameControl.gc.currentLevel;
+                GetComponent<Rigidbody2D>().mass = enemyBattleShipMass;
                 firingPositions = new Transform[4];
                 firingPositions[0] = transform.FindChild("LeftTurret");
                 firingPositions[1] = transform.FindChild("RightTurret");
@@ -116,7 +119,6 @@ public class EnemyShipScript : MonoBehaviour {
         mainCamera = Camera.main;
         booster_time = Time.time;
         fire_time = Time.time;
-        hit_effect = GameControl.gc.hit_effect;
 
         armor = 0.01f * GameControl.gc.currentLevel;
 
@@ -150,7 +152,7 @@ public class EnemyShipScript : MonoBehaviour {
             }
         }
 
-        if (trans.position.y > 5)
+        if (trans.position.y > 4 && sType == ShipType.MissileCruiser)
         {
             Vector3 newpos = trans.position;
             newpos.y -= 0.01f;
@@ -173,7 +175,8 @@ public class EnemyShipScript : MonoBehaviour {
         {
             if (sType == ShipType.Fighter)
             {
-                RotateTowards(playerShip.transform.position);
+                if (playerShip != null)
+                    RotateTowards(playerShip.transform.position);
             }
             else if (sType == ShipType.MissileCruiser)
             {
@@ -186,9 +189,6 @@ public class EnemyShipScript : MonoBehaviour {
                 RotateTowards(playerShip.transform.position);
             }
         }
-
-        //if (!IsOnScreen())
-        //    return;
     }
 
     void Update () {
@@ -225,19 +225,6 @@ public class EnemyShipScript : MonoBehaviour {
             isHit(col.gameObject.GetComponent<PlayerProjectileScript>().damage, false, true, col.gameObject.GetComponent<PlayerProjectileScript>().armorPierce);
         }
 
-        if (col.gameObject.GetComponent<MeteorScript>() != null)
-        {
-            if (!IsOnScreen())
-                return;
-            int divider;
-            if (sType == ShipType.Fighter)
-            {
-                divider = 20;
-                int dmg = maxHitPoints / divider;
-                isHit(dmg, true, true);
-            }
-        }
-
         if (col.gameObject.GetComponent<CollectorScript>() != null)
         {
             if (sType == ShipType.Fighter)
@@ -264,9 +251,6 @@ public class EnemyShipScript : MonoBehaviour {
     void OnTriggerEnter2D(Collider2D col)
     {
         iscrit = false;
-
-        //if (!IsOnScreen())
-        //    return;
 
         if (col.gameObject.GetComponent<PlayerProjectileScript>() != null)
         {
@@ -324,7 +308,10 @@ public class EnemyShipScript : MonoBehaviour {
         //GetComponent<SpriteRenderer>().enabled = false;
         //GetComponent<PolygonCollider2D>().enabled = false;
         //Destroy(this.gameObject, 1);
-        Destroy(GetComponent<Collider2D>());
+
+        foreach (Collider2D collider in GetComponents<Collider2D>())
+            Destroy(collider);
+
         gameObject.GetComponent<Rigidbody2D>().gravityScale = 0.1f;
         gameObject.GetComponent<SpriteRenderer>().color = Color.gray;
 
@@ -353,11 +340,20 @@ public class EnemyShipScript : MonoBehaviour {
 
     private void HitEffect()
     {
-        ParticleSystem.MainModule mm;
         GameObject hiteffect;
-        hiteffect = Instantiate(hit_effect, trans.position, Quaternion.identity) as GameObject;
+        hiteffect = ObjectPool.pool.GetPooledObject(GameControl.gc.hit_effect, 1);
+        if (hiteffect == null)
+            return;
+
+        Vector3 rngpos = trans.position;
+        rngpos.x += Random.Range(-0.1f, 0.1f);
+        rngpos.y += Random.Range(-0.1f, 0.1f);
+
+        ParticleSystem.MainModule mm;
+        hiteffect.transform.position = rngpos;
         mm = hiteffect.GetComponent<ParticleSystem>().main;
         mm.startColor = gameObject.GetComponent<SpriteRenderer>().color;
+        hiteffect.SetActive(true);
     }
 
     private bool IsOnScreen()
@@ -421,14 +417,40 @@ public class EnemyShipScript : MonoBehaviour {
 
     private void DamageText(bool CRITICAL, int dmg)
     {
-        GameObject ft;
-        ft = Instantiate(floatingText, trans.position, Quaternion.identity) as GameObject;
-        ft.GetComponent<FloatingTextScript>().text = dmg.ToString();
-        ft.GetComponent<FloatingTextScript>().fttype = FloatingText.FTType.PopUp;
-        if (CRITICAL)
+        if (!CRITICAL)
         {
-            ft.GetComponent<TextMesh>().fontSize = 50;
-            ft.GetComponent<TextMesh>().color = Color.yellow;
+            if (Time.time - hitTime < 0.5f)
+                return;
+            GameObject normalDamageTextInstance;
+            normalDamageTextInstance = ObjectPool.pool.GetPooledObject(GameControl.gc.floatingText, 1);
+
+            if (normalDamageTextInstance == null)
+                return;
+
+            normalDamageTextInstance.transform.position = trans.position;
+            normalDamageTextInstance.GetComponent<FloatingTextScript>().fttype = FloatingText.FTType.PopUp;
+            normalDamageTextInstance.GetComponent<FloatingTextScript>().text = dmg.ToString();
+            normalDamageTextInstance.SetActive(true);
+            hitTime = Time.time;
+        }
+
+        else
+        {
+            if (Time.time - critTime < 0.5f)
+                return;
+            GameObject criticalDamageTextInstance;
+            criticalDamageTextInstance = ObjectPool.pool.GetPooledObject(GameControl.gc.floatingText, 1);
+
+            if (criticalDamageTextInstance == null)
+                return;
+
+            criticalDamageTextInstance.transform.position = trans.position;
+            criticalDamageTextInstance.GetComponent<FloatingTextScript>().fttype = FloatingText.FTType.PopUp;
+            criticalDamageTextInstance.GetComponent<FloatingTextScript>().text = dmg.ToString();
+            criticalDamageTextInstance.GetComponent<FloatingTextScript>().isCrit = true;
+            criticalDamageTextInstance.GetComponent<TextMesh>().color = Color.yellow;
+            criticalDamageTextInstance.SetActive(true);
+            critTime = Time.time;
         }
     }
 }

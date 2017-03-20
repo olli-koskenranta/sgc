@@ -5,7 +5,6 @@ public class EnemyProjectileScript : MonoBehaviour {
 
     public enum ProjectileType { Bullet, Missile };
     private Camera mainCamera;
-    public GameObject hit_effect;
     public GameObject missileTarget;
     public ProjectileType pType = ProjectileType.Bullet;
     public GameObject playerShip;
@@ -22,7 +21,6 @@ public class EnemyProjectileScript : MonoBehaviour {
         gameObject.GetComponent<Rigidbody2D>().mass = mass;
         rotateSpeed = 3f;
         missileSpeed = 5f;
-        hit_effect = GameControl.gc.hit_effect;
         if (pType == ProjectileType.Missile)
         {
             playerShip = GameObject.FindWithTag("ShipHull");
@@ -49,10 +47,6 @@ public class EnemyProjectileScript : MonoBehaviour {
         }
     }
 	
-	void Update () {
-        
-	}
-
     private bool IsOnScreen()
     {
         Vector3 screenPoint = mainCamera.WorldToViewportPoint(trans.position);
@@ -76,10 +70,15 @@ public class EnemyProjectileScript : MonoBehaviour {
 
     private void HitEffect()
     {
-        ParticleSystem.MainModule mm;
         GameObject hiteffect;
-        hiteffect = Instantiate(hit_effect, trans.position, Quaternion.identity) as GameObject;
+        hiteffect = ObjectPool.pool.GetPooledObject(GameControl.gc.hit_effect, 1);
+        if (hiteffect == null)
+            return;
+
+        ParticleSystem.MainModule mm;
+        hiteffect.transform.position = trans.position;
         mm = hiteffect.GetComponent<ParticleSystem>().main;
         mm.startColor = gameObject.GetComponent<SpriteRenderer>().color;
+        hiteffect.SetActive(true);
     }
 }

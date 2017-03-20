@@ -11,6 +11,7 @@ public class GameControl : MonoBehaviour {
     public const int numberOfWeapons = 4;
     public const int numberOfStartZones = 11;
     public const int numberOfResearches = 5;
+    public const string GameVersion = "PERKELE";
 
     public static GameControl gc;
     public int scrapCount = 0;
@@ -21,14 +22,14 @@ public class GameControl : MonoBehaviour {
     public int[] Experience;
     public int[] WeaponSkill;
     public int ExpForSkillUp;
-    public string GameVersion = "0.9d";
-
+    
 
     public int[] ResearchScrapCost;
     public int[] ResearchRMCost;
 
     public DateTime DateDailyResearchTime;
     public DateTime DateDailyScrapBoostTime;
+    public DateTime DateDailyTrainingTime;
     public DateTime[] ResearchStartTimes;
     public bool[] ResearchStarted;
 
@@ -43,7 +44,6 @@ public class GameControl : MonoBehaviour {
     public bool PLAYER_ALIVE = true;
 
     //Player attributes
-    public int shipArmor;
     public System.Collections.Generic.List<int> StartZoneUnlocked;
 
     //Weapon types
@@ -55,7 +55,6 @@ public class GameControl : MonoBehaviour {
     public int SelectedZone = 0;
 
     //Player upgrades
-    public int ArmorUpgrades;
     public bool[] WeaponUnlocked;
     public bool ShipRepairBots;
     public bool ShipShieldGenerator;
@@ -101,6 +100,9 @@ public class GameControl : MonoBehaviour {
     public bool[] PowerUps;
     public string[] PowerUpNames;
 
+    public int[] ExtensionData;
+    private const int ExtensionDataSize = 2;
+
     //Preloaded gameobjects
     public GameObject floatingText;
     public GameObject scrapPiece;
@@ -132,6 +134,18 @@ public class GameControl : MonoBehaviour {
         Debug.Log("Application quit!");
     }
 
+    void OnApplicationPause(bool pauseStatus)
+    {
+        if (pauseStatus == true)
+        {
+            SaveData();
+            Debug.Log("Application pause!");
+        }
+        else
+            Debug.Log("Application not paused.");
+
+    }
+
     
     void Start()
     {
@@ -142,11 +156,11 @@ public class GameControl : MonoBehaviour {
 
         //Debug.Log("GameControl START()!");
         GAME_PAUSED = false;
-
+        ExtensionData = new int[ExtensionDataSize];
         
 
-        WeaponUpgradeCosts = new int[] { 1000, 10000, 100000, 1000000 };
-        WeaponUpgradeRMCosts = new int[] { 0, 2, 6, 10 };
+        WeaponUpgradeCosts = new int[] { 1000, 20000, 100000, 1000000 };
+        WeaponUpgradeRMCosts = new int[] { 0, 4, 8, 10 };
 
         highestLevelAchieved = 1;
 
@@ -157,8 +171,8 @@ public class GameControl : MonoBehaviour {
          * PulseLaser = 3
          * MassDriver = 4
          */
-        ResearchScrapCost = new int[numberOfResearches] { 100000, 200000, 50000, 100000, 1000000 };
-        ResearchRMCost = new int[numberOfResearches] { 10, 20, 5, 10, 50 };
+        ResearchScrapCost = new int[numberOfResearches] { 100000, 500000, 50000, 250000, 1000000 };
+        ResearchRMCost = new int[numberOfResearches] { 10, 50, 5, 25, 100 };
 
         Experience = new int[numberOfWeapons];
         PowerUps = new bool[numberOfPowerUps];
@@ -172,6 +186,7 @@ public class GameControl : MonoBehaviour {
         currentLevel = 1;
         DateDailyResearchTime = new DateTime(2001, 1, 1, 6, 0, 0);
         DateDailyScrapBoostTime = new DateTime(2001, 1, 1, 6, 0, 0);
+        DateDailyTrainingTime = new DateTime(2001, 1, 1, 6, 0, 0);
         ResearchStartTimes = new DateTime[numberOfResearches];
         
         ScrapBoostActive = false;
@@ -200,8 +215,8 @@ public class GameControl : MonoBehaviour {
         PulseLaserTurret = new Turret(20f, 100, 0f, 0.4f, 5, 2f, 1, SpecialType.Piercing, "Piercing", "Beam Split");
         PulseLaserTurret.SetUpgradeValuesPerSkillPoint(3, 0, 0.2f);
 
-        MassDriverTurret = new Turret(30f, 50, 0.1f, 0.2f, 5f, 2f, 2, SpecialType.Shrapnel, "Shrapnel", "Damage Accumulation");
-        MassDriverTurret.SetUpgradeValuesPerSkillPoint(4, 0.1f, 0.2f);
+        MassDriverTurret = new Turret(30f, 200, 0.1f, 0.2f, 5f, 2f, 2, SpecialType.Shrapnel, "Shrapnel", "Damage Accumulation");
+        MassDriverTurret.SetUpgradeValuesPerSkillPoint(5, 0.1f, 0.2f);
 
         PlasmaTurret = new Turret(10f, 10, 3, 1, 5, 5, 3, SpecialType.Shrapnel);
         PlasmaTurret.SetUpgradeValuesPerSkillPoint(10, 3, 0.2f);
@@ -222,21 +237,12 @@ public class GameControl : MonoBehaviour {
 
     }
 
-    public void UpdatePlayerAttributes()
-    {
-        shipArmor = ArmorUpgrades;
-    }
-    
-
     public void SaveData()
     {
         
         BinaryFormatter bf = new BinaryFormatter();
         FileStream file = File.Create(Application.persistentDataPath + "/SGC.dat");
-
         PlayerData playerData = GetPlayerData();
-
-     
 
         bf.Serialize(file, playerData);
         file.Close();
@@ -257,21 +263,6 @@ public class GameControl : MonoBehaviour {
             SetPlayerData(playerData);
 
             Debug.Log("Player data loaded!");
-            /*if (playerData.GameVersion == null || playerData.GameVersion.Equals(""))
-            {
-                Debug.Log("New game version found, resetting data!");
-                ResetData();
-                return;
-            }
-            else
-            {
-                if (!playerData.GameVersion.Equals(GameVersion))
-                {
-                    Debug.Log("New game version found, resetting data!");
-                    ResetData();
-                    return;
-                }
-            }*/
 
         }
         else
@@ -288,7 +279,6 @@ public class GameControl : MonoBehaviour {
         BinaryFormatter bf = new BinaryFormatter();
         FileStream file = File.Create(Application.persistentDataPath + "/SGC.dat");
 
-        //WeaponUpgrades = new int[4, 7];
         ClearArrays();
         WeaponUnlocked = new bool[numberOfWeapons] { true, false, false, false };
         ResearchStarted = new bool[numberOfResearches] { false, false, false, false, false };
@@ -299,7 +289,6 @@ public class GameControl : MonoBehaviour {
         file.Close();
         Debug.Log("Player data RESET!");
         LoadData();
-        //SaveData();
 
         for (int i = 0; i < Weapons.Length; i++)
         {
@@ -315,6 +304,7 @@ public class GameControl : MonoBehaviour {
         Array.Clear(WeaponSkill, 0, WeaponSkill.Length);
         Array.Clear(Experience, 0, Experience.Length);
         Array.Clear(WeaponUpgradePointsTotal, 0, WeaponUpgradePointsTotal.Length);
+        WeaponUpgradePointsTotal[0] = 4;
         Array.Clear(WeaponUpgradePointsAvailable, 0, WeaponUpgradePointsAvailable.Length);
         Array.Clear(ResearchStartTimes, 0, ResearchStartTimes.Length);
         StartZoneUnlocked.Clear();
@@ -343,14 +333,13 @@ public class GameControl : MonoBehaviour {
         if (ResetData)
         {
             data.scrapCount = 0;
-            data.shipArmor = 0;
             data.selectedWeapon = 0;
-            data.ArmorUpgrades = 0;
             data.researchMaterialCount = 0;
             data.highestLevelAchieved = 1;
             data.ScrapBoostActive = false;
             data.DateDailyResearchTime = new DateTime(2001, 1, 1, 6, 0, 0);
             data.DateDailyScrapBoostTime = new DateTime(2001, 1, 1, 6, 0, 0);
+            data.DateDailyTrainingTime = new DateTime(2001, 1, 1, 6, 0, 0);
             data.ShipShieldGenerator = false;
             data.ShipReactiveArmor = false;
             data.ShipRepairBots = false;
@@ -358,11 +347,10 @@ public class GameControl : MonoBehaviour {
         else
         {
             data.scrapCount = scrapCount;
-            data.shipArmor = shipArmor;
             data.selectedWeapon = SelectedWeapon;
-            data.ArmorUpgrades = ArmorUpgrades;
             data.researchMaterialCount = researchMaterialCount;
             data.DateDailyResearchTime = DateDailyResearchTime;
+            data.DateDailyTrainingTime = DateDailyTrainingTime;
             data.DateDailyScrapBoostTime = DateDailyScrapBoostTime;
             data.ScrapBoostActive = ScrapBoostActive;
             data.ShipShieldGenerator = ShipShieldGenerator;
@@ -378,7 +366,6 @@ public class GameControl : MonoBehaviour {
         data.WeaponUpgrades = WeaponUpgrades;
         data.WeaponUpgradePointsTotal = WeaponUpgradePointsTotal;
         data.WeaponUpgradePointsAvailable = WeaponUpgradePointsAvailable;
-        data.GameVersion = GameVersion;
 
         return data;
     }
@@ -386,74 +373,84 @@ public class GameControl : MonoBehaviour {
     private void SetPlayerData(PlayerData data)
     {
         scrapCount = data.scrapCount;
-        shipArmor = data.shipArmor;
         SelectedWeapon = data.selectedWeapon;
-        ArmorUpgrades = data.ArmorUpgrades;
         ScrapBoostActive = data.ScrapBoostActive;
         ShipReactiveArmor = data.ShipReactiveArmor;
         ShipRepairBots = data.ShipRepairBots;
         ShipShieldGenerator = data.ShipShieldGenerator;
         researchMaterialCount = data.researchMaterialCount;
         
-        if (!data.GameVersion.Equals(GameVersion))
-           
-
         if (data.highestLevelAchieved != 0)
             highestLevelAchieved = data.highestLevelAchieved;
 
-        if (data.WeaponSkill.Length != 0)
-            WeaponSkill = data.WeaponSkill;
+        if (data.WeaponSkill != null)
+            if (data.WeaponSkill.Length != 0)
+                WeaponSkill = data.WeaponSkill;
         else
             Debug.Log("WeaponSkill[] length is 0");
 
-        if (data.Experience.Length != 0)
-            Experience = data.Experience;
+        if (data.Experience != null)
+            if (data.Experience.Length != 0)
+                Experience = data.Experience;
         else
             Debug.Log("Experience[] length is 0");
 
         if (data.WeaponUnlocked != null)
-            WeaponUnlocked = data.WeaponUnlocked;
+            if (data.WeaponUnlocked.Length != 0)
+                WeaponUnlocked = data.WeaponUnlocked;
         else
-            Debug.Log("WeaponUnlocked[] is null");
+            Debug.Log("WeaponUnlocked[] length is 0");
 
         if (data.StartZoneUnlocked != null)
-            StartZoneUnlocked = data.StartZoneUnlocked;
+            if (data.StartZoneUnlocked.Count != 0)
+                StartZoneUnlocked = data.StartZoneUnlocked;
         else
-            Debug.Log("StartZoneUnlocked[] is null");
+            Debug.Log("StartZoneUnlocked[] length is 0");
 
         if (data.WeaponUpgrades != null)
-            WeaponUpgrades = data.WeaponUpgrades;
+            if (data.WeaponUpgrades.Length != 0)
+                WeaponUpgrades = data.WeaponUpgrades;
         else
-            Debug.Log("WeaponUpgrades[] is null");
+            Debug.Log("WeaponUpgrades[] length is 0");
 
-        if (data.WeaponUpgradePointsTotal.Length != 0)
-            WeaponUpgradePointsTotal = data.WeaponUpgradePointsTotal;
+        if (data.WeaponUpgradePointsTotal != null)
+            if (data.WeaponUpgradePointsTotal.Length != 0)
+                WeaponUpgradePointsTotal = data.WeaponUpgradePointsTotal;
         else
             Debug.Log("WeaponUpgradePointsTotal[] length is 0");
 
-        if (data.WeaponUpgradePointsAvailable.Length != 0)
-            WeaponUpgradePointsAvailable = data.WeaponUpgradePointsAvailable;
+        if (data.WeaponUpgradePointsAvailable != null)
+            if (data.WeaponUpgradePointsAvailable.Length != 0)
+                WeaponUpgradePointsAvailable = data.WeaponUpgradePointsAvailable;
         else
             Debug.Log("WeaponUpgradePointsAvailable[] length is 0");
+
         if (data.DateDailyResearchTime != null)
             DateDailyResearchTime = data.DateDailyResearchTime;
         else
             Debug.Log("DateDailyResearchTime is null");
+
         if (data.DateDailyScrapBoostTime != null)
             DateDailyScrapBoostTime = data.DateDailyScrapBoostTime;
         else
             Debug.Log("DateDailyScrapBoostTime is null");
 
-        if (data.ResearchStartTimes != null)
-            ResearchStartTimes = data.ResearchStartTimes;
+        if (data.DateDailyTrainingTime != null)
+            DateDailyTrainingTime = data.DateDailyTrainingTime;
         else
-            Debug.Log("ResearchStartTimes[] is null");
+            Debug.Log("DateDailyTrainingTime is null");
+
+        if (data.ResearchStartTimes != null)
+            if (data.ResearchStartTimes.Length != 0)
+                ResearchStartTimes = data.ResearchStartTimes;
+        else
+            Debug.Log("ResearchStartTimes[] length is 0");
 
         if (data.ResearchStarted != null)
-            ResearchStarted = data.ResearchStarted;
+            if (data.ResearchStarted.Length != 0)
+                ResearchStarted = data.ResearchStarted;
         else
             Debug.Log("ResearchStarted is null");
-
 
     }
 
@@ -548,29 +545,26 @@ public class GameControl : MonoBehaviour {
 [Serializable]
 class PlayerData
 {
+    // DO NOT MAKE CHANGES HERE
     public int scrapCount;
 
     public int researchMaterialCount;
 
-    public int shipArmor;
+    public int[] WeaponSkill;
 
-    public int ArmorUpgrades;
+    public int[] Experience;
 
-    public int[] WeaponSkill = new int[GameControl.gc.GetNumberOfWeapons()];
+    public bool[] WeaponUnlocked;
 
-    public int[] Experience = new int[GameControl.gc.GetNumberOfWeapons()];
+    public System.Collections.Generic.List<int> StartZoneUnlocked;
 
-    public bool[] WeaponUnlocked = new bool[GameControl.gc.GetNumberOfWeapons()];
+    public bool[] ResearchStarted;
 
-    public System.Collections.Generic.List<int> StartZoneUnlocked = new System.Collections.Generic.List<int>();
+    public int[,] WeaponUpgrades;
 
-    public bool[] ResearchStarted = new bool[GameControl.gc.GetNumberOfResearches()];
+    public int[] WeaponUpgradePointsTotal;
 
-    public int[,] WeaponUpgrades = new int[GameControl.gc.GetNumberOfWeapons(), 7];
-
-    public int[] WeaponUpgradePointsTotal = new int[GameControl.gc.GetNumberOfWeapons()];
-
-    public int[] WeaponUpgradePointsAvailable = new int[GameControl.gc.GetNumberOfWeapons()];
+    public int[] WeaponUpgradePointsAvailable;
 
     public DateTime DateDailyResearchTime;
 
@@ -584,13 +578,20 @@ class PlayerData
 
     public bool ShipReactiveArmor;
 
-    public DateTime[] ResearchStartTimes = new DateTime[GameControl.gc.GetNumberOfResearches()];
+    public DateTime[] ResearchStartTimes;
 
     public int selectedWeapon;
 
     public int highestLevelAchieved;
 
-    public string GameVersion;
+    public DateTime DateDailyTrainingTime;
+    
+}
+
+[Serializable]
+class PlayerDataExtension
+{
+    public int[] ExtensionData;
 }
 
 namespace Asteroids

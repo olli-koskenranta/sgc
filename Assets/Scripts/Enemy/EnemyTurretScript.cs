@@ -40,11 +40,20 @@ public class EnemyTurretScript : MonoBehaviour {
 
     private void HitEffect()
     {
-        ParticleSystem.MainModule mm;
         GameObject hiteffect;
-        hiteffect = Instantiate(hit_effect, transform.position, Quaternion.identity) as GameObject;
+        hiteffect = ObjectPool.pool.GetPooledObject(GameControl.gc.hit_effect, 1);
+        if (hiteffect == null)
+            return;
+
+        Vector3 rngpos = transform.position;
+        rngpos.x += Random.Range(-0.1f, 0.1f);
+        rngpos.y += Random.Range(-0.1f, 0.1f);
+
+        ParticleSystem.MainModule mm;
+        hiteffect.transform.position = rngpos;
         mm = hiteffect.GetComponent<ParticleSystem>().main;
         mm.startColor = gameObject.GetComponent<SpriteRenderer>().color;
+        hiteffect.SetActive(true);
     }
 
     private void Shoot()

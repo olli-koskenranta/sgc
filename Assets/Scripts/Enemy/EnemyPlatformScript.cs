@@ -3,7 +3,7 @@
 public class EnemyPlatformScript : MonoBehaviour {
 
     private float gravityHitTime;
-    private float gravityHitResetTime = 2f;
+    private float gravityHitResetTime = 4f;
     private int hitPoints;
 
     private float destroyed_time;
@@ -18,13 +18,17 @@ public class EnemyPlatformScript : MonoBehaviour {
 
     GameObject battlestation;
 
+    private float hitTime;
+    private float critTime;
+
+
     void Start ()
     {
         battlestation = GameObject.FindWithTag("Anomaly4");
         floatingText = GameControl.gc.floatingText;
         trans = transform;
         ALIVE = true;
-        hitPoints = 100000;
+        hitPoints = battlestation.GetComponent<AnomalyScript>().maxHitPoints / 8;
         gravityHitTime = Time.time;
         hit_effect = GameControl.gc.hit_effect;
     }
@@ -111,10 +115,18 @@ public class EnemyPlatformScript : MonoBehaviour {
             Damage = (int)nDamage;
         }
 
+        
         hitPoints -= Damage;
+        if (hitPoints >= 0)
+            battlestation.GetComponent<AnomalyScript>().isHit(Damage, true, false);
+        else
+        {
+            Damage += hitPoints;
+            battlestation.GetComponent<AnomalyScript>().isHit(Damage, true, false);
+        }
         if (hitPoints <= 0)
         {
-            battlestation.GetComponent<AnomalyScript>().GeneratorHit(3);
+            
             ALIVE = false;
             Explode();
             destroyed_time = Time.time;
@@ -141,23 +153,58 @@ public class EnemyPlatformScript : MonoBehaviour {
 
     private void HitEffect()
     {
-        ParticleSystem.MainModule mm;
         GameObject hiteffect;
-        hiteffect = Instantiate(hit_effect, trans.position, Quaternion.identity) as GameObject;
+        hiteffect = ObjectPool.pool.GetPooledObject(GameControl.gc.hit_effect, 1);
+        if (hiteffect == null)
+            return;
+
+        Vector3 rngpos = trans.position;
+        rngpos.x += Random.Range(-0.1f, 0.1f);
+        rngpos.y += Random.Range(-0.1f, 0.1f);
+
+        ParticleSystem.MainModule mm;
+        hiteffect.transform.position = rngpos;
         mm = hiteffect.GetComponent<ParticleSystem>().main;
         mm.startColor = gameObject.GetComponent<SpriteRenderer>().color;
+        hiteffect.SetActive(true);
     }
 
     private void DamageText(bool CRITICAL, int dmg)
     {
-        GameObject ft;
-        ft = Instantiate(floatingText, trans.position, Quaternion.identity) as GameObject;
-        ft.GetComponent<FloatingTextScript>().text = dmg.ToString();
-        ft.GetComponent<FloatingTextScript>().fttype = FloatingText.FTType.PopUp;
-        if (CRITICAL)
+        if (!CRITICAL)
         {
-            ft.GetComponent<TextMesh>().fontSize = 50;
-            ft.GetComponent<TextMesh>().color = Color.yellow;
+            if (Time.time - hitTime < 0.5f)
+                return;
+            GameObject normalDamageTextInstance;
+            normalDamageTextInstance = ObjectPool.pool.GetPooledObject(GameControl.gc.floatingText, 1);
+
+            if (normalDamageTextInstance == null)
+                return;
+
+            normalDamageTextInstance.transform.position = trans.position;
+            normalDamageTextInstance.GetComponent<FloatingTextScript>().fttype = FloatingText.FTType.PopUp;
+            normalDamageTextInstance.GetComponent<FloatingTextScript>().text = dmg.ToString();
+            normalDamageTextInstance.SetActive(true);
+            hitTime = Time.time;
+        }
+
+        else
+        {
+            if (Time.time - critTime < 0.5f)
+                return;
+            GameObject criticalDamageTextInstance;
+            criticalDamageTextInstance = ObjectPool.pool.GetPooledObject(GameControl.gc.floatingText, 1);
+
+            if (criticalDamageTextInstance == null)
+                return;
+
+            criticalDamageTextInstance.transform.position = trans.position;
+            criticalDamageTextInstance.GetComponent<FloatingTextScript>().fttype = FloatingText.FTType.PopUp;
+            criticalDamageTextInstance.GetComponent<FloatingTextScript>().text = dmg.ToString();
+            criticalDamageTextInstance.GetComponent<FloatingTextScript>().isCrit = true;
+            criticalDamageTextInstance.GetComponent<TextMesh>().color = Color.yellow;
+            criticalDamageTextInstance.SetActive(true);
+            critTime = Time.time;
         }
     }
 }

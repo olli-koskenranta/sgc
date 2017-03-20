@@ -3,19 +3,15 @@ using FloatingText;
 
 public class AnnouncerScript : MonoBehaviour {
 
-    private GameObject text;
-    private GameObject textInstance;
-
-
-    void Start () {
-        text = Resources.Load("FloatingText") as GameObject;
-	}
-
     public void Announce(string announcement, FTType type)
     {
-        textInstance = Instantiate(text, transform.position, Quaternion.identity) as GameObject;
+        GameObject textInstance;
+        textInstance = Instantiate(GameControl.gc.floatingText, transform.position, Quaternion.identity);
         textInstance.GetComponent<FloatingTextScript>().text = announcement;
         textInstance.GetComponent<FloatingTextScript>().fttype = type;
+        textInstance.GetComponent<FloatingTextScript>().KILL_ME = true;
+        textInstance.transform.position = transform.position;
+        //textInstance.SetActive(true);
     }
 
 }

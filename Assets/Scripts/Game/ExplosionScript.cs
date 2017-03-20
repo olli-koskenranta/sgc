@@ -2,9 +2,18 @@
 
 public class ExplosionScript : MonoBehaviour {
 
-	void Start ()
+    public bool KILL_ME = false;
+	void OnEnable ()
     {
-        Destroy(this.gameObject, GetComponent<ParticleSystem>().main.duration);
+        GetComponent<ParticleSystem>().Play();
+        Invoke("EndLife", GetComponent<ParticleSystem>().main.duration);
 	}
+
+    private void EndLife()
+    {
+        if (KILL_ME)
+            Destroy(gameObject);
+        gameObject.SetActive(false);
+    }
 	
 }

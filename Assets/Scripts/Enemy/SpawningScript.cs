@@ -115,7 +115,7 @@ public class SpawningScript : MonoBehaviour {
 
         else if ((GameControl.gc.currentLevel == 40 || (GameControl.gc.currentLevel - 40) % 50 == 0) && !ANOMALY_SPAWNED)
         {
-            GameObject.Find("UIControl").GetComponent<UIControlScript>().SetBossBarsActive(true, true);
+            GameObject.Find("UIControl").GetComponent<UIControlScript>().SetBossBarsActive(true);
             SpawnAnomaly(4);
             announcer.GetComponent<AnnouncerScript>().Announce("!ANOMALY DETECTED!", FloatingText.FTType.Danger);
         }

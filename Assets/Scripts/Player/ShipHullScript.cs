@@ -33,33 +33,51 @@ public class ShipHullScript : MonoBehaviour {
         {
             selectWeapon = GameObject.Find("ButtonWeapon1");
             selectWeapon.GetComponent<Button>().interactable = true;
+            Color newColor = selectWeapon.GetComponentInChildren<RawImage>().color;
+            newColor.a = 1;
+            selectWeapon.GetComponentInChildren<RawImage>().color = newColor;
         }
         else
         {
             selectWeapon = GameObject.Find("ButtonWeapon1");
             selectWeapon.GetComponent<Button>().interactable = false;
+            Color newColor = selectWeapon.GetComponentInChildren<RawImage>().color;
+            newColor.a = 0.47f;
+            selectWeapon.GetComponentInChildren<RawImage>().color = newColor;
         }
 
         if (GameControl.gc.WeaponUnlocked[1])
         {
             selectWeapon = GameObject.Find("ButtonWeapon2");
             selectWeapon.GetComponent<Button>().interactable = true;
+            Color newColor = selectWeapon.GetComponentInChildren<RawImage>().color;
+            newColor.a = 1;
+            selectWeapon.GetComponentInChildren<RawImage>().color = newColor;
         }
         else
         {
             selectWeapon = GameObject.Find("ButtonWeapon2");
             selectWeapon.GetComponent<Button>().interactable = false;
+            Color newColor = selectWeapon.GetComponentInChildren<RawImage>().color;
+            newColor.a = 0.47f;
+            selectWeapon.GetComponentInChildren<RawImage>().color = newColor;
         }
 
         if (GameControl.gc.WeaponUnlocked[2])
         {
             selectWeapon = GameObject.Find("ButtonWeapon3");
             selectWeapon.GetComponent<Button>().interactable = true;
+            Color newColor = selectWeapon.GetComponentInChildren<RawImage>().color;
+            newColor.a = 1;
+            selectWeapon.GetComponentInChildren<RawImage>().color = newColor;
         }
         else
         {
             selectWeapon = GameObject.Find("ButtonWeapon3");
             selectWeapon.GetComponent<Button>().interactable = false;
+            Color newColor = selectWeapon.GetComponentInChildren<RawImage>().color;
+            newColor.a = 0.47f;
+            selectWeapon.GetComponentInChildren<RawImage>().color = newColor;
         }
 
     }
@@ -70,8 +88,10 @@ public class ShipHullScript : MonoBehaviour {
             if (Time.time - destroyed_time >= destroyed_interval)
             {
                 Vector3 rngpos = new Vector3(Random.Range(-0.5f, 0.5f), Random.Range(-2f, 2f), 0f);
-                
-                Instantiate(hit_effect, transform.position + rngpos, Quaternion.identity);
+
+
+                GameObject explos = Instantiate(hit_effect, transform.position + rngpos, Quaternion.identity);
+                explos.GetComponent<ExplosionScript>().KILL_ME = true;
                 destroyed_time = Time.time;
             }
             transform.position += new Vector3(0f, -0.01f, 0);
@@ -155,6 +175,7 @@ public class ShipHullScript : MonoBehaviour {
         ft = Instantiate(floatingText, transform.position, Quaternion.identity) as GameObject;
         ft.GetComponent<FloatingTextScript>().text = dmg.ToString();
         ft.GetComponent<FloatingTextScript>().fttype = FloatingText.FTType.PopUp;
+        ft.GetComponent<FloatingTextScript>().KILL_ME = true;
         ft.GetComponent<TextMesh>().fontSize = 50;
         ft.GetComponent<TextMesh>().color = Color.red;
     }

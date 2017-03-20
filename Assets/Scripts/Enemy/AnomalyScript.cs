@@ -20,7 +20,8 @@ public class AnomalyScript : MonoBehaviour {
     private float destroyed_interval = 0.1f;
     private float damageStacks;
     public Transform trans;
-
+    private float hitTime;
+    private float critTime;
 
     //Boss spesific variables
 
@@ -49,7 +50,6 @@ public class AnomalyScript : MonoBehaviour {
     private GameObject generator;
     private int generatorHitPoints;
     private int generatorMaxHitPoints;
-    public Slider BossShieldBar;
 
     //5
     public int phase;
@@ -143,11 +143,6 @@ public class AnomalyScript : MonoBehaviour {
 
         BossHPBar = GameObject.Find("Canvas/SliderBossHP").GetComponent<Slider>();
         BossHPBar.maxValue = maxHitPoints;
-        if (anomalyNumber == 4)
-        { 
-            BossShieldBar = GameObject.Find("Canvas/SliderBossShield").GetComponent<Slider>();
-            BossShieldBar.maxValue = generatorMaxHitPoints;
-        }
 
         UpdateBossHPBar();
     }
@@ -318,31 +313,6 @@ public class AnomalyScript : MonoBehaviour {
         }
     }
 
-    public void OnGeneratorCollisionEnter(Collision2D col)
-    {
-        if (col.gameObject.tag.Equals("EnemyTurretPlatform"))
-        {
-            GeneratorHit(1);
-
-        }
-    }
-
-    public void GeneratorHit(int damage)
-    {
-        if (generatorHitPoints > 0)
-        {
-            generatorHitPoints -= damage;
-            UpdateBossHPBar();
-            HitEffect();
-            //Debug.Log(generatorHitPoints.ToString());
-        }
-        else
-        {
-            Destroy(generator);
-            Destroy(shield);
-        }
-    }
-
     public void OnTriggerStay2D(Collider2D col)
     {
         if (anomalyNumber == 5 && ALIVE && phase == 2 && col.gameObject.GetComponent<MeteorScript>() != null)
@@ -439,15 +409,20 @@ public class AnomalyScript : MonoBehaviour {
 
     private void HitEffect()
     {
+        GameObject hiteffect;
+        hiteffect = ObjectPool.pool.GetPooledObject(GameControl.gc.hit_effect, 1);
+        if (hiteffect == null)
+            return;
+
         Vector3 rngpos = trans.position;
         rngpos.x += Random.Range(-1f, 1f);
         rngpos.y += Random.Range(-1f, 1f);
         
         ParticleSystem.MainModule mm;
-        GameObject hiteffect;
-        hiteffect = Instantiate(hit_effect, rngpos, Quaternion.identity) as GameObject;
+        hiteffect.transform.position = rngpos;
         mm = hiteffect.GetComponent<ParticleSystem>().main;
         mm.startColor = gameObject.GetComponent<SpriteRenderer>().color;
+        hiteffect.SetActive(true);
     }
 
     private void SpawnFighter(float dirX = -1f, float dirY = 0f)
@@ -486,27 +461,42 @@ public class AnomalyScript : MonoBehaviour {
 
     private void DamageText(bool CRITICAL, int dmg)
     {
-        GameObject ft;
-        ft = Instantiate(floatingText, trans.position, Quaternion.identity) as GameObject;
-        ft.GetComponent<FloatingTextScript>().text = dmg.ToString();
-        ft.GetComponent<FloatingTextScript>().fttype = FloatingText.FTType.PopUp;
-        if (CRITICAL)
+        if (!CRITICAL)
         {
-            ft.GetComponent<TextMesh>().fontSize = 50;
-            ft.GetComponent<TextMesh>().color = Color.yellow;
+            if (Time.time - hitTime < 0.5f)
+                return;
+            GameObject normalDamageTextInstance;
+            normalDamageTextInstance = ObjectPool.pool.GetPooledObject(GameControl.gc.floatingText, 1);
+            if (normalDamageTextInstance == null)
+                return;
+            normalDamageTextInstance.transform.position = trans.position;
+            normalDamageTextInstance.GetComponent<FloatingTextScript>().fttype = FloatingText.FTType.PopUp;
+            normalDamageTextInstance.GetComponent<FloatingTextScript>().text = dmg.ToString();
+            normalDamageTextInstance.SetActive(true);
+            hitTime = Time.time;
+        }
+
+        else
+        {
+            if (Time.time - critTime < 0.5f)
+                return;
+            GameObject criticalDamageTextInstance;
+            criticalDamageTextInstance = ObjectPool.pool.GetPooledObject(GameControl.gc.floatingText, 1);
+            if (criticalDamageTextInstance == null)
+                return;
+            criticalDamageTextInstance.transform.position = trans.position;
+            criticalDamageTextInstance.GetComponent<FloatingTextScript>().fttype = FloatingText.FTType.PopUp;
+            criticalDamageTextInstance.GetComponent<FloatingTextScript>().text = dmg.ToString();
+            criticalDamageTextInstance.GetComponent<FloatingTextScript>().isCrit = true;
+            criticalDamageTextInstance.GetComponent<TextMesh>().color = Color.yellow;
+            criticalDamageTextInstance.SetActive(true);
+            critTime = Time.time;
         }
     }
 
     void UpdateBossHPBar()
     {
         BossHPBar.value = hitPoints;
-        if (anomalyNumber == 4)
-        {
-            BossShieldBar.value = generatorHitPoints;
-
-            if (BossShieldBar.value == 0)
-                BossShieldBar.gameObject.SetActive(false);
-        }
     }
 
     private void Explode()

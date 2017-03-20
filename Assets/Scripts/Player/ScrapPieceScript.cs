@@ -18,11 +18,10 @@ public class ScrapPieceScript : MonoBehaviour {
             GetComponent<SpriteRenderer>().color = Color.cyan;
     }
 	
-	// Update is called once per frame
-	void Update () {
-
+    void FixedUpdate()
+    {
         //Destroy gameobject if "out of bounds"
-        if (gameObject.transform.position.x > 19 || gameObject.transform.position.x < -10 || gameObject.transform.position.y < -7 || gameObject.transform.position.y > 7 )
+        if (gameObject.transform.position.x > 19 || gameObject.transform.position.x < -10 || gameObject.transform.position.y < -7 || gameObject.transform.position.y > 7)
             Destroy(gameObject);
     }
 
@@ -30,19 +29,20 @@ public class ScrapPieceScript : MonoBehaviour {
     {
         if (col.gameObject.tag.Equals("Collector"))
         {
-            GameObject ft;
-            GameObject floatingText = GameControl.gc.floatingText;
-            ft = Instantiate(floatingText, transform.position, Quaternion.identity) as GameObject;
+            
+            GameObject floatingText = ObjectPool.pool.GetPooledObject(GameControl.gc.floatingText, 1);
             if (type == ScrapType.ResearchMaterial)
             {
-                ft.GetComponent<TextMesh>().color = Color.cyan;
-                ft.GetComponent<FloatingTextScript>().text = "+" + researchMaterialAmount.ToString();
+                floatingText.GetComponent<TextMesh>().color = Color.cyan;
+                floatingText.GetComponent<FloatingTextScript>().text = "+" + researchMaterialAmount.ToString();
             }
             else
             {
-                ft.GetComponent<FloatingTextScript>().text = "+" + scrapAmount.ToString();
+                floatingText.GetComponent<FloatingTextScript>().text = "+" + scrapAmount.ToString();
             }
-            ft.GetComponent<FloatingTextScript>().fttype = FloatingText.FTType.PopUp;
+            floatingText.GetComponent<FloatingTextScript>().fttype = FloatingText.FTType.PopUp;
+            floatingText.transform.position = transform.position;
+            floatingText.SetActive(true);
             Destroy(this.gameObject);
         }
     }
