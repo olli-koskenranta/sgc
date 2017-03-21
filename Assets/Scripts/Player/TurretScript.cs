@@ -234,7 +234,7 @@ public class TurretScript : MonoBehaviour {
 
         bulletInstance = Instantiate(splitBeam, trans.position + new Vector3(posX, posY), trans.rotation) as GameObject;
         PlayerProjectileScript bulletScript = bulletInstance.GetComponent<PlayerProjectileScript>();
-        bulletScript.damage /= 2;
+        //bulletScript.damage /= 2;
         bulletScript.Critical = isCrit;
         bulletScript.Special = isSpecial;
 

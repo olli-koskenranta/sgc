@@ -165,14 +165,14 @@ public class MeteorScript : MonoBehaviour {
 
                 if (anomaly5.GetComponent<AnomalyScript>().phase == 0)
                 {
-                    armor = baseArmor + 1f;
+                    //armor = baseArmor + 1f;
                     gameObject.GetComponent<SpriteRenderer>().color = Color.cyan;
                     Vector2 forceVector = (anomaly5.transform.position - trans.position).normalized * gameObject.GetComponent<Rigidbody2D>().mass / 10; // * GameControlScript.gameControl.currentLevel;
                     GetComponent<Rigidbody2D>().AddForce(forceVector, ForceMode2D.Impulse);
                 }
                 else if (anomaly5.GetComponent<AnomalyScript>().phase == 1)
                 {
-                    armor = baseArmor;
+                    //armor = baseArmor;
                     if (tagged)
                     {
 
@@ -273,6 +273,25 @@ public class MeteorScript : MonoBehaviour {
                 gameObject.GetComponent<MeteorScript>().hitPoints = 1;
                 col.gameObject.GetComponent<PUBombScript>().HitEffect(trans.position);
                 gameObject.GetComponent<SpriteRenderer>().color = Color.gray;
+            }
+        }
+
+        else if (col.gameObject.GetComponent<AnomalyScript>() != null)
+        {
+            if (col.gameObject.GetComponent<AnomalyScript>().anomalyNumber == 5)
+            {
+                armor = baseArmor + 0.1f;
+            }
+        }
+    }
+
+    void OnTriggerExit2D(Collider2D col)
+    {
+        if ((col.gameObject.GetComponent<AnomalyScript>() != null))
+        {
+            if (col.gameObject.GetComponent<AnomalyScript>().anomalyNumber == 5)
+            {
+                armor = baseArmor;
             }
         }
     }

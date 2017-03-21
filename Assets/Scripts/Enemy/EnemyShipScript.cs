@@ -81,7 +81,7 @@ public class EnemyShipScript : MonoBehaviour {
                 XP = 12;
                 transform.localRotation = Quaternion.Euler(0, 0, 180);
                 projectile_speed = 0.5f;
-                fire_interval = 1f;
+                fire_interval = 2f;
                 Bullet = Resources.Load("Missile") as GameObject;
                 GetComponent<Rigidbody2D>().mass = enemyMissileCruiserMass * GameControl.gc.currentLevel;
                 damage = enemyMissileCruiserDamage;
