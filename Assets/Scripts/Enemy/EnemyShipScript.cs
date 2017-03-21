@@ -280,7 +280,11 @@ public class EnemyShipScript : MonoBehaviour {
             float newDamage = incomingDamage;
             if (!ignoreArmor)
             {
-                newDamage -= (armor - armor * armorPierce)  * (float)incomingDamage;
+                float totalArmor = armor - armor * armorPierce;
+                if (totalArmor > 0.99f)
+                    totalArmor = 0.99f;
+
+                newDamage -= newDamage * totalArmor;
                 incomingDamage = (int)newDamage;
                 if (incomingDamage <= 1)
                     incomingDamage = 1;

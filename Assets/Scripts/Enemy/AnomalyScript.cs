@@ -197,9 +197,6 @@ public class AnomalyScript : MonoBehaviour {
                 break;
 
             case 4:
-                if (GameControl.gc.GAME_PAUSED)
-                    return;
-
                 GetComponent<SpriteRenderer>().transform.Rotate(Vector3.back * 0.2f);
 
                 if (shipHull != null && ALIVE)
@@ -309,6 +306,12 @@ public class AnomalyScript : MonoBehaviour {
                 iscrit = true;
             else
                 iscrit = false;
+
+            if (col.gameObject.GetComponent<PlayerProjectileScript>().damageAccumulation > 0)
+            {
+                damageStacks += 1;
+            }
+
             isHit(col.gameObject.GetComponent<PlayerProjectileScript>().damage, false, true, col.gameObject.GetComponent<PlayerProjectileScript>().armorPierce);
         }
     }
@@ -363,7 +366,11 @@ public class AnomalyScript : MonoBehaviour {
         float newDamage = incomingDamage;
         if (!ignoreArmor)
         {
-            newDamage -= newDamage * (armor - armor * armorPierce);
+            float totalArmor = armor - armor * armorPierce;
+            if (totalArmor > 0.99f)
+                totalArmor = 0.99f;
+
+            newDamage -= newDamage * totalArmor;
             incomingDamage = (int)(newDamage);
 
             if (incomingDamage <= 1)

@@ -25,6 +25,8 @@ public class CollectorScript : MonoBehaviour
     private float shieldGenTime;
     private float shieldGenInterval = 10f;
 
+    public bool ContGame = false;
+
     void Start()
     {
         shieldGenTime = Time.time;
@@ -41,6 +43,9 @@ public class CollectorScript : MonoBehaviour
 
     void Update()
     {
+        if (GameControl.gc.currentLevel == 201 && !ContGame)
+            return;
+
         if (Time.time - levelStartTime >= levelUpInterval && !IsBossPresent())
         {
             LevelUp();

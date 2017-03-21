@@ -38,7 +38,7 @@ public class EnemyTurretScript : MonoBehaviour {
         transform.rotation = Quaternion.Lerp(transform.rotation, q, rotateSpeed * Time.deltaTime);
     }
 
-    private void HitEffect()
+    /*private void HitEffect()
     {
         GameObject hiteffect;
         hiteffect = ObjectPool.pool.GetPooledObject(GameControl.gc.hit_effect, 1);
@@ -54,7 +54,7 @@ public class EnemyTurretScript : MonoBehaviour {
         mm = hiteffect.GetComponent<ParticleSystem>().main;
         mm.startColor = gameObject.GetComponent<SpriteRenderer>().color;
         hiteffect.SetActive(true);
-    }
+    }*/
 
     private void Shoot()
     {

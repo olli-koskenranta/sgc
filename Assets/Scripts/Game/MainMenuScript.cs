@@ -12,6 +12,7 @@ public class MainMenuScript : MonoBehaviour {
 	void Start ()
     {
         GameControl.gc.PauseGame(false);
+        GameObject.Find("Canvas").transform.FindChild("CreditsPanel").gameObject.SetActive(false);
         TextVersion.text = "Version " + GameControl.GameVersion;
     }
 
@@ -24,10 +25,15 @@ public class MainMenuScript : MonoBehaviour {
 
     public void CreditsClicked()
     {
-
+        GameObject.Find("Canvas").transform.FindChild("CreditsPanel").gameObject.SetActive(true);
     }
 
-    
+    public void CloseCredits()
+    {
+        GameObject.Find("Canvas").transform.FindChild("CreditsPanel").gameObject.SetActive(false);
+    }
+
+
 
 
 }

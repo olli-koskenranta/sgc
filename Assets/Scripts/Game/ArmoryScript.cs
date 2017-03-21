@@ -63,6 +63,7 @@ public class ArmoryScript : MonoBehaviour {
         btnDailyBoosts.transform.FindChild("ButtonDailyResearch").gameObject.SetActive(false);
         btnDailyBoosts.transform.FindChild("ButtonDailyScrap").gameObject.SetActive(false);
         btnDailyBoosts.transform.FindChild("ButtonDailyTraining").gameObject.SetActive(false);
+        btnDailyBoosts.transform.FindChild("ImageAd").gameObject.SetActive(false);
         buttonShipUpgrades.transform.FindChild("ButtonSU0").gameObject.SetActive(false);
         buttonShipUpgrades.transform.FindChild("ButtonSU1").gameObject.SetActive(false);
         buttonShipUpgrades.transform.FindChild("ButtonSU2").gameObject.SetActive(false);
@@ -322,9 +323,9 @@ public class ArmoryScript : MonoBehaviour {
     {
         if (IsDailyResearchAvailable())
         {
-            GameObject.Find("TextBoost").GetComponent<Text>().text = "Boost\nAvailable!";
+            GameObject.Find("TextBoost").GetComponent<Text>().text = "Boosts Available!";
             btnDailyResearch.interactable = true;
-            btnDailyResearch.GetComponentInChildren<Text>().text = "+5 Research Material!\nWatch Ad";
+            btnDailyResearch.GetComponentInChildren<Text>().text = "Research\n+5 Research Material!";
         }
         else
         {
@@ -334,9 +335,9 @@ public class ArmoryScript : MonoBehaviour {
 
         if (IsDailyScrapBoostAvailable())
         {
-            GameObject.Find("TextBoost").GetComponent<Text>().text = "Boost\nAvailable!";
+            GameObject.Find("TextBoost").GetComponent<Text>().text = "Boosts Available!";
             btnDailyScrapBoost.interactable = true;
-            btnDailyScrapBoost.GetComponentInChildren<Text>().text = "Scrap Boost\n+100% Scrap!\nWatch Ad";
+            btnDailyScrapBoost.GetComponentInChildren<Text>().text = "Daily Equipment Maintenance\n+100% Scrap Gained!";
         }
         else
         {
@@ -346,9 +347,9 @@ public class ArmoryScript : MonoBehaviour {
 
         if (IsDailyTrainingAvailable())
         {
-            GameObject.Find("TextBoost").GetComponent<Text>().text = "Boost\nAvailable!";
+            GameObject.Find("TextBoost").GetComponent<Text>().text = "Boosts Available!";
             btnDailyTraining.interactable = true;
-            btnDailyTraining.GetComponentInChildren<Text>().text = "Daily Training!\n+100 Max Skill for Selected Weapon";
+            btnDailyTraining.GetComponentInChildren<Text>().text = "Daily Training\n+100 Max Skill for Selected Weapon!";
 
         }
         else
@@ -359,7 +360,7 @@ public class ArmoryScript : MonoBehaviour {
 
         if (!IsDailyResearchAvailable() && !IsDailyScrapBoostAvailable() && !IsDailyTrainingAvailable())
         {
-            GameObject.Find("TextBoost").GetComponent<Text>().text = "Boosts";
+            GameObject.Find("TextBoost").GetComponent<Text>().text = "No Boosts Available";
         }
     }
 
@@ -494,6 +495,8 @@ public class ArmoryScript : MonoBehaviour {
             temp.SetActive(false);
             temp = btnDailyBoosts.transform.FindChild("ButtonDailyTraining").gameObject;
             temp.SetActive(false);
+            temp = btnDailyBoosts.transform.FindChild("ImageAd").gameObject;
+            temp.SetActive(false);
         }
         else
         {
@@ -501,6 +504,8 @@ public class ArmoryScript : MonoBehaviour {
             temp = btnDailyBoosts.transform.FindChild("ButtonDailyScrap").gameObject;
             temp.SetActive(true);
             temp = btnDailyBoosts.transform.FindChild("ButtonDailyTraining").gameObject;
+            temp.SetActive(true);
+            temp = btnDailyBoosts.transform.FindChild("ImageAd").gameObject;
             temp.SetActive(true);
         }
         UpdateArmoryUI();

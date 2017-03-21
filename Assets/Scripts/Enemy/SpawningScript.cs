@@ -42,6 +42,9 @@ public class SpawningScript : MonoBehaviour {
 
     public bool ANOMALY_SPAWNED = false;
 
+    public bool EARTH_SPAWNED = false;
+    public GameObject earthInstance;
+
     private Vector2 topLeft;
     private Vector2 bottomRight;
     Vector2[] spawnAreaCoordinates;
@@ -90,7 +93,17 @@ public class SpawningScript : MonoBehaviour {
 	
 	void Update () {
 
-        
+        if (GameControl.gc.currentLevel == 201)
+        {
+            if (!EARTH_SPAWNED)
+            {
+                GameObject earth = Resources.Load("Earth") as GameObject;
+                earthInstance = Instantiate(earth, new Vector3(15, 0, 0), Quaternion.identity);
+                announcer.GetComponent<AnnouncerScript>().Announce("EARTH DETECTED!", FloatingText.FTType.Danger);
+                EARTH_SPAWNED = true;
+            }
+            return;
+        }
 
         if ((GameControl.gc.currentLevel == 10 || (GameControl.gc.currentLevel - 10) % 50 == 0) && !ANOMALY_SPAWNED)
         {

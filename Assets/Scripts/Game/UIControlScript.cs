@@ -24,11 +24,14 @@ public class UIControlScript : MonoBehaviour {
         }
 
         if (SceneManager.GetActiveScene().name.Equals("GameWorld1"))
-            CloseOptions();
+        {
+            GameObject.Find("Canvas").transform.FindChild("OptionsPanel").gameObject.SetActive(false);
+            GameObject.Find("Canvas").transform.FindChild("EndingPanel").gameObject.SetActive(false);
+        }
         else if (SceneManager.GetActiveScene().name.Equals("MainMenu"))
-            CloseOptions();
+            GameObject.Find("Canvas").transform.FindChild("OptionsPanel").gameObject.SetActive(false);
 
-        
+
     }
 
     void Update()
@@ -51,15 +54,36 @@ public class UIControlScript : MonoBehaviour {
                 if (GameObject.Find("Canvas").transform.FindChild("OptionsPanel").gameObject.activeSelf)
                     CloseOptions();
                 else
+                {
                     ExitClicked();
+                    return;
+                }
+
+                if (GameObject.Find("Canvas").transform.FindChild("CreditsPanel").gameObject.activeSelf)
+                    GameObject.Find("Canvas").transform.FindChild("CreditsPanel").gameObject.SetActive(false);
             }
         
         }
 
         if (Input.GetKeyDown(KeyCode.R))
         {
+            if (GameControl.gc.GetSceneName().Equals("MainMenu"))
+            {
+                Debug.Log("Reset check invoked in 2...");
+                Invoke("ResetCheck", 2);
+            }
+        }
+    }
+
+    private void ResetCheck()
+    {
+        if (Input.GetKey(KeyCode.R))
+        {
+            Debug.Log("Confirmed");
             ResetClicked();
         }
+        else
+            Debug.Log("Canceled");
     }
 
     public void PlayGameClicked()
@@ -194,5 +218,17 @@ public class UIControlScript : MonoBehaviour {
             GameControl.gc.PauseGame(false);
     }
 
+    public void ContinueClicked()
+    {
+        GameControl.gc.PauseGame(false);
+        GameObject.Find("Collector").GetComponent<CollectorScript>().ContGame = true;
+        Destroy(GameObject.Find("EndingPanel"));
+    }
 
+    public void WatchTVWithThePresidentClicked()
+    {
+        StartCoroutine(GameObject.Find("AdManager").GetComponent<AdManagerScript>().ShowAd());
+        GameObject.Find("ButtonWatchAd").GetComponent<Button>().interactable = false;
+        GameObject.Find("ButtonWatchAd").GetComponent<Button>().GetComponentInChildren<Text>().text = "Watching TV with the President!";
+    }
 }

@@ -11,7 +11,7 @@ public class GameControl : MonoBehaviour {
     public const int numberOfWeapons = 4;
     public const int numberOfStartZones = 11;
     public const int numberOfResearches = 5;
-    public const string GameVersion = "PERKELE";
+    public const string GameVersion = "1.0";
 
     public static GameControl gc;
     public int scrapCount = 0;

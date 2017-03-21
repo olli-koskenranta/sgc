@@ -170,6 +170,7 @@ public class NebulaScript : MonoBehaviour {
         }
 
         ALIVE = false;
+        Destroy(GetComponent<Collider2D>());
         
         
     }

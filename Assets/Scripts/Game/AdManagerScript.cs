@@ -11,15 +11,18 @@ public class AdManagerScript : MonoBehaviour {
 
     void Awake()
     {
-        Advertisement.Initialize(GameID, true);
+        Advertisement.Initialize(GameID, false);
     }
 
     void Start()
     {
-        armory = GameObject.Find("ArmoryScript").GetComponent<ArmoryScript>();
-        if (armory)
+        if (GameControl.gc.GetSceneName().Equals("Armory"))
         {
-            Debug.Log("Armory found!");
+            armory = GameObject.Find("ArmoryScript").GetComponent<ArmoryScript>();
+            if (armory)
+            {
+                Debug.Log("Armory found!");
+            }
         }
     }
 
@@ -63,6 +66,8 @@ public class AdManagerScript : MonoBehaviour {
 
     void AdCallbackHandler(ShowResult result)
     {
+        if (armory == null)
+            return;
         switch (result)
         {
             case ShowResult.Finished:

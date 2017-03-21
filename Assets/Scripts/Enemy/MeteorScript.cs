@@ -289,7 +289,11 @@ public class MeteorScript : MonoBehaviour {
 
         if (!ignoreArmor)
         {
-            newDamage -= newDamage * (armor - armor * armorPierce);
+            float totalArmor = armor - armor * armorPierce;
+            if (totalArmor > 0.99f)
+                totalArmor = 0.99f;
+
+            newDamage -= newDamage * totalArmor;
             incomingDamage = (int)(newDamage);
 
             if (incomingDamage <= 1)
