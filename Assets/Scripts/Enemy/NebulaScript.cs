@@ -140,7 +140,8 @@ public class NebulaScript : MonoBehaviour {
 
     private void Consume(GameObject gameobj, int hp)
     {
-        hitPoints += 3 * hp;
+        float hitPointsGained = 2.5f * hp;
+        hitPoints += (int)hitPointsGained;
         Destroy(gameobj);
         if (preferredScale.x < 1f)
         {
