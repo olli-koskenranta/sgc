@@ -35,10 +35,6 @@ public class EnemyPlatformScript : MonoBehaviour {
 	
     void FixedUpdate()
     {
-        //Destroy if "out of bounds"
-        if (trans.position.x > 19 || trans.position.x < -9 || trans.position.y < -7 || trans.position.y > 7)
-            Destroy(gameObject);
-
         if (Time.time - gravityHitTime >= gravityHitResetTime && ALIVE)
         {
             gameObject.GetComponent<Rigidbody2D>().gravityScale = 0;

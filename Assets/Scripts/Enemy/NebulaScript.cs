@@ -154,7 +154,7 @@ public class NebulaScript : MonoBehaviour {
     {
         if (!ALIVE)
             return;
-        GameControl.gc.ExperienceGained(XP);
+        GameControl.gc.ExperienceGained(XP + 9 * consumedObjects);
         asteroidFragment = Resources.Load("ScrapPiece") as GameObject;
         for (int i = 0; i <= consumedObjects; i++)
         {
