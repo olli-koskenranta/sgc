@@ -28,9 +28,14 @@ public class EnemyPlatformScript : MonoBehaviour {
         floatingText = GameControl.gc.floatingText;
         trans = transform;
         ALIVE = true;
-        hitPoints = battlestation.GetComponent<AnomalyScript>().maxHitPoints / 8;
+        Invoke("SetHitPoints", 1);
         gravityHitTime = Time.time;
         hit_effect = GameControl.gc.hit_effect;
+    }
+
+    void SetHitPoints()
+    {
+        hitPoints = battlestation.GetComponent<AnomalyScript>().maxHitPoints / 8;
     }
 	
     void FixedUpdate()
@@ -81,8 +86,6 @@ public class EnemyPlatformScript : MonoBehaviour {
         {
             if (!ALIVE)
                 Destroy(gameObject);
-            else
-                isHit(col.gameObject.GetComponent<CollectorScript>().grinderDamage);
         }
     }
 
@@ -113,13 +116,8 @@ public class EnemyPlatformScript : MonoBehaviour {
 
         
         hitPoints -= Damage;
-        if (hitPoints >= 0)
-            battlestation.GetComponent<AnomalyScript>().isHit(Damage, true, false);
-        else
-        {
-            Damage += hitPoints;
-            battlestation.GetComponent<AnomalyScript>().isHit(Damage, true, false);
-        }
+        battlestation.GetComponent<AnomalyScript>().isHit(Damage, true, false);
+        
         if (hitPoints <= 0)
         {
             
