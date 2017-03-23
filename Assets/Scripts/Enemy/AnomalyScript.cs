@@ -202,6 +202,12 @@ public class AnomalyScript : MonoBehaviour {
                 if (shipHull != null && ALIVE)
                 {
                     GetComponent<Rigidbody2D>().velocity = (standingPosition.position - trans.position).normalized * 0.3f;
+                    //Debug.Log("Children: " + GetComponentsInChildren<EnemyPlatformScript>().Length.ToString());
+                    if (GetComponentsInChildren<EnemyPlatformScript>().Length == 0)
+                    {
+                        
+                        isHit(maxHitPoints, true, false);
+                    }
                 }
                 break;
             case 5:

@@ -4,7 +4,7 @@ public class EnemyPlatformScript : MonoBehaviour {
 
     private float gravityHitTime;
     private float gravityHitResetTime = 4f;
-    private int hitPoints;
+    public int hitPoints;
 
     private float destroyed_time;
     private float destroyed_interval = 0.3f;
@@ -40,6 +40,9 @@ public class EnemyPlatformScript : MonoBehaviour {
 	
     void FixedUpdate()
     {
+        if (trans.position.y < -8)
+            Destroy(gameObject);
+
         if (Time.time - gravityHitTime >= gravityHitResetTime && ALIVE)
         {
             gameObject.GetComponent<Rigidbody2D>().gravityScale = 0;
@@ -136,7 +139,7 @@ public class EnemyPlatformScript : MonoBehaviour {
         GameControl.gc.ExperienceGained(XP);
         //GetComponent<SpriteRenderer>().enabled = false;
         //GetComponent<PolygonCollider2D>().enabled = false;
-        Destroy(GetComponent<Collider2D>());
+        //Destroy(GetComponent<Collider2D>());
         gameObject.GetComponent<Rigidbody2D>().gravityScale += 1.5f;
         gameObject.GetComponent<SpriteRenderer>().color = Color.gray;
         HitEffect();
