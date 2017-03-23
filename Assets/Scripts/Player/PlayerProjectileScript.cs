@@ -220,7 +220,7 @@ public class PlayerProjectileScript : MonoBehaviour {
         bulletInstance.GetComponent<SpriteRenderer>().color = GetComponent<SpriteRenderer>().color;
         //bulletInstance.GetComponent<Transform>().localScale /= 2;
         bulletInstance.GetComponent<PlayerProjectileScript>().damageAccumulation = damageAccumulation;
-        bulletInstance.GetComponent<PlayerProjectileScript>().damage = damage / 4;
+        bulletInstance.GetComponent<PlayerProjectileScript>().damage = damage / 2;
     }
 
     public bool Piercing
