@@ -105,7 +105,7 @@ public class MeteorScript : MonoBehaviour {
                 XP = 20;
                 damage = hugeMeteorDamage;
                 GetComponent<Rigidbody2D>().mass = hugeMeteorMass * 10 * GameControl.gc.currentLevel;
-                hitPoints = hugeMeteorHitPoints * GameControl.gc.currentLevel;
+                hitPoints = medMeteorHitPoints * GameControl.gc.currentLevel;
                 GetComponent<Rigidbody2D>().velocity = trans.TransformDirection(Vector3.left * speed * 2);
                 break;
             default:
