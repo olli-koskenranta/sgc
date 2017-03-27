@@ -11,7 +11,7 @@ public class GameControl : MonoBehaviour {
     public const int numberOfWeapons = 4;
     public const int numberOfStartZones = 11;
     public const int numberOfResearches = 5;
-    public const string GameVersion = "1.08";
+    public const string GameVersion = "1.1";
 
     public static GameControl gc;
     public int scrapCount = 0;
@@ -31,6 +31,7 @@ public class GameControl : MonoBehaviour {
     public DateTime DateDailyScrapBoostTime;
     public DateTime DateDailyTrainingTime;
     public DateTime[] ResearchStartTimes;
+    public float ConvertTime;
     public bool[] ResearchStarted;
 
     public bool ScrapBoostActive;
@@ -97,7 +98,6 @@ public class GameControl : MonoBehaviour {
     //5 = Repel Shield,
     //6 = Attack speed
 
-    public bool[] PowerUps;
     public string[] PowerUpNames;
 
     public int[] ExtensionData;
@@ -109,27 +109,41 @@ public class GameControl : MonoBehaviour {
     public GameObject[] meteors;
     public GameObject hit_effect;
 
+    public bool exitWithoutSaving;
+    public bool firstBossDefeated;
+
     void Awake()
     {
-        
+        Debug.Log("GameControl Awake()");
 
         if (gc == null)
         {
             DontDestroyOnLoad(gameObject);
             gc = this;
+            Debug.Log("gc is null, gc is this!");
+            SceneManager.sceneLoaded += SceneManager_sceneLoaded;
 
-            
 
         }
         else if (gc != this)
         {
+            Debug.Log("gc not null, destroying this!");
             Destroy(gameObject);
         }
 
     }
 
+    private void SceneManager_sceneLoaded(Scene arg0, LoadSceneMode arg1)
+    {
+        Debug.Log("Scene loaded: " + arg0.name);
+        if (SceneManager.GetActiveScene().name.Equals("MainMenu"))
+            GameObject.Find("UIControl").GetComponent<UIControlScript>().ShowErrorPanel(false);
+    }
+
     void OnApplicationQuit()
     {
+        if (exitWithoutSaving)
+            return;
         SaveData();
         Debug.Log("Application quit!");
     }
@@ -138,6 +152,8 @@ public class GameControl : MonoBehaviour {
     {
         if (pauseStatus == true)
         {
+            if (exitWithoutSaving)
+                return;
             SaveData();
             Debug.Log("Application pause!");
         }
@@ -149,20 +165,25 @@ public class GameControl : MonoBehaviour {
     
     void Start()
     {
+        exitWithoutSaving = false;
+        firstBossDefeated = false;
+        Debug.Log("GameControl: Loading Resources...");
         floatingText = Resources.Load("FloatingText") as GameObject;
         scrapPiece = Resources.Load("ScrapPiece") as GameObject;
         meteors = new GameObject[2] { Resources.Load("medMeteor1") as GameObject, Resources.Load("bigMeteor1") as GameObject };
         hit_effect =  Resources.Load("Explosion") as GameObject;
+        Debug.Log("GameControl: Resource loading complete.");
 
         //Debug.Log("GameControl START()!");
-        GAME_PAUSED = false;
+        Debug.Log("GameControl: Initializing everything.");
+        
         ExtensionData = new int[ExtensionDataSize];
         
 
         WeaponUpgradeCosts = new int[] { 1000, 20000, 100000, 1000000 };
         WeaponUpgradeRMCosts = new int[] { 0, 4, 8, 10 };
 
-        highestLevelAchieved = 1;
+        
 
         /*
          * RepairBots = 0
@@ -175,37 +196,43 @@ public class GameControl : MonoBehaviour {
         ResearchRMCost = new int[numberOfResearches] { 10, 50, 5, 25, 100 };
 
         Experience = new int[numberOfWeapons];
-        PowerUps = new bool[numberOfPowerUps];
         PowerUpNames = new string[numberOfPowerUps] { "Kinetic Bomb", "Shield", "Gravity Bomb", "Max Weapon Skill" }; //, "Slow Meteors", "Cluster Projectile", "Repel Shield", "Attack Speed" };
         WeaponSkill = new int[numberOfWeapons] { 0, 0, 0, 0 };
         WeaponUnlocked = new bool[numberOfWeapons] { true, false, false, false };
         ResearchStarted = new bool[numberOfResearches] { false, false, false, false, false };
         
         AttackSpeedReductions = new float[] { 0.15f, 0.05f, 0.025f, 0 };
-        ExpForSkillUp = 10;
-        currentLevel = 1;
+        
         DateDailyResearchTime = new DateTime(2001, 1, 1, 6, 0, 0);
         DateDailyScrapBoostTime = new DateTime(2001, 1, 1, 6, 0, 0);
         DateDailyTrainingTime = new DateTime(2001, 1, 1, 6, 0, 0);
         ResearchStartTimes = new DateTime[numberOfResearches];
-        
-        ScrapBoostActive = false;
-
-        ShipRepairBots = false;
-        ShipShieldGenerator = false;
-        ShipReactiveArmor = false;
 
         WeaponUpgrades = new int[numberOfWeapons, 7];
         WeaponUpgradePointsTotal = new int[numberOfWeapons];
         WeaponUpgradePointsAvailable = new int[numberOfWeapons];
-
         StartZoneUnlocked = new System.Collections.Generic.List<int>();
-        
 
+        Debug.Log("GameControl: Initialization complete");
+
+        Debug.Log("GameControl: Clearing Arrays...");
         ClearArrays();
-        
+        Debug.Log("GameControl: Array clear complete");
 
 
+        Debug.Log("GameControl: Setting default values.");
+        ExpForSkillUp = 10;
+        currentLevel = 1;
+        highestLevelAchieved = 1;
+        ScrapBoostActive = false;
+        ShipRepairBots = false;
+        ShipShieldGenerator = false;
+        ShipReactiveArmor = false;
+        GAME_PAUSED = false;
+
+
+
+        Debug.Log("GameControl: Creating weapons...");
         Weapons = new Turret[numberOfWeapons];
 
         //Create weapons
@@ -225,29 +252,53 @@ public class GameControl : MonoBehaviour {
         Weapons[1] = PulseLaserTurret;
         Weapons[2] = MassDriverTurret;
         Weapons[3] = PlasmaTurret;
+        Debug.Log("GameControl: Weapons created.");
 
-
-        ResetPowerUps();
+        Debug.Log("GameControl: Loading data...");
         LoadData();
 
+        Debug.Log("GameControl: Updating Weapon Values...");
         for (int i = 0; i < Weapons.Length; i++)
         {
             Weapons[i].UpdateValues(i);
         }
+        Debug.Log("GameControl: Weapon Values Update complete");
 
     }
 
-    public void SaveData()
+    public void SaveData(bool saveBackUp = false)
     {
-        
-        BinaryFormatter bf = new BinaryFormatter();
-        FileStream file = File.Create(Application.persistentDataPath + "/SGC.dat");
-        PlayerData playerData = GetPlayerData();
+        try
+        {
+            BinaryFormatter bf = new BinaryFormatter();
+            FileStream file = File.Create(Application.persistentDataPath + "/SGC.dat");
 
-        bf.Serialize(file, playerData);
-        file.Close();
-        Debug.Log("Player data saved!");
-        
+            PlayerData playerData = GetPlayerData();
+
+            bf.Serialize(file, playerData);
+            file.Close();
+
+            if (saveBackUp)
+            {
+                FileStream backupFile = File.Create(Application.persistentDataPath + "/SGC.backup");
+                bf.Serialize(backupFile, playerData);
+                backupFile.Close();
+                Debug.Log("Backup saved!");
+            }
+            Debug.Log("Player data saved!");
+        }
+
+        catch (Exception e)
+        {
+            Debug.LogError(e.Message);
+            string errorMessage = e.Message;
+            string errorPath = Application.persistentDataPath + "/Error.txt";
+            
+            using (StreamWriter outputFile = new StreamWriter(errorPath, true))
+            {
+                    outputFile.WriteLine(errorMessage);
+            }
+        }
     }
 
     public void LoadData()
@@ -263,14 +314,16 @@ public class GameControl : MonoBehaviour {
             SetPlayerData(playerData);
 
             Debug.Log("Player data loaded!");
+            GameObject.Find("UIControl").GetComponent<UIControlScript>().ShowErrorPanel(false);
 
         }
         else
         {
             Debug.Log("Player data not found!");
-            ResetData();
-            return;
+            if (PlayerPrefs.GetInt(GameControl.gc.GetTutorialKey(), 0) == 1)
+                GameObject.Find("UIControl").GetComponent<UIControlScript>().ShowErrorPanel(true);
         }
+
     }
 
     public void ResetData()
@@ -454,13 +507,6 @@ public class GameControl : MonoBehaviour {
 
     }
 
-    public void ResetPowerUps()
-    {
-        
-        for (int i = 0; i < PowerUps.Length; i++)
-            PowerUps[i] = false;
-    }
-
     public int GetNumberOfPowerUps()
     {
         return numberOfPowerUps;
@@ -596,7 +642,7 @@ class PlayerDataExtension
 
 namespace Asteroids
 {
-    public enum AsteroidType { NONE, Medium, Big, Huge }
+    public enum AsteroidType { NONE, Medium, Big, Huge, Golden }
 }
 
 namespace FloatingText

@@ -15,19 +15,19 @@ public class ArmoryScript : MonoBehaviour {
     public Button selectWeapon0;
     public Button selectWeapon1;
     public Button selectWeapon2;
-    public Button buttonShipUpgrades;
+    public Button btnShipUpgrades;
     public Button btnBuyPoints;
     public Button btnDailyResearch;
     public Button btnDailyScrapBoost;
     public Button btnDailyTraining;
     public Button btnDailyBoosts;
+    public Button btnConvert;
     public Button btnSU0;
     public Button btnSU1;
     public Button btnSU2;
 
     public Dropdown ddSelectZone;
-
-    
+        
 
     private ResearchType researchType = 0;
     private AnnouncerScript announcer;
@@ -48,6 +48,7 @@ public class ArmoryScript : MonoBehaviour {
     private bool DAILY_RESEARCH = false;
     private bool DAILY_SCRAPBOOST = false;
     private bool DAILY_TRAINING = false;
+    private bool CONVERT_RM = false;
 
     private int[] StartingZones;
 
@@ -64,9 +65,9 @@ public class ArmoryScript : MonoBehaviour {
         btnDailyBoosts.transform.FindChild("ButtonDailyScrap").gameObject.SetActive(false);
         btnDailyBoosts.transform.FindChild("ButtonDailyTraining").gameObject.SetActive(false);
         btnDailyBoosts.transform.FindChild("ImageAd").gameObject.SetActive(false);
-        buttonShipUpgrades.transform.FindChild("ButtonSU0").gameObject.SetActive(false);
-        buttonShipUpgrades.transform.FindChild("ButtonSU1").gameObject.SetActive(false);
-        buttonShipUpgrades.transform.FindChild("ButtonSU2").gameObject.SetActive(false);
+        btnShipUpgrades.transform.FindChild("ButtonSU0").gameObject.SetActive(false);
+        btnShipUpgrades.transform.FindChild("ButtonSU1").gameObject.SetActive(false);
+        btnShipUpgrades.transform.FindChild("ButtonSU2").gameObject.SetActive(false);
         GameObject.Find("Canvas").transform.FindChild("PanelResearch").gameObject.SetActive(false);
         textNotEnoughResources.gameObject.SetActive(false);
 
@@ -102,6 +103,35 @@ public class ArmoryScript : MonoBehaviour {
 
     public void UpdateArmoryUI()
     {
+        //Disable "extra" buttons if tutorial is not complete
+        if (PlayerPrefs.GetInt(GameControl.gc.GetTutorialKey(), 0) == 0)
+        {
+            btnShipUpgrades.interactable = false;
+            btnBuyPoints.interactable = false;
+            btnDailyBoosts.interactable = false;
+            ddSelectZone.interactable = false;
+            selectWeapon1.interactable = false;
+            selectWeapon2.interactable = false;
+            
+        }
+        else
+        {
+            btnShipUpgrades.interactable = true;
+            btnBuyPoints.interactable = true;
+            btnDailyBoosts.interactable = true;
+            ddSelectZone.interactable = true;
+            selectWeapon1.interactable = true;
+            selectWeapon2.interactable = true;
+        }
+
+        if (GameControl.gc.highestLevelAchieved < 101)
+        {
+            btnConvert.gameObject.SetActive(false);
+        }
+        else
+        {
+            btnConvert.gameObject.SetActive(true);
+        }
 
         string specialText2;
         if (GameControl.gc.SelectedWeapon == 0)
@@ -150,6 +180,7 @@ public class ArmoryScript : MonoBehaviour {
         UpdateWeaponTexts();
         UpdateDailyBoostTexts();
         HighlightSelectedWeapon();
+        UpdateConversionButton();
         
 
 
@@ -287,6 +318,24 @@ public class ArmoryScript : MonoBehaviour {
             btnSU2.GetComponentInChildren<Text>().text = "Research Reactive Armor";
     }
 
+    public void UpdateConversionButton()
+    {
+        float timeDifference = Time.realtimeSinceStartup - GameControl.gc.ConvertTime;
+        if (btnConvert.gameObject.activeSelf)
+        {
+            if (timeDifference >= 120)
+            {
+                btnConvert.GetComponentInChildren<Text>().text = "+50 Weapon Skill\nCost: 50 RM + Ad";
+            }
+            else
+            {
+                int cooldown = 120 - (int)timeDifference;
+                btnConvert.GetComponentInChildren<Text>().text = "Available in: \n" + cooldown.ToString() + " seconds";
+            }
+        }
+
+    }
+
     public void UpdateWeaponTexts()
     {
         selectWeapon0.GetComponentInChildren<Text>().text = GameControl.gc.WeaponNames[0];
@@ -321,11 +370,17 @@ public class ArmoryScript : MonoBehaviour {
 
     public void UpdateDailyBoostTexts()
     {
-        if (IsDailyResearchAvailable())
+        if (IsDailyResearchAvailable() && GameControl.gc.firstBossDefeated)
         {
             GameObject.Find("TextBoost").GetComponent<Text>().text = "Boosts Available!";
             btnDailyResearch.interactable = true;
             btnDailyResearch.GetComponentInChildren<Text>().text = "Research\n+5 Research Material!";
+        }
+
+        else if (IsDailyResearchAvailable() && !GameControl.gc.firstBossDefeated)
+        {
+            btnDailyResearch.interactable = false;
+            btnDailyResearch.GetComponentInChildren<Text>().text = "Defeat an Anomaly to Unlock Research!";
         }
         else
         {
@@ -333,11 +388,16 @@ public class ArmoryScript : MonoBehaviour {
             btnDailyResearch.GetComponentInChildren<Text>().text = "Research\nCompleted\nCooldown " + researchCooldown.ToString() + " Hour";
         }
 
-        if (IsDailyScrapBoostAvailable())
+        if (IsDailyScrapBoostAvailable() && GameControl.gc.firstBossDefeated)
         {
             GameObject.Find("TextBoost").GetComponent<Text>().text = "Boosts Available!";
             btnDailyScrapBoost.interactable = true;
             btnDailyScrapBoost.GetComponentInChildren<Text>().text = "Daily Equipment Maintenance\n+100% Scrap Gained!";
+        }
+        else if (IsDailyScrapBoostAvailable() && !GameControl.gc.firstBossDefeated)
+        {
+            btnDailyScrapBoost.interactable = false;
+            btnDailyScrapBoost.GetComponentInChildren<Text>().text = "Defeat an Anomaly to Unlock Daily Scrap Boost!";
         }
         else
         {
@@ -345,12 +405,17 @@ public class ArmoryScript : MonoBehaviour {
             btnDailyScrapBoost.GetComponentInChildren<Text>().text = "Scrap Boost\nActive";
         }
 
-        if (IsDailyTrainingAvailable())
+        if (IsDailyTrainingAvailable() && GameControl.gc.firstBossDefeated)
         {
             GameObject.Find("TextBoost").GetComponent<Text>().text = "Boosts Available!";
             btnDailyTraining.interactable = true;
             btnDailyTraining.GetComponentInChildren<Text>().text = "Daily Training\n+100 Max Skill for Selected Weapon!";
 
+        }
+        else if (IsDailyTrainingAvailable() && !GameControl.gc.firstBossDefeated)
+        {
+            btnDailyTraining.interactable = false;
+            btnDailyTraining.GetComponentInChildren<Text>().text = "Defeat an anomaly to Unlock Daily Training!";
         }
         else
         {
@@ -389,6 +454,29 @@ public class ArmoryScript : MonoBehaviour {
             return;
         researchType = (ResearchType)value;
         ShowResearchPanel(true);
+    }
+
+    public void RMConvertClicked()
+    {
+        if (CONVERT_RM)
+            return;
+
+        float timeDifference = Time.time - GameControl.gc.ConvertTime;
+        if (timeDifference >= 120)
+        {
+            if (GameControl.gc.researchMaterialCount >= 50)
+            {
+                CONVERT_RM = true;
+                StartCoroutine(adManager.ShowAd());
+            }
+            else
+            {
+                Debug.Log("Not enough research material");
+                ShowWarning();
+            }
+        }
+        else
+            UpdateConversionButton();
     }
 
     public void ShowResearchPanel(bool value)
@@ -513,21 +601,21 @@ public class ArmoryScript : MonoBehaviour {
 
     public void ShipSystemsClicked()
     {
-        GameObject temp = buttonShipUpgrades.transform.FindChild("ButtonSU0").gameObject;
+        GameObject temp = btnShipUpgrades.transform.FindChild("ButtonSU0").gameObject;
         if (temp.activeSelf)
         {
             temp.SetActive(false);
-            temp = buttonShipUpgrades.transform.FindChild("ButtonSU1").gameObject;
+            temp = btnShipUpgrades.transform.FindChild("ButtonSU1").gameObject;
             temp.SetActive(false);
-            temp = buttonShipUpgrades.transform.FindChild("ButtonSU2").gameObject;
+            temp = btnShipUpgrades.transform.FindChild("ButtonSU2").gameObject;
             temp.SetActive(false);
         }
         else
         {
             temp.SetActive(true);
-            temp = buttonShipUpgrades.transform.FindChild("ButtonSU1").gameObject;
+            temp = btnShipUpgrades.transform.FindChild("ButtonSU1").gameObject;
             temp.SetActive(true);
-            temp = buttonShipUpgrades.transform.FindChild("ButtonSU2").gameObject;
+            temp = btnShipUpgrades.transform.FindChild("ButtonSU2").gameObject;
             temp.SetActive(true);
         }
         UpdateArmoryUI();
@@ -704,6 +792,16 @@ public class ArmoryScript : MonoBehaviour {
                     GameControl.gc.SaveData();
                     Debug.Log("Training Complete");
                 }
+                else if (CONVERT_RM)
+                {
+                    CONVERT_RM = false;
+                    GameControl.gc.researchMaterialCount -= 50;
+                    GameControl.gc.WeaponUpgrades[GameControl.gc.SelectedWeapon, 6] += 5;
+                    GameControl.gc.Weapons[GameControl.gc.SelectedWeapon].UpdateValues(GameControl.gc.SelectedWeapon);
+                    GameControl.gc.SaveData();
+                    GameControl.gc.ConvertTime = Time.realtimeSinceStartup;
+                    Debug.Log("Conversion Complete");
+                }
                 else
                 {
                     CompleteStartedResearch();
@@ -716,6 +814,7 @@ public class ArmoryScript : MonoBehaviour {
                 DAILY_RESEARCH = false;
                 DAILY_SCRAPBOOST = false;
                 DAILY_TRAINING = false;
+                CONVERT_RM = false;
                 UpdateArmoryUI();
                 break;
             case "FAILED":
@@ -724,6 +823,7 @@ public class ArmoryScript : MonoBehaviour {
                 DAILY_RESEARCH = false;
                 DAILY_SCRAPBOOST = false;
                 DAILY_TRAINING = false;
+                CONVERT_RM = false;
                 UpdateArmoryUI();
                 break;
             default:

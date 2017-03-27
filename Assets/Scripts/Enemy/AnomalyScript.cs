@@ -415,6 +415,11 @@ public class AnomalyScript : MonoBehaviour {
                 gameObject.GetComponent<Rigidbody2D>().mass = 1000000;
                 gameObject.GetComponent<Rigidbody2D>().gravityScale = 0.1f;
             }
+            if (GameControl.gc.firstBossDefeated == false)
+            {
+                GameControl.gc.firstBossDefeated = true;
+                GameObject.Find("Announcer").GetComponent<AnnouncerScript>().Announce("Boosts in base Unlocked!", FloatingText.FTType.PowerUp);
+            }
 
             
         }

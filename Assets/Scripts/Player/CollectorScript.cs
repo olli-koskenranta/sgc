@@ -157,7 +157,13 @@ public class CollectorScript : MonoBehaviour
         GameControl.gc.currentLevel += 1;
         GameObject.Find("MeteorSpawning").GetComponent<SpawningScript>().ANOMALY_SPAWNED = false;
         if (GameControl.gc.highestLevelAchieved < GameControl.gc.currentLevel)
+        {
             GameControl.gc.highestLevelAchieved = GameControl.gc.currentLevel;
+            if (GameControl.gc.currentLevel == 101)
+            {
+                announcer.GetComponent<AnnouncerScript>().Announce("Research Material conversion unlocked in Base!", FloatingText.FTType.PowerUp);
+            }
+        }
         UpdateInfoText();
         if (GameControl.gc.currentLevel == 5 || (GameControl.gc.currentLevel - 1) % 10 == 0)
         {
@@ -224,7 +230,7 @@ public class CollectorScript : MonoBehaviour
         }
 
         if (PowerUpNumber != 3)
-            announcer.GetComponent<AnnouncerScript>().Announce(GameControl.gc.PowerUpNames[PowerUpNumber] + " gained!", FloatingText.FTType.PowerUp);
+            announcer.GetComponent<AnnouncerScript>().Announce(GameControl.gc.PowerUpNames[PowerUpNumber] + "!", FloatingText.FTType.PowerUp);
 
     }
 

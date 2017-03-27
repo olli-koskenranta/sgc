@@ -33,7 +33,4 @@ public class MainMenuScript : MonoBehaviour {
         GameObject.Find("Canvas").transform.FindChild("CreditsPanel").gameObject.SetActive(false);
     }
 
-
-
-
 }

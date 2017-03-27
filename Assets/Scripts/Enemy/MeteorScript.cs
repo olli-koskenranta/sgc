@@ -101,6 +101,13 @@ public class MeteorScript : MonoBehaviour {
                 asteroidFragment = GameControl.gc.meteors[1];
                 asteroidFragment.GetComponent<MeteorScript>().asteroidType = AsteroidType.Big;
                 break;
+            case AsteroidType.Golden:
+                XP = 20;
+                damage = hugeMeteorDamage;
+                GetComponent<Rigidbody2D>().mass = hugeMeteorMass * 10 * GameControl.gc.currentLevel;
+                hitPoints = hugeMeteorHitPoints * GameControl.gc.currentLevel;
+                GetComponent<Rigidbody2D>().velocity = trans.TransformDirection(Vector3.left * speed * 2);
+                break;
             default:
                 break;
         }
@@ -246,7 +253,7 @@ public class MeteorScript : MonoBehaviour {
             else
                 iscrit = false;
 
-            if (col.gameObject.GetComponent<PlayerProjectileScript>().GravityDamage)
+            if (col.gameObject.GetComponent<PlayerProjectileScript>().GravityDamage && asteroidType != AsteroidType.Golden)
             {
                 HIT_BY_GRAVITY_DMG = true;
                 gameObject.GetComponent<SpriteRenderer>().color = Color.green;
@@ -258,14 +265,14 @@ public class MeteorScript : MonoBehaviour {
 
         else if (col.gameObject.GetComponent<PUBombScript>() != null)
         {
-            if (col.gameObject.GetComponent<PUBombScript>().type == PUBombs.PUBombType.Gravity)
+            if (col.gameObject.GetComponent<PUBombScript>().type == PUBombs.PUBombType.Gravity && asteroidType != AsteroidType.Golden)
             {
                 HIT_BY_GRAVITY_DMG = true;
                 gameObject.GetComponent<Rigidbody2D>().gravityScale = 0.1f;
                 col.gameObject.GetComponent<PUBombScript>().HitEffect(trans.position);
                 gameObject.GetComponent<SpriteRenderer>().color = Color.green;
             }
-            else if (col.gameObject.GetComponent<PUBombScript>().type == PUBombs.PUBombType.Kinetic)
+            else if (col.gameObject.GetComponent<PUBombScript>().type == PUBombs.PUBombType.Kinetic && asteroidType != AsteroidType.Golden)
             {
                 HIT_BY_KINECTIC_DMG = true;
                 gameObject.GetComponent<Rigidbody2D>().velocity *= 0;
@@ -339,7 +346,7 @@ public class MeteorScript : MonoBehaviour {
         GameControl.gc.ExperienceGained(XP);
         GetComponent<SpriteRenderer>().enabled = false;
         Destroy(GetComponent<Collider2D>());
-        Destroy(gameObject, 1);
+        
 
         if (asteroidType == AsteroidType.Big || asteroidType == AsteroidType.Huge)
         {
@@ -369,7 +376,21 @@ public class MeteorScript : MonoBehaviour {
         {
             fragmentInstance.GetComponent<ScrapPieceScript>().type = Scrap.ScrapType.ResearchMaterial;
         }
-        
+
+        if (asteroidType == AsteroidType.Golden)
+        {
+            for (int i = 0; i <= 10; i++)
+            {
+                Vector3 rngpos = trans.position;
+                rngpos.x += Random.Range(-0.5f, 0.5f);
+                rngpos.y += Random.Range(-0.5f, 0.5f);
+                fragmentInstance = Instantiate(scrapFragment, rngpos, trans.rotation) as GameObject;
+                fragmentInstance.GetComponent<ScrapPieceScript>().type = Scrap.ScrapType.Normal;
+            }
+        }
+
+        Destroy(gameObject, 1);
+
     }
 
     public bool IsOnScreen()

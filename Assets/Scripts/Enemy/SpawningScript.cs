@@ -9,6 +9,7 @@ public class SpawningScript : MonoBehaviour {
     public GameObject medMeteor1;
     public GameObject bigMeteor1;
     public GameObject hugeMeteor1;
+    public GameObject goldenMeteor;
     public GameObject Nebula;
     public GameObject powerUpContainer;
     
@@ -27,6 +28,7 @@ public class SpawningScript : MonoBehaviour {
 
     private int PUChance;
     private int bigAsteroidChance;
+    private int goldenAsteroidChance;
 
     private float HugeAsteroidInterval;
     private float EnemyFighterInterval;
@@ -56,6 +58,8 @@ public class SpawningScript : MonoBehaviour {
         GameObject.Find("UIControl").GetComponent<UIControlScript>().SetBossBarsActive(false);
 
         bigAsteroidChance = 30;
+        goldenAsteroidChance = 100;
+        
         //Define spawn chances here (%), maybe some increase per level? Ok, lets change these to times
         /*PUChance = 1;
         HugeAsteroidChance = 1;
@@ -88,6 +92,7 @@ public class SpawningScript : MonoBehaviour {
         enemyMissileCruiser = Resources.Load("MissileCruiser") as GameObject;
         Nebula = Resources.Load("Nebula") as GameObject;
         enemyBattleShip = Resources.Load("BattleShip") as GameObject;
+        goldenMeteor = Resources.Load("GoldenMeteor") as GameObject;
 
 	}
 	
@@ -152,6 +157,9 @@ public class SpawningScript : MonoBehaviour {
             SpawnPowerUp();
             return;
         }
+
+        if (GameControl.gc.GetSceneName().Equals("MainMenu"))
+            return; 
 
         if (!FindAnomaly(5) && !FindAnomaly(3) && !FindAnomaly(4))
         {
@@ -266,9 +274,9 @@ public class SpawningScript : MonoBehaviour {
         Transform spawnPosition = transform;
         Vector3 rngpos;
         float randomScaleFactor;
-
+        int roll = RollDice(100);
         //Big Asteroid
-        if (RollDice(100) <= bigAsteroidChance)
+        if (roll <= bigAsteroidChance)
         {
             rngpos = spawnPosition.position;
             rngpos.x = Random.Range(14f, 18f);
@@ -279,6 +287,18 @@ public class SpawningScript : MonoBehaviour {
             bigMeteorInstance.GetComponent<MeteorScript>().asteroidType = AsteroidType.Big;
             randomScaleFactor = Random.Range(0, 0.5f);
             bigMeteorInstance.GetComponent<Transform>().localScale += new Vector3(randomScaleFactor, randomScaleFactor, 0);
+        }
+
+        //Golden asteroid
+        else if (roll == goldenAsteroidChance)
+        {
+            rngpos = spawnPosition.position;
+            rngpos.x = Random.Range(14f, 18f);
+            rngpos.y = Random.Range(0f, 4f);
+
+            spawnPosition.position = rngpos;
+            GameObject goldenMeteorInstance = Instantiate(goldenMeteor, spawnPosition.position, spawnPosition.rotation) as GameObject;
+            goldenMeteorInstance.GetComponent<MeteorScript>().asteroidType = AsteroidType.Golden;
         }
 
         //Medium asteroid

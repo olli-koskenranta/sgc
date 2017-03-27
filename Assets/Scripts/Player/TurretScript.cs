@@ -262,6 +262,15 @@ public class TurretScript : MonoBehaviour {
     public void ChangeWeapon(int weaponNumber)
     {
         GameControl.gc.SelectedWeapon = weaponNumber;
+
+        GameObject ftInstance = Instantiate(ft, transform.position, Quaternion.identity) as GameObject;
+        ftInstance.GetComponent<Transform>().position += new Vector3(1f, 0f, 0f);
+        ftInstance.GetComponent<FloatingTextScript>().text = GameControl.gc.WeaponNames[GameControl.gc.SelectedWeapon];
+        ftInstance.GetComponent<FloatingTextScript>().fttype = FloatingText.FTType.Normal;
+        ftInstance.GetComponent<FloatingTextScript>().durationBeforeFading = 2;
+        ftInstance.GetComponent<FloatingTextScript>().KILL_ME = true;
+        ftInstance.GetComponent<TextMesh>().fontSize = 15;
+
         GameObject.Find("Collector").GetComponent<CollectorScript>().UpdateInfoText();
         Start();
     }

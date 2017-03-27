@@ -65,25 +65,6 @@ public class UIControlScript : MonoBehaviour {
         
         }
 
-        if (Input.GetKeyDown(KeyCode.R))
-        {
-            if (GameControl.gc.GetSceneName().Equals("MainMenu"))
-            {
-                Debug.Log("Reset check invoked in 2...");
-                Invoke("ResetCheck", 2);
-            }
-        }
-    }
-
-    private void ResetCheck()
-    {
-        if (Input.GetKey(KeyCode.R))
-        {
-            Debug.Log("Confirmed");
-            ResetClicked();
-        }
-        else
-            Debug.Log("Canceled");
     }
 
     public void PlayGameClicked()
@@ -105,9 +86,8 @@ public class UIControlScript : MonoBehaviour {
         LoadingText = canvas.transform.FindChild("LoadingText").gameObject;
 
         
-        GameControl.gc.SaveData();
+        GameControl.gc.SaveData(true);
         GameControl.gc.currentLevel = 1;
-        GameControl.gc.ResetPowerUps();
         LoadingText.GetComponent<Text>().enabled = true;
         SceneManager.LoadScene("Armory");
     }
@@ -124,12 +104,6 @@ public class UIControlScript : MonoBehaviour {
         LoadingText.GetComponent<Text>().enabled = true;
         GameControl.gc.SaveData();
         SceneManager.LoadScene("MainMenu");
-    }
-
-    public void BESTBUTTONPRESSED()
-    {
-        GameControl.gc.scrapCount = 999999999;
-        GameControl.gc.researchMaterialCount = 9999;
     }
 
     public void ResetClicked()
@@ -230,5 +204,39 @@ public class UIControlScript : MonoBehaviour {
         StartCoroutine(GameObject.Find("AdManager").GetComponent<AdManagerScript>().ShowAd());
         GameObject.Find("ButtonWatchAd").GetComponent<Button>().interactable = false;
         GameObject.Find("ButtonWatchAd").GetComponent<Button>().GetComponentInChildren<Text>().text = "Watching TV with the President!";
+    }
+
+    public void SaveTryAgain()
+    {
+        ShowErrorPanel(false);
+        GameControl.gc.LoadData();
+
+    }
+
+    public void ExitWithoutSaving()
+    {
+        GameControl.gc.exitWithoutSaving = true;
+        Application.Quit();
+    }
+
+    public void CreateNewSaveData()
+    {
+        ShowErrorPanel(false);
+        GameControl.gc.ResetData();
+    }
+
+    public void ShowErrorPanel(bool value)
+    {
+        if (GameControl.gc.GetSceneName().Equals("MainMenu"))
+        {
+            if (value)
+            {
+                GameObject.Find("Canvas").transform.FindChild("ErrorPanel").gameObject.SetActive(true);
+            }
+            else
+            {
+                GameObject.Find("Canvas").transform.FindChild("ErrorPanel").gameObject.SetActive(false);
+            }
+        }
     }
 }

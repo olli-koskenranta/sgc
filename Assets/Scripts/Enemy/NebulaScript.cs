@@ -97,6 +97,7 @@ public class NebulaScript : MonoBehaviour {
 
         if (col.GetComponent<MeteorScript>() != null)
         {
+            if (col.GetComponent<MeteorScript>().asteroidType != Asteroids.AsteroidType.Golden)
             {
                 //if (counter % 10 == 0)
                 //{
