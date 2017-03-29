@@ -48,7 +48,7 @@ public class ArmoryScript : MonoBehaviour {
     private bool DAILY_RESEARCH = false;
     private bool DAILY_SCRAPBOOST = false;
     private bool DAILY_TRAINING = false;
-    private bool CONVERT_RM = false;
+    public bool CONVERT_RM = false;
 
     private int[] StartingZones;
 
@@ -81,6 +81,10 @@ public class ArmoryScript : MonoBehaviour {
         if (adManager)
         {
             Debug.Log("Ad manager found!");
+        }
+        for (int i = 0; i < GameControl.gc.ResearchStartTimes.Length; i++)
+        {
+            Debug.Log(i.ToString() + ":" + GameControl.gc.ResearchStartTimes[i].ToString());
         }
     }
 
@@ -256,6 +260,7 @@ public class ArmoryScript : MonoBehaviour {
             GameControl.gc.scrapCount -= GameControl.gc.ResearchScrapCost[(int)researchType];
             GameControl.gc.researchMaterialCount -= GameControl.gc.ResearchRMCost[(int)researchType];
             GameControl.gc.ResearchStarted[(int)researchType] = true;
+            Debug.Log("Research started on " + researchType.ToString());
             GameControl.gc.ResearchStartTimes[(int)researchType] = System.DateTime.Now;
         }
         else
@@ -333,6 +338,7 @@ public class ArmoryScript : MonoBehaviour {
                 btnConvert.GetComponentInChildren<Text>().text = "Available in: \n" + cooldown.ToString() + " seconds";
             }
         }
+        
 
     }
 
@@ -353,8 +359,9 @@ public class ArmoryScript : MonoBehaviour {
         else
             selectWeapon1.GetComponentInChildren<Text>().text = GameControl.gc.WeaponNames[1];
 
-        if (!GameControl.gc.WeaponUnlocked[2])
+        if (!GameControl.gc.WeaponUnlocked[2] && !GameControl.gc.ResearchStarted[4])
         {
+
             selectWeapon2.GetComponentInChildren<Text>().text = GameControl.gc.WeaponNames[2];
             selectWeapon2.GetComponentInChildren<Text>().text = "Research\n" + GameControl.gc.WeaponNames[2];
         }
@@ -459,13 +466,17 @@ public class ArmoryScript : MonoBehaviour {
     public void RMConvertClicked()
     {
         if (CONVERT_RM)
+        {
+            Debug.Log("Convert RM is true");
             return;
+        }
 
-        float timeDifference = Time.time - GameControl.gc.ConvertTime;
+        float timeDifference = Time.realtimeSinceStartup - GameControl.gc.ConvertTime;
         if (timeDifference >= 120)
         {
             if (GameControl.gc.researchMaterialCount >= 50)
             {
+                Debug.Log("Showing ad");
                 CONVERT_RM = true;
                 StartCoroutine(adManager.ShowAd());
             }
@@ -476,7 +487,10 @@ public class ArmoryScript : MonoBehaviour {
             }
         }
         else
+        {
+            Debug.Log("Wait more!");
             UpdateConversionButton();
+        }
     }
 
     public void ShowResearchPanel(bool value)
@@ -910,6 +924,7 @@ public class ArmoryScript : MonoBehaviour {
         {
             if (GameControl.gc.ResearchStarted[i] == true)
             {
+                Debug.Log("Research number " + i + " is complete.");
                 /*
                  * RepairBots = 0
                  * ShieldGenerator = 1
@@ -920,18 +935,23 @@ public class ArmoryScript : MonoBehaviour {
                 switch (i)
                 {
                     case 0:
+                        Debug.Log("Repair Bots research complete");
                         GameControl.gc.ShipRepairBots = true;
                         break;
                     case 1:
+                        Debug.Log("Shield Generator research complete");
                         GameControl.gc.ShipShieldGenerator = true;
                         break;
                     case 2:
+                        Debug.Log("Reactive Armor research complete");
                         GameControl.gc.ShipReactiveArmor = true;
                         break;
                     case 3:
+                        Debug.Log("Pulse Laser research complete");
                         GameControl.gc.WeaponUnlocked[1] = true;
                         break;
                     case 4:
+                        Debug.Log("Mass Driver research complete");
                         GameControl.gc.WeaponUnlocked[2] = true;
                         break;
                 }

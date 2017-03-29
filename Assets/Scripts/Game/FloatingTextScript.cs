@@ -6,7 +6,7 @@ public class FloatingTextScript : MonoBehaviour {
 
 
     public string SortingLayerName = "OnTop";
-    public int SortingOrder = 0;
+    public int SortingOrder = 1;
     public FTType fttype = FTType.Normal;
     public string text = "EMPTY";
     private Color newColor;

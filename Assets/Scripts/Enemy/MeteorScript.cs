@@ -142,7 +142,7 @@ public class MeteorScript : MonoBehaviour {
     void FixedUpdate()
     {
         //Destroy if "out of bounds"
-        if (trans.position.x > 19 || trans.position.x < -9 || trans.position.y < -7 || trans.position.y > 7)
+        if (trans.position.x > 19 || trans.position.x < -9 || trans.position.y < -9 || trans.position.y > 9)
             Destroy(gameObject);
 
         if (anomaly1 != null)
@@ -344,7 +344,8 @@ public class MeteorScript : MonoBehaviour {
         }
 
         GameControl.gc.ExperienceGained(XP);
-        GetComponent<SpriteRenderer>().enabled = false;
+        if (asteroidType != AsteroidType.Golden)
+            GetComponent<SpriteRenderer>().enabled = false;
         Destroy(GetComponent<Collider2D>());
         
 
@@ -388,8 +389,13 @@ public class MeteorScript : MonoBehaviour {
                 fragmentInstance.GetComponent<ScrapPieceScript>().type = Scrap.ScrapType.Normal;
             }
         }
-
-        Destroy(gameObject, 1);
+        if (asteroidType == AsteroidType.Golden)
+        {
+            gameObject.GetComponent<Rigidbody2D>().gravityScale = 1;
+            gameObject.GetComponent<SpriteRenderer>().color = Color.gray;
+        }
+        else
+            Destroy(gameObject, 1);
 
     }
 

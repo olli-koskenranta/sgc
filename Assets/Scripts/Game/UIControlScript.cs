@@ -65,6 +65,11 @@ public class UIControlScript : MonoBehaviour {
         
         }
 
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            ResetClicked();
+        }
+
     }
 
     public void PlayGameClicked()

@@ -17,7 +17,6 @@ public class GameControl : MonoBehaviour {
     public int scrapCount = 0;
     public int researchMaterialCount = 0;
     public int currentLevel;
-    //public int scrapRequiredForNextLevel;
 
     public int[] Experience;
     public int[] WeaponSkill;
@@ -31,6 +30,7 @@ public class GameControl : MonoBehaviour {
     public DateTime DateDailyScrapBoostTime;
     public DateTime DateDailyTrainingTime;
     public DateTime[] ResearchStartTimes;
+
     public float ConvertTime;
     public bool[] ResearchStarted;
 
@@ -167,15 +167,15 @@ public class GameControl : MonoBehaviour {
     {
         exitWithoutSaving = false;
         firstBossDefeated = false;
-        Debug.Log("GameControl: Loading Resources...");
+        //Debug.Log("GameControl: Loading Resources...");
         floatingText = Resources.Load("FloatingText") as GameObject;
         scrapPiece = Resources.Load("ScrapPiece") as GameObject;
         meteors = new GameObject[2] { Resources.Load("medMeteor1") as GameObject, Resources.Load("bigMeteor1") as GameObject };
         hit_effect =  Resources.Load("Explosion") as GameObject;
-        Debug.Log("GameControl: Resource loading complete.");
+        //Debug.Log("GameControl: Resource loading complete.");
 
         //Debug.Log("GameControl START()!");
-        Debug.Log("GameControl: Initializing everything.");
+        //Debug.Log("GameControl: Initializing everything.");
         
         ExtensionData = new int[ExtensionDataSize];
         
@@ -213,14 +213,13 @@ public class GameControl : MonoBehaviour {
         WeaponUpgradePointsAvailable = new int[numberOfWeapons];
         StartZoneUnlocked = new System.Collections.Generic.List<int>();
 
-        Debug.Log("GameControl: Initialization complete");
+        //Debug.Log("GameControl: Initialization complete");
 
-        Debug.Log("GameControl: Clearing Arrays...");
+        //Debug.Log("GameControl: Clearing Arrays...");
         ClearArrays();
-        Debug.Log("GameControl: Array clear complete");
+        //Debug.Log("GameControl: Array clear complete");
 
-
-        Debug.Log("GameControl: Setting default values.");
+        //Debug.Log("GameControl: Setting default values.");
         ExpForSkillUp = 10;
         currentLevel = 1;
         highestLevelAchieved = 1;
@@ -232,7 +231,7 @@ public class GameControl : MonoBehaviour {
 
 
 
-        Debug.Log("GameControl: Creating weapons...");
+        //Debug.Log("GameControl: Creating weapons...");
         Weapons = new Turret[numberOfWeapons];
 
         //Create weapons
@@ -252,17 +251,17 @@ public class GameControl : MonoBehaviour {
         Weapons[1] = PulseLaserTurret;
         Weapons[2] = MassDriverTurret;
         Weapons[3] = PlasmaTurret;
-        Debug.Log("GameControl: Weapons created.");
+        //Debug.Log("GameControl: Weapons created.");
 
         Debug.Log("GameControl: Loading data...");
         LoadData();
 
-        Debug.Log("GameControl: Updating Weapon Values...");
+        //Debug.Log("GameControl: Updating Weapon Values...");
         for (int i = 0; i < Weapons.Length; i++)
         {
             Weapons[i].UpdateValues(i);
         }
-        Debug.Log("GameControl: Weapon Values Update complete");
+        //Debug.Log("GameControl: Weapon Values Update complete");
 
     }
 
@@ -275,6 +274,7 @@ public class GameControl : MonoBehaviour {
 
             PlayerData playerData = GetPlayerData();
 
+            Debug.Log("Trying to serialize and save...");
             bf.Serialize(file, playerData);
             file.Close();
 
@@ -290,8 +290,8 @@ public class GameControl : MonoBehaviour {
 
         catch (Exception e)
         {
-            Debug.LogError(e.Message);
-            string errorMessage = e.Message;
+            Debug.LogError("SaveData(): " + e.ToString());
+            string errorMessage = "SaveData(): " + e.ToString();
             string errorPath = Application.persistentDataPath + "/Error.txt";
             
             using (StreamWriter outputFile = new StreamWriter(errorPath, true))
@@ -306,15 +306,30 @@ public class GameControl : MonoBehaviour {
 
         if (File.Exists(Application.persistentDataPath + "/SGC.dat"))
         {
-            BinaryFormatter bf = new BinaryFormatter();
-            FileStream file = File.Open(Application.persistentDataPath + "/SGC.dat", FileMode.Open);
-            PlayerData playerData = (PlayerData)bf.Deserialize(file);
-            file.Close();
+            try
+            {
+                BinaryFormatter bf = new BinaryFormatter();
+                FileStream file = File.Open(Application.persistentDataPath + "/SGC.dat", FileMode.Open);
+                Debug.Log("Trying to deserialize load data...");
+                PlayerData playerData = (PlayerData)bf.Deserialize(file);
+                file.Close();
 
-            SetPlayerData(playerData);
+                SetPlayerData(playerData);
 
-            Debug.Log("Player data loaded!");
-            GameObject.Find("UIControl").GetComponent<UIControlScript>().ShowErrorPanel(false);
+                Debug.Log("Player data loaded!");
+                GameObject.Find("UIControl").GetComponent<UIControlScript>().ShowErrorPanel(false);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("LoadData(): " + e.ToString());
+                string errorMessage = "LoadData(): " + e.ToString();
+                string errorPath = Application.persistentDataPath + "/Error.txt";
+
+                using (StreamWriter outputFile = new StreamWriter(errorPath, true))
+                {
+                    outputFile.WriteLine(errorMessage);
+                }
+            }
 
         }
         else
@@ -382,6 +397,7 @@ public class GameControl : MonoBehaviour {
 
     private PlayerData GetPlayerData(bool ResetData = false)
     {
+        Debug.Log("Getting player data...");
         PlayerData data = new PlayerData();
         if (ResetData)
         {
@@ -390,9 +406,9 @@ public class GameControl : MonoBehaviour {
             data.researchMaterialCount = 0;
             data.highestLevelAchieved = 1;
             data.ScrapBoostActive = false;
-            data.DateDailyResearchTime = new DateTime(2001, 1, 1, 6, 0, 0);
-            data.DateDailyScrapBoostTime = new DateTime(2001, 1, 1, 6, 0, 0);
-            data.DateDailyTrainingTime = new DateTime(2001, 1, 1, 6, 0, 0);
+            data.strDailyResearchTime = null;
+            data.strDailyScrapBoostTime = null;
+            data.strDailyTrainingTime = null;
             data.ShipShieldGenerator = false;
             data.ShipReactiveArmor = false;
             data.ShipRepairBots = false;
@@ -402,9 +418,9 @@ public class GameControl : MonoBehaviour {
             data.scrapCount = scrapCount;
             data.selectedWeapon = SelectedWeapon;
             data.researchMaterialCount = researchMaterialCount;
-            data.DateDailyResearchTime = DateDailyResearchTime;
-            data.DateDailyTrainingTime = DateDailyTrainingTime;
-            data.DateDailyScrapBoostTime = DateDailyScrapBoostTime;
+            data.strDailyResearchTime = DateDailyResearchTime.ToString();
+            data.strDailyTrainingTime = DateDailyTrainingTime.ToString();
+            data.strDailyScrapBoostTime = DateDailyScrapBoostTime.ToString();
             data.ScrapBoostActive = ScrapBoostActive;
             data.ShipShieldGenerator = ShipShieldGenerator;
             data.ShipReactiveArmor = ShipReactiveArmor;
@@ -420,11 +436,17 @@ public class GameControl : MonoBehaviour {
         data.WeaponUpgradePointsTotal = WeaponUpgradePointsTotal;
         data.WeaponUpgradePointsAvailable = WeaponUpgradePointsAvailable;
 
+        for (int i = 0; i < ResearchStartTimes.Length; i++)
+        {
+            data.strResearchStartTimes[i] = ResearchStartTimes[i].ToString();
+        }
+
         return data;
     }
 
     private void SetPlayerData(PlayerData data)
     {
+        Debug.Log("Setting player data...");
         scrapCount = data.scrapCount;
         SelectedWeapon = data.selectedWeapon;
         ScrapBoostActive = data.ScrapBoostActive;
@@ -478,26 +500,64 @@ public class GameControl : MonoBehaviour {
         else
             Debug.Log("WeaponUpgradePointsAvailable[] length is 0");
 
-        if (data.DateDailyResearchTime != null)
-            DateDailyResearchTime = data.DateDailyResearchTime;
+        if (data.strDailyResearchTime != null)
+        {
+            if (DateTime.TryParse(data.strDailyResearchTime, out DateDailyResearchTime))
+            {
+                Debug.Log("ResearchDate conversion succesful");
+            }
+            else
+            {
+                Debug.LogError("ResearchDate conversion failed");
+            }
+        }
         else
-            Debug.Log("DateDailyResearchTime is null");
+            Debug.Log("strDailyResearchTime is null");
 
-        if (data.DateDailyScrapBoostTime != null)
-            DateDailyScrapBoostTime = data.DateDailyScrapBoostTime;
+        if (data.strDailyScrapBoostTime != null)
+        {
+            if (DateTime.TryParse(data.strDailyScrapBoostTime, out DateDailyScrapBoostTime))
+            {
+                Debug.Log("ScrapBoostDate conversion succesful");
+            }
+            else
+            {
+                Debug.LogError("ScrapBoostDate conversion failed");
+            }
+        }
         else
-            Debug.Log("DateDailyScrapBoostTime is null");
+            Debug.Log("strDailyScrapBoostTime is null");
 
-        if (data.DateDailyTrainingTime != null)
-            DateDailyTrainingTime = data.DateDailyTrainingTime;
+        if (data.strDailyTrainingTime != null)
+        {
+            if (DateTime.TryParse(data.strDailyTrainingTime, out DateDailyTrainingTime))
+            {
+                Debug.Log("TrainingDate conversion succesful");
+            }
+            else
+            {
+                Debug.LogError("TrainingDate conversion failed");
+            }
+        }
         else
-            Debug.Log("DateDailyTrainingTime is null");
+            Debug.Log("strDailyTrainingTime is null");
 
-        if (data.ResearchStartTimes != null)
-            if (data.ResearchStartTimes.Length != 0)
-                ResearchStartTimes = data.ResearchStartTimes;
+        if (data.strResearchStartTimes != null)
+        {
+            for (int i = 0; i < data.strResearchStartTimes.Length; i++)
+            {
+                if (DateTime.TryParse(data.strResearchStartTimes[i], out ResearchStartTimes[i]))
+                {
+                    Debug.Log("strResearchStartTimes " + i + " conversion succesful");
+                }
+                else
+                {
+                    Debug.LogError("strResearchStartTimes " + i + " conversion failed");
+                }
+            }
+        }
         else
-            Debug.Log("ResearchStartTimes[] length is 0");
+            Debug.Log("strResearchStartTimes is null");
 
         if (data.ResearchStarted != null)
             if (data.ResearchStarted.Length != 0)
@@ -612,10 +672,6 @@ class PlayerData
 
     public int[] WeaponUpgradePointsAvailable;
 
-    public DateTime DateDailyResearchTime;
-
-    public DateTime DateDailyScrapBoostTime;
-
     public bool ScrapBoostActive;
 
     public bool ShipRepairBots;
@@ -624,14 +680,40 @@ class PlayerData
 
     public bool ShipReactiveArmor;
 
-    public DateTime[] ResearchStartTimes;
-
     public int selectedWeapon;
 
     public int highestLevelAchieved;
 
+    public string strDailyResearchTime;
+
+    public string strDailyScrapBoostTime;
+
+    public string strDailyTrainingTime;
+
+    public string[] strResearchStartTimes;
+
+    [System.Runtime.Serialization.OptionalField]
+    public DateTime[] ResearchStartTimes;
+    [System.Runtime.Serialization.OptionalField]
+    public DateTime DateDailyResearchTime;
+    [System.Runtime.Serialization.OptionalField]
+    public DateTime DateDailyScrapBoostTime;
+    [System.Runtime.Serialization.OptionalField]
     public DateTime DateDailyTrainingTime;
-    
+
+    public PlayerData()
+    {
+        if (strResearchStartTimes == null)
+        {
+            Debug.Log("PlayerData: strResearchStartTimes was null, intializing...");
+            strResearchStartTimes = new string[GameControl.gc.GetNumberOfResearches()];
+        }
+        else
+        {
+            Debug.Log("PlayerData: strResearchTimes was not null, no need to initialize");
+        }
+    }
+
 }
 
 [Serializable]
