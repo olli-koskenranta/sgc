@@ -65,10 +65,10 @@ public class UIControlScript : MonoBehaviour {
         
         }
 
-        if (Input.GetKeyDown(KeyCode.R))
+        /*if (Input.GetKeyDown(KeyCode.R))
         {
             ResetClicked();
-        }
+        }*/
 
     }
 

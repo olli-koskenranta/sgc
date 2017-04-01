@@ -11,7 +11,7 @@ public class GameControl : MonoBehaviour {
     public const int numberOfWeapons = 4;
     public const int numberOfStartZones = 11;
     public const int numberOfResearches = 5;
-    public const string GameVersion = "1.1";
+    public const string GameVersion = "1.11";
 
     public static GameControl gc;
     public int scrapCount = 0;
@@ -290,7 +290,7 @@ public class GameControl : MonoBehaviour {
 
         catch (Exception e)
         {
-            Debug.LogError("SaveData(): " + e.ToString());
+            Debug.LogError(DateTime.Now.ToString() + " SaveData(): " + e.ToString() + "\n");
             string errorMessage = "SaveData(): " + e.ToString();
             string errorPath = Application.persistentDataPath + "/Error.txt";
             
@@ -321,7 +321,7 @@ public class GameControl : MonoBehaviour {
             }
             catch (Exception e)
             {
-                Debug.LogError("LoadData(): " + e.ToString());
+                Debug.LogError(DateTime.Now.ToString() + " LoadData(): " + e.ToString() + "\n");
                 string errorMessage = "LoadData(): " + e.ToString();
                 string errorPath = Application.persistentDataPath + "/Error.txt";
 
