@@ -43,7 +43,7 @@ public class EnemyProjectileScript : MonoBehaviour {
             Quaternion q = Quaternion.AngleAxis(targetAngle, Vector3.forward);
             trans.rotation = Quaternion.Lerp(trans.rotation, q, rotateSpeed * Time.deltaTime);
 
-            GetComponent<Rigidbody2D>().velocity = trans.right * missileSpeed;
+            GetComponent<Rigidbody2D>().linearVelocity = trans.right * missileSpeed;
         }
     }
 	

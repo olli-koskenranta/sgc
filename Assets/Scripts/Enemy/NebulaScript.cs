@@ -101,7 +101,7 @@ public class NebulaScript : MonoBehaviour {
             {
                 //if (counter % 10 == 0)
                 //{
-                col.attachedRigidbody.velocity = (trans.position - col.transform.position).normalized;
+                col.attachedRigidbody.linearVelocity = (trans.position - col.transform.position).normalized;
                 Vector3 newScale = col.transform.localScale;
                 newScale.x -= 0.02f;
                 newScale.y -= 0.02f;

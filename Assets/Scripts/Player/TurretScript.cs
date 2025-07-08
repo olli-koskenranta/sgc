@@ -21,7 +21,7 @@ public class TurretScript : MonoBehaviour {
 
     void Start()
     {
-        firingPosition = transform.FindChild("FiringPosition");
+        firingPosition = transform.Find("FiringPosition");
         ft = GameControl.gc.floatingText;
         //Set up weapon here
         //Weapon types
@@ -185,7 +185,7 @@ public class TurretScript : MonoBehaviour {
         }
 
         
-        bulletInstance.GetComponent<Rigidbody2D>().velocity = firingPosition.TransformDirection(Vector3.right * turret.Speed);
+        bulletInstance.GetComponent<Rigidbody2D>().linearVelocity = firingPosition.TransformDirection(Vector3.right * turret.Speed);
         bulletScript = bulletInstance.GetComponent<PlayerProjectileScript>();
 
         if (bulletInstance.GetComponent<TrailRenderer>() != null)
@@ -238,7 +238,7 @@ public class TurretScript : MonoBehaviour {
         bulletScript.Critical = isCrit;
         bulletScript.Special = isSpecial;
 
-        bulletInstance.GetComponent<Rigidbody2D>().velocity = bulletInstance.transform.TransformDirection(Vector3.right * turret.Speed);
+        bulletInstance.GetComponent<Rigidbody2D>().linearVelocity = bulletInstance.transform.TransformDirection(Vector3.right * turret.Speed);
     }
 
 

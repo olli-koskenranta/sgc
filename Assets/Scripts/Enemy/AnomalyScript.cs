@@ -115,7 +115,7 @@ public class AnomalyScript : MonoBehaviour {
             case 3:
                 hitPoints = 100000;
                 fighter = Resources.Load("AlienShip1") as GameObject;
-                spawnPosition = transform.FindChild("SpawnPosition");
+                spawnPosition = transform.Find("SpawnPosition");
                 break;
             case 4:
                 hitPoints = 100000;
@@ -155,7 +155,7 @@ public class AnomalyScript : MonoBehaviour {
                 GetComponent<SpriteRenderer>().transform.Rotate(Vector3.forward * 0.5f);
                 if (shipHull != null && ALIVE)
                 {
-                    GetComponent<Rigidbody2D>().velocity = (shipHull.transform.position - trans.position).normalized * 0.3f;
+                    GetComponent<Rigidbody2D>().linearVelocity = (shipHull.transform.position - trans.position).normalized * 0.3f;
                 }
                 break;
 
@@ -163,7 +163,7 @@ public class AnomalyScript : MonoBehaviour {
                 GetComponent<SpriteRenderer>().transform.Rotate(Vector3.forward * 0.2f);
                 if (shipHull != null && ALIVE)
                 {
-                    GetComponent<Rigidbody2D>().velocity = (standingPosition.position - trans.position).normalized * 0.3f;
+                    GetComponent<Rigidbody2D>().linearVelocity = (standingPosition.position - trans.position).normalized * 0.3f;
                 }
                 break;
 
@@ -174,7 +174,7 @@ public class AnomalyScript : MonoBehaviour {
 
                 if (shipHull != null && ALIVE)
                 {
-                    GetComponent<Rigidbody2D>().velocity = (standingPosition.position - trans.position).normalized * 0.3f;
+                    GetComponent<Rigidbody2D>().linearVelocity = (standingPosition.position - trans.position).normalized * 0.3f;
                 }
 
                 //if (!IsOnScreen())
@@ -201,7 +201,7 @@ public class AnomalyScript : MonoBehaviour {
 
                 if (shipHull != null && ALIVE)
                 {
-                    GetComponent<Rigidbody2D>().velocity = (standingPosition.position - trans.position).normalized * 0.3f;
+                    GetComponent<Rigidbody2D>().linearVelocity = (standingPosition.position - trans.position).normalized * 0.3f;
                     //Debug.Log("Children: " + GetComponentsInChildren<EnemyPlatformScript>().Length.ToString());
                     if (GetComponentsInChildren<EnemyPlatformScript>().Length == 0)
                     {
@@ -303,7 +303,7 @@ public class AnomalyScript : MonoBehaviour {
             if (!col.gameObject.GetComponent<MeteorScript>().tagged)
             {
                 col.gameObject.GetComponent<MeteorScript>().tagged = true;
-                col.gameObject.GetComponent<Rigidbody2D>().velocity *= 0.1f;
+                col.gameObject.GetComponent<Rigidbody2D>().linearVelocity *= 0.1f;
             }
         }
         if (col.gameObject.GetComponent<PlayerProjectileScript>() != null)
@@ -326,7 +326,7 @@ public class AnomalyScript : MonoBehaviour {
     {
         if (anomalyNumber == 5 && ALIVE && phase == 2 && col.gameObject.GetComponent<MeteorScript>() != null)
         {
-            col.attachedRigidbody.velocity = (trans.position - col.transform.position).normalized;
+            col.attachedRigidbody.linearVelocity = (trans.position - col.transform.position).normalized;
             Vector3 newScale = col.GetComponent<Transform>().localScale;
             newScale.x -= 0.02f;
             newScale.y -= 0.02f;
@@ -448,10 +448,10 @@ public class AnomalyScript : MonoBehaviour {
         GameObject fighterInstance;
         fighter.GetComponent<EnemyShipScript>().sType = EnemyShipScript.ShipType.Fighter;
         fighterInstance = Instantiate(fighter, spawnPosition.position, spawnPosition.rotation) as GameObject;
-        Vector2 velocityVector = fighterInstance.GetComponent<Rigidbody2D>().velocity;
+        Vector2 velocityVector = fighterInstance.GetComponent<Rigidbody2D>().linearVelocity;
         velocityVector.x = dirX * 2;
         velocityVector.y = dirY * 2;
-        fighterInstance.GetComponent<Rigidbody2D>().velocity = velocityVector;
+        fighterInstance.GetComponent<Rigidbody2D>().linearVelocity = velocityVector;
         fighterCounter--;
         if (fighterCounter == 0)
         {

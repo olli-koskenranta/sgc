@@ -52,7 +52,7 @@ public class MeteorScript : MonoBehaviour {
         spawnTime = Time.time;
         originalPitch = soundExplode.pitch;
 
-        GetComponent<Rigidbody2D>().velocity = trans.TransformDirection(Vector3.left * speed);
+        GetComponent<Rigidbody2D>().linearVelocity = trans.TransformDirection(Vector3.left * speed);
         
 
         mainCamera = Camera.main;
@@ -106,7 +106,7 @@ public class MeteorScript : MonoBehaviour {
                 damage = hugeMeteorDamage;
                 GetComponent<Rigidbody2D>().mass = hugeMeteorMass * 10 * GameControl.gc.currentLevel;
                 hitPoints = medMeteorHitPoints * GameControl.gc.currentLevel;
-                GetComponent<Rigidbody2D>().velocity = trans.TransformDirection(Vector3.left * speed * 2);
+                GetComponent<Rigidbody2D>().linearVelocity = trans.TransformDirection(Vector3.left * speed * 2);
                 break;
             default:
                 break;
@@ -275,7 +275,7 @@ public class MeteorScript : MonoBehaviour {
             else if (col.gameObject.GetComponent<PUBombScript>().type == PUBombs.PUBombType.Kinetic && asteroidType != AsteroidType.Golden)
             {
                 HIT_BY_KINECTIC_DMG = true;
-                gameObject.GetComponent<Rigidbody2D>().velocity *= 0;
+                gameObject.GetComponent<Rigidbody2D>().linearVelocity *= 0;
                 gameObject.GetComponent<Rigidbody2D>().mass = 1;
                 gameObject.GetComponent<MeteorScript>().hitPoints = 1;
                 col.gameObject.GetComponent<PUBombScript>().HitEffect(trans.position);

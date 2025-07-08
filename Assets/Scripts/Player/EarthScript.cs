@@ -22,7 +22,7 @@ public class EarthScript : MonoBehaviour {
 
     private void EndingReached()
     {
-        GameObject.Find("Canvas").transform.FindChild("EndingPanel").gameObject.SetActive(true);
+        GameObject.Find("Canvas").transform.Find("EndingPanel").gameObject.SetActive(true);
         GameControl.gc.PauseGame();
     }
 }

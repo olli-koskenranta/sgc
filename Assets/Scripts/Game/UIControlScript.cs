@@ -13,7 +13,7 @@ public class UIControlScript : MonoBehaviour {
     {
         GameObject canvas;
         canvas = GameObject.Find("Canvas");
-        LoadingText = canvas.transform.FindChild("LoadingText").gameObject;
+        LoadingText = canvas.transform.Find("LoadingText").gameObject;
         LoadingText.GetComponent<Text>().enabled = false;
 
         GameObject btnCloseOptions = GameObject.Find("ButtonCloseOptions");
@@ -25,11 +25,11 @@ public class UIControlScript : MonoBehaviour {
 
         if (SceneManager.GetActiveScene().name.Equals("GameWorld1"))
         {
-            GameObject.Find("Canvas").transform.FindChild("OptionsPanel").gameObject.SetActive(false);
-            GameObject.Find("Canvas").transform.FindChild("EndingPanel").gameObject.SetActive(false);
+            GameObject.Find("Canvas").transform.Find("OptionsPanel").gameObject.SetActive(false);
+            GameObject.Find("Canvas").transform.Find("EndingPanel").gameObject.SetActive(false);
         }
         else if (SceneManager.GetActiveScene().name.Equals("MainMenu"))
-            GameObject.Find("Canvas").transform.FindChild("OptionsPanel").gameObject.SetActive(false);
+            GameObject.Find("Canvas").transform.Find("OptionsPanel").gameObject.SetActive(false);
 
 
     }
@@ -40,7 +40,7 @@ public class UIControlScript : MonoBehaviour {
         {
             if (SceneManager.GetActiveScene().name.Equals("GameWorld1"))
             {
-                if (GameObject.Find("Canvas").transform.FindChild("OptionsPanel").gameObject.activeSelf)
+                if (GameObject.Find("Canvas").transform.Find("OptionsPanel").gameObject.activeSelf)
                     CloseOptions();
                 else
                     ShowOptions();
@@ -51,7 +51,7 @@ public class UIControlScript : MonoBehaviour {
             }
             else if (SceneManager.GetActiveScene().name.Equals("MainMenu"))
             {
-                if (GameObject.Find("Canvas").transform.FindChild("OptionsPanel").gameObject.activeSelf)
+                if (GameObject.Find("Canvas").transform.Find("OptionsPanel").gameObject.activeSelf)
                     CloseOptions();
                 else
                 {
@@ -59,8 +59,8 @@ public class UIControlScript : MonoBehaviour {
                     return;
                 }
 
-                if (GameObject.Find("Canvas").transform.FindChild("CreditsPanel").gameObject.activeSelf)
-                    GameObject.Find("Canvas").transform.FindChild("CreditsPanel").gameObject.SetActive(false);
+                if (GameObject.Find("Canvas").transform.Find("CreditsPanel").gameObject.activeSelf)
+                    GameObject.Find("Canvas").transform.Find("CreditsPanel").gameObject.SetActive(false);
             }
         
         }
@@ -88,7 +88,7 @@ public class UIControlScript : MonoBehaviour {
     {
         GameObject canvas;
         canvas = GameObject.Find("Canvas");
-        LoadingText = canvas.transform.FindChild("LoadingText").gameObject;
+        LoadingText = canvas.transform.Find("LoadingText").gameObject;
 
         
         GameControl.gc.SaveData(true);
@@ -122,19 +122,19 @@ public class UIControlScript : MonoBehaviour {
         {
             GameObject canvas;
             canvas = GameObject.Find("Canvas");
-            canvas.transform.FindChild("SliderBossHP").gameObject.SetActive(value);
+            canvas.transform.Find("SliderBossHP").gameObject.SetActive(value);
         }
     }
 
     public void ShowOptions()
     {
-        if (GameObject.Find("Canvas").transform.FindChild("OptionsPanel").gameObject.activeSelf)
+        if (GameObject.Find("Canvas").transform.Find("OptionsPanel").gameObject.activeSelf)
             return;
 
         if (SceneManager.GetActiveScene().name.Equals("GameWorld1"))
             GameControl.gc.PauseGame();
 
-        GameObject.Find("Canvas").transform.FindChild("OptionsPanel").gameObject.SetActive(true);
+        GameObject.Find("Canvas").transform.Find("OptionsPanel").gameObject.SetActive(true);
         Text textSounds = GameObject.Find("Canvas/OptionsPanel/ButtonSound").GetComponentInChildren<Text>();
         Text textMusic = GameObject.Find("Canvas/OptionsPanel/ButtonMusic").GetComponentInChildren<Text>();
 
@@ -192,7 +192,7 @@ public class UIControlScript : MonoBehaviour {
 
     public void CloseOptions()
     {
-        GameObject.Find("Canvas").transform.FindChild("OptionsPanel").gameObject.SetActive(false);
+        GameObject.Find("Canvas").transform.Find("OptionsPanel").gameObject.SetActive(false);
         if (SceneManager.GetActiveScene().name.Equals("GameWorld1"))
             GameControl.gc.PauseGame(false);
     }
@@ -236,11 +236,11 @@ public class UIControlScript : MonoBehaviour {
         {
             if (value)
             {
-                GameObject.Find("Canvas").transform.FindChild("ErrorPanel").gameObject.SetActive(true);
+                GameObject.Find("Canvas").transform.Find("ErrorPanel").gameObject.SetActive(true);
             }
             else
             {
-                GameObject.Find("Canvas").transform.FindChild("ErrorPanel").gameObject.SetActive(false);
+                GameObject.Find("Canvas").transform.Find("ErrorPanel").gameObject.SetActive(false);
             }
         }
     }

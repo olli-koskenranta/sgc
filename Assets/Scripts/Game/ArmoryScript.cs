@@ -61,14 +61,14 @@ public class ArmoryScript : MonoBehaviour {
         //WeaponUpgradeUIElements = FindGameObjectsWithLayer(12);
         //ShipUpgradeUIElements = FindGameObjectsWithLayer(13);
 
-        btnDailyBoosts.transform.FindChild("ButtonDailyResearch").gameObject.SetActive(false);
-        btnDailyBoosts.transform.FindChild("ButtonDailyScrap").gameObject.SetActive(false);
-        btnDailyBoosts.transform.FindChild("ButtonDailyTraining").gameObject.SetActive(false);
-        btnDailyBoosts.transform.FindChild("ImageAd").gameObject.SetActive(false);
-        btnShipUpgrades.transform.FindChild("ButtonSU0").gameObject.SetActive(false);
-        btnShipUpgrades.transform.FindChild("ButtonSU1").gameObject.SetActive(false);
-        btnShipUpgrades.transform.FindChild("ButtonSU2").gameObject.SetActive(false);
-        GameObject.Find("Canvas").transform.FindChild("PanelResearch").gameObject.SetActive(false);
+        btnDailyBoosts.transform.Find("ButtonDailyResearch").gameObject.SetActive(false);
+        btnDailyBoosts.transform.Find("ButtonDailyScrap").gameObject.SetActive(false);
+        btnDailyBoosts.transform.Find("ButtonDailyTraining").gameObject.SetActive(false);
+        btnDailyBoosts.transform.Find("ImageAd").gameObject.SetActive(false);
+        btnShipUpgrades.transform.Find("ButtonSU0").gameObject.SetActive(false);
+        btnShipUpgrades.transform.Find("ButtonSU1").gameObject.SetActive(false);
+        btnShipUpgrades.transform.Find("ButtonSU2").gameObject.SetActive(false);
+        GameObject.Find("Canvas").transform.Find("PanelResearch").gameObject.SetActive(false);
         textNotEnoughResources.gameObject.SetActive(false);
 
         UpdateSliders();
@@ -191,8 +191,8 @@ public class ArmoryScript : MonoBehaviour {
         textUpgPoints.text = "Allocate " + GameControl.gc.WeaponNames[GameControl.gc.SelectedWeapon] + " Weapon Power: " + UpgPointsAvailable().ToString();
         if (GameControl.gc.WeaponUpgradePointsTotal[GameControl.gc.SelectedWeapon] < 24)
         {
-            btnBuyPoints.transform.FindChild("Text").transform.FindChild("TextScrapp").gameObject.SetActive(true);
-            btnBuyPoints.transform.FindChild("Text").FindChild("TextRMM").gameObject.SetActive(true);
+            btnBuyPoints.transform.Find("Text").transform.Find("TextScrapp").gameObject.SetActive(true);
+            btnBuyPoints.transform.Find("Text").Find("TextRMM").gameObject.SetActive(true);
             int scrapCost = GameControl.gc.UpgradePointCost(0) / 1000;
             Text[] children = btnBuyPoints.GetComponentsInChildren<Text>();
             foreach (Text child in children)
@@ -219,8 +219,8 @@ public class ArmoryScript : MonoBehaviour {
         }
         else
         {
-            btnBuyPoints.transform.FindChild("Text").transform.FindChild("TextScrapp").gameObject.SetActive(false);
-            btnBuyPoints.transform.FindChild("Text").FindChild("TextRMM").gameObject.SetActive(false);
+            btnBuyPoints.transform.Find("Text").transform.Find("TextScrapp").gameObject.SetActive(false);
+            btnBuyPoints.transform.Find("Text").Find("TextRMM").gameObject.SetActive(false);
             Text[] children = btnBuyPoints.GetComponentsInChildren<Text>();
             foreach (Text child in children)
             {
@@ -496,7 +496,7 @@ public class ArmoryScript : MonoBehaviour {
     public void ShowResearchPanel(bool value)
     {
         GameObject temp;
-        temp = GameObject.Find("Canvas").transform.FindChild("PanelResearch").gameObject;
+        temp = GameObject.Find("Canvas").transform.Find("PanelResearch").gameObject;
         temp.SetActive(value);
         if (value == true)
         {
@@ -589,25 +589,25 @@ public class ArmoryScript : MonoBehaviour {
 
     public void DailyBoostsClicked()
     {
-        GameObject temp = btnDailyBoosts.transform.FindChild("ButtonDailyResearch").gameObject;
+        GameObject temp = btnDailyBoosts.transform.Find("ButtonDailyResearch").gameObject;
         if (temp.activeSelf)
         {
             temp.SetActive(false);
-            temp = btnDailyBoosts.transform.FindChild("ButtonDailyScrap").gameObject;
+            temp = btnDailyBoosts.transform.Find("ButtonDailyScrap").gameObject;
             temp.SetActive(false);
-            temp = btnDailyBoosts.transform.FindChild("ButtonDailyTraining").gameObject;
+            temp = btnDailyBoosts.transform.Find("ButtonDailyTraining").gameObject;
             temp.SetActive(false);
-            temp = btnDailyBoosts.transform.FindChild("ImageAd").gameObject;
+            temp = btnDailyBoosts.transform.Find("ImageAd").gameObject;
             temp.SetActive(false);
         }
         else
         {
             temp.SetActive(true);
-            temp = btnDailyBoosts.transform.FindChild("ButtonDailyScrap").gameObject;
+            temp = btnDailyBoosts.transform.Find("ButtonDailyScrap").gameObject;
             temp.SetActive(true);
-            temp = btnDailyBoosts.transform.FindChild("ButtonDailyTraining").gameObject;
+            temp = btnDailyBoosts.transform.Find("ButtonDailyTraining").gameObject;
             temp.SetActive(true);
-            temp = btnDailyBoosts.transform.FindChild("ImageAd").gameObject;
+            temp = btnDailyBoosts.transform.Find("ImageAd").gameObject;
             temp.SetActive(true);
         }
         UpdateArmoryUI();
@@ -615,21 +615,21 @@ public class ArmoryScript : MonoBehaviour {
 
     public void ShipSystemsClicked()
     {
-        GameObject temp = btnShipUpgrades.transform.FindChild("ButtonSU0").gameObject;
+        GameObject temp = btnShipUpgrades.transform.Find("ButtonSU0").gameObject;
         if (temp.activeSelf)
         {
             temp.SetActive(false);
-            temp = btnShipUpgrades.transform.FindChild("ButtonSU1").gameObject;
+            temp = btnShipUpgrades.transform.Find("ButtonSU1").gameObject;
             temp.SetActive(false);
-            temp = btnShipUpgrades.transform.FindChild("ButtonSU2").gameObject;
+            temp = btnShipUpgrades.transform.Find("ButtonSU2").gameObject;
             temp.SetActive(false);
         }
         else
         {
             temp.SetActive(true);
-            temp = btnShipUpgrades.transform.FindChild("ButtonSU1").gameObject;
+            temp = btnShipUpgrades.transform.Find("ButtonSU1").gameObject;
             temp.SetActive(true);
-            temp = btnShipUpgrades.transform.FindChild("ButtonSU2").gameObject;
+            temp = btnShipUpgrades.transform.Find("ButtonSU2").gameObject;
             temp.SetActive(true);
         }
         UpdateArmoryUI();
@@ -647,7 +647,7 @@ public class ArmoryScript : MonoBehaviour {
     {
         ddSelectZone.ClearOptions();
         
-        RectTransform rect = ddSelectZone.transform.FindChild("Template").GetComponent<RectTransform>();
+        RectTransform rect = ddSelectZone.transform.Find("Template").GetComponent<RectTransform>();
         float size = 0;
         for (int i = GameControl.gc.StartZoneUnlocked.Count - 1; i >= 0; i--)
         {

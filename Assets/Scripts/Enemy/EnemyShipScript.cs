@@ -74,8 +74,8 @@ public class EnemyShipScript : MonoBehaviour {
                 damage = enemyFighterDamage;
                 hitPoints = enemyFighterHitPoints * GameControl.gc.currentLevel;
                 firingPositions = new Transform[2];
-                firingPositions[0] = transform.FindChild("firingPosition1");
-                firingPositions[1] = transform.FindChild("firingPosition2");
+                firingPositions[0] = transform.Find("firingPosition1");
+                firingPositions[1] = transform.Find("firingPosition2");
                 break;
             case ShipType.MissileCruiser:
                 XP = 12;
@@ -87,8 +87,8 @@ public class EnemyShipScript : MonoBehaviour {
                 damage = enemyMissileCruiserDamage;
                 hitPoints = enemyMissileCruiserHitPoints * GameControl.gc.currentLevel;
                 firingPositions = new Transform[2];
-                firingPositions[0] = transform.FindChild("firingPosition1");
-                firingPositions[1] = transform.FindChild("firingPosition2");
+                firingPositions[0] = transform.Find("firingPosition1");
+                firingPositions[1] = transform.Find("firingPosition2");
                 break;
             case ShipType.BattleShip:
                 XP = 24;
@@ -100,10 +100,10 @@ public class EnemyShipScript : MonoBehaviour {
                 hitPoints = enemyBattleShipHitPoints * GameControl.gc.currentLevel;
                 GetComponent<Rigidbody2D>().mass = enemyBattleShipMass;
                 firingPositions = new Transform[4];
-                firingPositions[0] = transform.FindChild("LeftTurret");
-                firingPositions[1] = transform.FindChild("RightTurret");
-                firingPositions[2] = transform.FindChild("LeftMissileTurret");
-                firingPositions[3] = transform.FindChild("RightMissileTurret");
+                firingPositions[0] = transform.Find("LeftTurret");
+                firingPositions[1] = transform.Find("RightTurret");
+                firingPositions[2] = transform.Find("LeftMissileTurret");
+                firingPositions[3] = transform.Find("RightMissileTurret");
                 break;
             default:
                 break;
@@ -145,9 +145,9 @@ public class EnemyShipScript : MonoBehaviour {
             if (Time.time - booster_time >= booster_interval && hitPoints > 0)
             {
                 if (Vector3.Distance(playerShip.transform.position, trans.position) > 5)
-                    GetComponent<Rigidbody2D>().velocity = (playerShip.transform.position - trans.position).normalized * speed;
+                    GetComponent<Rigidbody2D>().linearVelocity = (playerShip.transform.position - trans.position).normalized * speed;
                 else
-                    GetComponent<Rigidbody2D>().velocity = -1 * (playerShip.transform.position - trans.position).normalized * speed;
+                    GetComponent<Rigidbody2D>().linearVelocity = -1 * (playerShip.transform.position - trans.position).normalized * speed;
                 booster_time = Time.time;
             }
         }
@@ -162,12 +162,12 @@ public class EnemyShipScript : MonoBehaviour {
 
         if (sType == ShipType.MissileCruiser && hitPoints > 0)
         {
-            GetComponent<Rigidbody2D>().velocity = trans.TransformDirection(Vector3.right * 0.5f);
+            GetComponent<Rigidbody2D>().linearVelocity = trans.TransformDirection(Vector3.right * 0.5f);
         }
 
         if (sType == ShipType.BattleShip && hitPoints > 0)
         {
-            GetComponent<Rigidbody2D>().velocity = trans.TransformDirection(Vector3.right * 0.2f);
+            GetComponent<Rigidbody2D>().linearVelocity = trans.TransformDirection(Vector3.right * 0.2f);
         }
 
         //Rotate towards target
@@ -319,7 +319,7 @@ public class EnemyShipScript : MonoBehaviour {
         gameObject.GetComponent<Rigidbody2D>().gravityScale = 0.1f;
         gameObject.GetComponent<SpriteRenderer>().color = Color.gray;
 
-        gameObject.GetComponent<Rigidbody2D>().velocity = new Vector2(0, 0);
+        gameObject.GetComponent<Rigidbody2D>().linearVelocity = new Vector2(0, 0);
         HitEffect();
         HitEffect();
         HitEffect();
@@ -399,7 +399,7 @@ public class EnemyShipScript : MonoBehaviour {
             }
             bulletInstance.GetComponent<EnemyProjectileScript>().mass = projectileMass;
             bulletInstance.GetComponent<EnemyProjectileScript>().damage = damage;
-            bulletInstance.GetComponent<Rigidbody2D>().velocity = firingPositions[firepos].TransformDirection(Vector3.right * projectile_speed);
+            bulletInstance.GetComponent<Rigidbody2D>().linearVelocity = firingPositions[firepos].TransformDirection(Vector3.right * projectile_speed);
         }
         else if (sType == ShipType.BattleShip)
         {
@@ -407,13 +407,13 @@ public class EnemyShipScript : MonoBehaviour {
             bulletInstance.GetComponent<EnemyProjectileScript>().pType = EnemyProjectileScript.ProjectileType.Bullet;
             bulletInstance.GetComponent<EnemyProjectileScript>().mass = projectileMass;
             bulletInstance.GetComponent<EnemyProjectileScript>().damage = enemyFighterDamage;
-            bulletInstance.GetComponent<Rigidbody2D>().velocity = firingPositions[firepos].TransformDirection(Vector3.right * projectile_speed);
+            bulletInstance.GetComponent<Rigidbody2D>().linearVelocity = firingPositions[firepos].TransformDirection(Vector3.right * projectile_speed);
 
             GameObject missileInstance = Instantiate(Missile, firingPositions[firepos + 2].position, firingPositions[firepos + 2].rotation) as GameObject;
             bulletInstance.GetComponent<EnemyProjectileScript>().pType = EnemyProjectileScript.ProjectileType.Missile;
             missileInstance.GetComponent<EnemyProjectileScript>().mass = projectileMass;
             missileInstance.GetComponent<EnemyProjectileScript>().damage = enemyMissileCruiserDamage;
-            missileInstance.GetComponent<Rigidbody2D>().velocity = firingPositions[firepos].TransformDirection(Vector3.right * missile_speed);
+            missileInstance.GetComponent<Rigidbody2D>().linearVelocity = firingPositions[firepos].TransformDirection(Vector3.right * missile_speed);
 
         }
         fire_time = Time.time;

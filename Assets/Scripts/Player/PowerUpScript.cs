@@ -13,7 +13,7 @@ public class PowerUpScript : MonoBehaviour {
     void Start()
     {
         speed = 1f;
-        GetComponent<Rigidbody2D>().velocity = transform.TransformDirection(Vector3.left * speed);
+        GetComponent<Rigidbody2D>().linearVelocity = transform.TransformDirection(Vector3.left * speed);
         mainCamera = Camera.main;
     }
 

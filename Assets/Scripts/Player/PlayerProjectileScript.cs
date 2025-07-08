@@ -216,7 +216,7 @@ public class PlayerProjectileScript : MonoBehaviour {
         Vector2 newVelocity;
         newVelocity.x = dirX;
         newVelocity.y = dirY;
-        bulletInstance.GetComponent<Rigidbody2D>().velocity = newVelocity.normalized * speed;
+        bulletInstance.GetComponent<Rigidbody2D>().linearVelocity = newVelocity.normalized * speed;
         bulletInstance.GetComponent<SpriteRenderer>().color = GetComponent<SpriteRenderer>().color;
         //bulletInstance.GetComponent<Transform>().localScale /= 2;
         bulletInstance.GetComponent<PlayerProjectileScript>().damageAccumulation = damageAccumulation;

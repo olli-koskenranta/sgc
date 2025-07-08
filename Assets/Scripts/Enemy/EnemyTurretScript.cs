@@ -65,7 +65,7 @@ public class EnemyTurretScript : MonoBehaviour {
         bulletInstance.GetComponent<EnemyProjectileScript>().pType = EnemyProjectileScript.ProjectileType.Bullet;
         bulletInstance.GetComponent<EnemyProjectileScript>().mass = projectileMass;
         bulletInstance.GetComponent<EnemyProjectileScript>().damage = damage;
-        bulletInstance.GetComponent<Rigidbody2D>().velocity = transform.TransformDirection(Vector3.right * projectile_speed);
+        bulletInstance.GetComponent<Rigidbody2D>().linearVelocity = transform.TransformDirection(Vector3.right * projectile_speed);
         fire_time = Time.time;
     }
 
